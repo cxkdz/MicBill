@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 外层阴影 -->
+    <item android:left="1dp" android:top="1dp">
+        <shape android:shape="rectangle">
+            <solid android:color="#60B8C4D4" />
+            <corners android:radius="@dimen/radius_xl" />
+        </shape>
+    </item>
+    <!-- 高光层（左上偏移） -->
+    <item android:right="4dp" android:bottom="4dp">
+        <shape android:shape="rectangle">
+            <solid android:color="#E0FFFFFF" />
+            <corners android:radius="@dimen/radius_xl" />
+        </shape>
+    </item>
+    <!-- 主体渐变 -->
+    <item android:left="2dp" android:top="2dp" android:right="2dp" android:bottom="2dp">
+        <shape android:shape="rectangle">
+            <gradient
+                android:angle="135"
+                android:startColor="@color/neu_surface"
+                android:centerColor="@color/neu_bg"
+                android:endColor="#E0E5EB"
+                android:type="linear" />
+            <corners android:radius="@dimen/radius_xl" />
+            <stroke
+                android:width="0.5dp"
+                android:color="#30FFFFFF" />
+        </shape>
+    </item>
+</layer-list>

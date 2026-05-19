@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 新拟态基础色 - 深色模式 -->
+    <color name="neu_bg">#1E1E32</color>
+    <color name="neu_bg_dark">#16162A</color>
+    <color name="neu_shadow_dark">#12122A</color>
+    <color name="neu_shadow_light">#32324E</color>
+    <color name="neu_surface">#222240</color>
+
+    <!-- 主色调 -->
+    <color name="colorPrimary">#6B8DD6</color>
+    <color name="colorPrimaryDark">#5A7BC8</color>
+    <color name="colorAccent">#8BA7E8</color>
+
+    <!-- 语义色 -->
+    <color name="expense_red">#E87C7C</color>
+    <color name="income_green">#7CD4A8</color>
+    <color name="balance_blue">#7CA8E8</color>
+
+    <!-- 文字层次 - 深色模式白色系 -->
+    <color name="text_primary">#F0F2F5</color>
+    <color name="text_secondary">#B0B8C8</color>
+    <color name="text_hint">#6B7280</color>
+    <color name="text_white">#FFFFFF</color>
+
+    <!-- 页面/卡片背景 -->
+    <color name="bg_page">#1A1A2E</color>
+    <color name="bg_card">#1A1A2E</color>
+    <color name="bg_surface">#222240</color>
+    <color name="bg_icon_circle">#2A2A44</color>
+    <color name="tag_wechat_bg">#1A2E1A</color>
+
+    <!-- 分割线 -->
+    <color name="divider">#2A2A44</color>
+
+    <!-- 渐变色 -->
+    <color name="gradient_start">#6B8DD6</color>
+    <color name="gradient_end">#4A6FD6</color>
+
+    <!-- 绿色主题 -->
+    <color name="green_primary">#7CD4A8</color>
+    <color name="green_primary_dark">#5CB88A</color>
+
+    <!-- 橙色主题 -->
+    <color name="orange_primary">#F0A050</color>
+    <color name="orange_primary_dark">#E08840</color>
+
+    <!-- 紫色主题 -->
+    <color name="purple_primary">#A088D0</color>
+    <color name="purple_primary_dark">#8870B8</color>
+
+    <!-- 粉色主题 -->
+    <color name="pink_primary">#E88CA0</color>
+    <color name="pink_primary_dark">#D07088</color>
+
+    <!-- 深色主题 -->
+    <color name="dark_primary">#2D3748</color>
+    <color name="dark_primary_dark">#1A1A2E</color>
+</resources>

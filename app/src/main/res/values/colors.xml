@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 新拟态基础色 -->
+    <color name="neu_bg">#E8ECF1</color>
+    <color name="neu_bg_dark">#D0D6DE</color>
+    <color name="neu_shadow_dark">#B8C4D4</color>
+    <color name="neu_shadow_light">#F5F7FA</color>
+    <color name="neu_surface">#EDF0F5</color>
+
+    <!-- 主色调 - 柔和版本 -->
+    <color name="colorPrimary">#6B8DD6</color>
+    <color name="colorPrimaryDark">#5A7BC8</color>
+    <color name="colorAccent">#8BA7E8</color>
+
+    <!-- 语义色 - 柔和版本 -->
+    <color name="expense_red">#E87C7C</color>
+    <color name="income_green">#7CD4A8</color>
+    <color name="balance_blue">#7CA8E8</color>
+
+    <!-- 文字层次 -->
+    <color name="text_primary">#3D4A5C</color>
+    <color name="text_secondary">#8895A7</color>
+    <color name="text_hint">#A8B4C4</color>
+    <color name="text_white">#FFFFFF</color>
+
+    <!-- 页面/卡片背景 -->
+    <color name="bg_page">#E0E5EC</color>
+    <color name="bg_card">#E0E5EC</color>
+    <color name="bg_surface">#E8EDF4</color>
+    <color name="bg_icon_circle">#DDE3EC</color>
+    <color name="tag_wechat_bg">#E8F5E9</color>
+
+    <!-- 分割线 -->
+    <color name="divider">#E0E6EF</color>
+
+    <!-- 渐变色 -->
+    <color name="gradient_start">#6B8DD6</color>
+    <color name="gradient_end">#4A6FD6</color>
+
+    <!-- 绿色主题 -->
+    <color name="green_primary">#7CD4A8</color>
+    <color name="green_primary_dark">#5CB88A</color>
+
+    <!-- 橙色主题 -->
+    <color name="orange_primary">#F0A050</color>
+    <color name="orange_primary_dark">#E08840</color>
+
+    <!-- 紫色主题 -->
+    <color name="purple_primary">#A088D0</color>
+    <color name="purple_primary_dark">#8870B8</color>
+
+    <!-- 粉色主题 -->
+    <color name="pink_primary">#E88CA0</color>
+    <color name="pink_primary_dark">#D07088</color>
+
+    <!-- 深色主题 -->
+    <color name="dark_primary">#4A5568</color>
+    <color name="dark_primary_dark">#2D3748</color>
+
+    <!-- Glass Morphism -->
+    <color name="glass_fill">#0DFFFFFF</color>
+    <color name="glass_border">#15FFFFFF</color>
+    <color name="glass_fill_strong">#20FFFFFF</color>
+    <color name="glass_segment_active">#30FFFFFF</color>
+
+    <!-- Dynamic Glass Overlay -->
+    <color name="glass_overlay_light">#20000000</color>
+    <color name="glass_overlay_dark">#18FFFFFF</color>
+</resources>

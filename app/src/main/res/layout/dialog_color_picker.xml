@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="选择主题色"
+        android:textColor="@color/text_primary"
+        android:textSize="@dimen/text_lg"
+        android:textStyle="bold" />
+
+    <!-- 预设颜色网格 -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="预设颜色"
+        android:textColor="@color/text_secondary"
+        android:textSize="@dimen/text_sm" />
+
+    <GridLayout
+        android:id="@+id/gridColors"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:columnCount="6"
+        android:rowCount="3"
+        android:useDefaultMargins="true" />
+
+    <!-- 自定义颜色 -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="自定义颜色"
+        android:textColor="@color/text_secondary"
+        android:textSize="@dimen/text_sm" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <View
+            android:id="@+id/colorPreview"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@drawable/bg_neu_circle" />
+
+        <EditText
+            android:id="@+id/etColorHex"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="16dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_neu_card"
+            android:hint="#RRGGBB"
+            android:inputType="textCapCharacters"
+            android:maxLength="7"
+            android:paddingHorizontal="16dp"
+            android:textColor="@color/text_primary"
+            android:textSize="@dimen/text_md" />
+
+        <FrameLayout
+            android:id="@+id/btnApplyColor"
+            android:layout_width="72dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="12dp"
+            android:background="@drawable/selector_neu_button">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="应用"
+                android:textColor="@color/text_primary"
+                android:textSize="@dimen/text_sm" />
+        </FrameLayout>
+    </LinearLayout>
+
+    <!-- RGB 滑块 -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="RGB 调色"
+        android:textColor="@color/text_secondary"
+        android:textSize="@dimen/text_sm" />
+
+    <!-- Red -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="24dp"
+            android:layout_height="wrap_content"
+            android:text="R"
+            android:textColor="@color/expense_red"
+            android:textSize="@dimen/text_md"
+            android:textStyle="bold" />
+
+        <SeekBar
+            android:id="@+id/seekBarRed"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginHorizontal="12dp"
+            android:max="255"
+            android:progress="107" />
+
+        <TextView
+            android:id="@+id/tvRedValue"
+            android:layout_width="36dp"
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            android:text="107"
+            android:textColor="@color/text_secondary"
+            android:textSize="@dimen/text_sm" />
+    </LinearLayout>
+
+    <!-- Green -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="24dp"
+            android:layout_height="wrap_content"
+            android:text="G"
+            android:textColor="@color/income_green"
+            android:textSize="@dimen/text_md"
+            android:textStyle="bold" />
+
+        <SeekBar
+            android:id="@+id/seekBarGreen"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginHorizontal="12dp"
+            android:max="255"
+            android:progress="141" />
+
+        <TextView
+            android:id="@+id/tvGreenValue"
+            android:layout_width="36dp"
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            android:text="141"
+            android:textColor="@color/text_secondary"
+            android:textSize="@dimen/text_sm" />
+    </LinearLayout>
+
+    <!-- Blue -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="24dp"
+            android:layout_height="wrap_content"
+            android:text="B"
+            android:textColor="@color/balance_blue"
+            android:textSize="@dimen/text_md"
+            android:textStyle="bold" />
+
+        <SeekBar
+            android:id="@+id/seekBarBlue"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginHorizontal="12dp"
+            android:max="255"
+            android:progress="214" />
+
+        <TextView
+            android:id="@+id/tvBlueValue"
+            android:layout_width="36dp"
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            android:text="214"
+            android:textColor="@color/text_secondary"
+            android:textSize="@dimen/text_sm" />
+    </LinearLayout>
+
+    <!-- 按钮 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:gravity="end"
+        android:orientation="horizontal">
+
+        <FrameLayout
+            android:id="@+id/btnCancel"
+            android:layout_width="80dp"
+            android:layout_height="44dp"
+            android:background="@drawable/selector_neu_button">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="取消"
+                android:textColor="@color/text_secondary"
+                android:textSize="@dimen/text_sm" />
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/btnConfirm"
+            android:layout_width="80dp"
+            android:layout_height="44dp"
+            android:layout_marginStart="16dp"
+            android:background="@drawable/selector_neu_button">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="确定"
+                android:textColor="@color/colorPrimary"
+                android:textSize="@dimen/text_sm"
+                android:textStyle="bold" />
+        </FrameLayout>
+    </LinearLayout>
+
+</LinearLayout>

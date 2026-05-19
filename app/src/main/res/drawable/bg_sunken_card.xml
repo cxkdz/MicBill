@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 高光边（底部右） - 让卡片看起来凹进去 -->
+    <item android:left="0.5dp" android:top="0.5dp">
+        <shape android:shape="rectangle">
+            <solid android:color="#35FFFFFF" />
+            <corners android:radius="@dimen/radius_lg" />
+        </shape>
+    </item>
+    <!-- 阴影边（顶部左） -->
+    <item android:right="0.5dp" android:bottom="0.5dp">
+        <shape android:shape="rectangle">
+            <solid android:color="#25000000" />
+            <corners android:radius="@dimen/radius_lg" />
+        </shape>
+    </item>
+    <!-- 内凹主体 -->
+    <item android:left="1.5dp" android:top="1.5dp" android:right="1.5dp" android:bottom="1.5dp">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/neu_bg" />
+            <corners android:radius="@dimen/radius_md" />
+        </shape>
+    </item>
+</layer-list>

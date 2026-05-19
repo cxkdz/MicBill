@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/spacing_lg">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="3D 空间主题"
+            android:textSize="@dimen/text_xl"
+            android:textStyle="bold"
+            android:textColor="#1A1A2E"
+            android:layout_marginBottom="@dimen/spacing_md" />
+
+        <!-- 自定义图片背景 -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="自定义场景背景"
+            android:textSize="@dimen/text_md"
+            android:textStyle="bold"
+            android:textColor="#1A1A2E"
+            android:layout_marginBottom="@dimen/spacing_sm" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="选择一张图片作为 3D 场景背景"
+            android:textSize="@dimen/text_xs"
+            android:textColor="#801A1A2E"
+            android:layout_marginBottom="@dimen/spacing_sm" />
+
+        <!-- 图片预览 -->
+        <FrameLayout
+            android:id="@+id/layoutImagePreview"
+            android:layout_width="match_parent"
+            android:layout_height="160dp"
+            android:layout_marginBottom="@dimen/spacing_sm"
+            android:background="@drawable/bg_glass_card"
+            android:visibility="gone">
+
+            <ImageView
+                android:id="@+id/ivPreview"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop" />
+        </FrameLayout>
+
+        <!-- 选择图片按钮 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="@dimen/spacing_lg">
+
+            <FrameLayout
+                android:id="@+id/btnPickImage"
+                android:layout_width="0dp"
+                android:layout_height="44dp"
+                android:layout_weight="1"
+                android:background="@drawable/selector_neu_button">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="选择图片"
+                    android:textColor="#1A1A2E"
+                    android:textSize="@dimen/text_sm" />
+            </FrameLayout>
+
+            <View
+                android:layout_width="8dp"
+                android:layout_height="match_parent" />
+
+            <FrameLayout
+                android:id="@+id/btnClearImage"
+                android:layout_width="0dp"
+                android:layout_height="44dp"
+                android:layout_weight="1"
+                android:background="@drawable/selector_neu_button"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="清除图片"
+                    android:textColor="#801A1A2E"
+                    android:textSize="@dimen/text_sm" />
+            </FrameLayout>
+        </LinearLayout>
+
+        <!-- 分割线 -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#15000000"
+            android:layout_marginBottom="@dimen/spacing_md" />
+
+        <!-- 按钮行 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/btnCancel"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:gravity="center"
+                android:paddingHorizontal="@dimen/spacing_lg"
+                android:text="取消"
+                android:textColor="#801A1A2E"
+                android:textSize="@dimen/text_md" />
+
+            <TextView
+                android:id="@+id/btnApply"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:gravity="center"
+                android:paddingHorizontal="@dimen/spacing_lg"
+                android:text="应用"
+                android:textColor="#6B8DD6"
+                android:textSize="@dimen/text_md"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

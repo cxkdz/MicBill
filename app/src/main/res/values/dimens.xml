@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 间距 -->
+    <dimen name="spacing_xs">4dp</dimen>
+    <dimen name="spacing_sm">8dp</dimen>
+    <dimen name="spacing_md">16dp</dimen>
+    <dimen name="spacing_lg">24dp</dimen>
+    <dimen name="spacing_xl">32dp</dimen>
+
+    <!-- 圆角 -->
+    <dimen name="radius_sm">8dp</dimen>
+    <dimen name="radius_md">12dp</dimen>
+    <dimen name="radius_lg">16dp</dimen>
+    <dimen name="radius_xl">24dp</dimen>
+    <dimen name="radius_xxl">32dp</dimen>
+    <dimen name="radius_circle">50dp</dimen>
+
+    <!-- 新拟态阴影 -->
+    <dimen name="neu_shadow_offset">3dp</dimen>
+    <dimen name="neu_shadow_blur">6dp</dimen>
+
+    <!-- 文字 -->
+    <dimen name="text_xs">11sp</dimen>
+    <dimen name="text_sm">13sp</dimen>
+    <dimen name="text_md">15sp</dimen>
+    <dimen name="text_lg">18sp</dimen>
+    <dimen name="text_xl">22sp</dimen>
+    <dimen name="text_xxl">28sp</dimen>
+    <dimen name="text_display">36sp</dimen>
+
+    <!-- 卡片 -->
+    <dimen name="card_elevation">2dp</dimen>
+    <dimen name="card_padding">16dp</dimen>
+
+    <!-- 图标 -->
+    <dimen name="icon_sm">20dp</dimen>
+    <dimen name="icon_md">24dp</dimen>
+    <dimen name="icon_lg">40dp</dimen>
+    <dimen name="icon_category">48dp</dimen>
+
+    <!-- 3D 装饰层 -->
+    <dimen name="decor_margin_horizontal">12dp</dimen>
+    <dimen name="decor_margin_top">60dp</dimen>
+    <dimen name="decor_margin_bottom">74dp</dimen>
+    <dimen name="decor_corner_radius">24dp</dimen>
+    <dimen name="decor_fade_height">60dp</dimen>
+
+    <!-- 导航栏 -->
+    <dimen name="nav_height">64dp</dimen>
+    <dimen name="nav_width">64dp</dimen>
+    <dimen name="nav_item_height">56dp</dimen>
+    <dimen name="fab_size">52dp</dimen>
+    <dimen name="bottom_nav_height">64dp</dimen>
+    <dimen name="content_margin_top">24dp</dimen>
+    <dimen name="content_margin_bottom">16dp</dimen>
+    <dimen name="content_radius">24dp</dimen>
+
+    <!-- 3D Background Plane -->
+    <dimen name="plane_corner_radius">20dp</dimen>
+    <dimen name="plane_margin_horizontal">8dp</dimen>
+    <dimen name="plane_margin_top">100dp</dimen>
+
+    <!-- Header -->
+    <dimen name="header_padding_top">48dp</dimen>
+
+    <!-- Bottom Gradient -->
+    <dimen name="bottom_gradient_height">80dp</dimen>
+</resources>

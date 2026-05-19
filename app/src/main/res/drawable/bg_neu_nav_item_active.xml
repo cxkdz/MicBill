@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 高光边（底部右） - 凹陷效果 -->
+    <item android:left="0.5dp" android:top="0.5dp">
+        <shape android:shape="rectangle">
+            <solid android:color="#30FFFFFF" />
+            <corners android:radius="@dimen/radius_sm" />
+        </shape>
+    </item>
+    <!-- 阴影边（顶部左） -->
+    <item android:right="0.5dp" android:bottom="0.5dp">
+        <shape android:shape="rectangle">
+            <solid android:color="#20000000" />
+            <corners android:radius="@dimen/radius_sm" />
+        </shape>
+    </item>
+    <!-- 内凹主体 -->
+    <item android:left="1dp" android:top="1dp" android:right="1dp" android:bottom="1dp">
+        <shape android:shape="rectangle">
+            <solid android:color="@color/neu_bg_dark" />
+            <corners android:radius="@dimen/radius_sm" />
+        </shape>
+    </item>
+</layer-list>

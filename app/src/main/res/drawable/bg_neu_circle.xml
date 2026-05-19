@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 右下阴影 -->
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="@color/neu_shadow_dark" />
+        </shape>
+    </item>
+    <!-- 左上高光 -->
+    <item android:bottom="2dp" android:right="2dp">
+        <shape android:shape="oval">
+            <solid android:color="@color/neu_shadow_light" />
+        </shape>
+    </item>
+    <!-- 主体 -->
+    <item android:bottom="3.5dp" android:right="3.5dp" android:top="1.5dp" android:left="1.5dp">
+        <shape android:shape="oval">
+            <gradient
+                android:angle="135"
+                android:startColor="@color/neu_surface"
+                android:endColor="@color/neu_bg"
+                android:type="linear" />
+        </shape>
+    </item>
+</layer-list>

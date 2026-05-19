@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clipChildren="false"
+    android:clipToPadding="false">
+
+    <!-- Layer 1: 主题场景层（最底层） -->
+    <com.billbook.app.view.DioramaView
+        android:id="@+id/dioramaLayer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <!-- Layer 1.5: 顶部渐变遮罩（黑→透明，沉浸式二次元视觉） -->
+    <View
+        android:id="@+id/statusBarGradient"
+        android:layout_width="match_parent"
+        android:layout_height="120dp"
+        android:layout_gravity="top" />
+
+    <!-- Layer 2: 3D 背景平面（绕底边旋转+15°，贴紧屏幕底边） -->
+    <FrameLayout
+        android:id="@+id/backgroundPlane"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginHorizontal="@dimen/plane_margin_horizontal"
+        android:layout_marginTop="@dimen/plane_margin_top"
+        android:layout_marginBottom="0dp"
+        android:background="@drawable/bg_glass_plane"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:rotationX="15"
+        android:alpha="1.0">
+
+        <!-- 平面内容（直接附着在平面上） -->
+        <LinearLayout
+            android:id="@+id/planeContent"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <!-- 日汇总栏 -->
+            <LinearLayout
+                android:id="@+id/daySummary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingHorizontal="@dimen/spacing_md"
+                android:paddingVertical="@dimen/spacing_sm">
+
+                <TextView
+                    android:id="@+id/tvDayDate"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textSize="@dimen/text_xs"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvDayExpense"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/text_xs" />
+
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="12dp"
+                    android:layout_marginHorizontal="@dimen/spacing_sm" />
+
+                <TextView
+                    android:id="@+id/tvDayIncome"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/text_xs" />
+            </LinearLayout>
+
+            <!-- 账单翻页区 -->
+            <androidx.viewpager2.widget.ViewPager2
+                android:id="@+id/vpDayBills"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:clipToPadding="false" />
+
+            <!-- Fragment 容器（其他 Tab） -->
+            <FrameLayout
+                android:id="@+id/fragmentContainer"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone" />
+
+            <!-- 空状态 -->
+            <TextView
+                android:id="@+id/tvEmpty"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="暂无账单数据"
+                android:textSize="@dimen/text_md"
+                android:visibility="gone" />
+        </LinearLayout>
+    </FrameLayout>
+
+    <!-- Layer 3: 浮动 Header（不参与3D倾斜） -->
+    <LinearLayout
+        android:id="@+id/headerLayer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top"
+        android:orientation="vertical"
+        android:paddingHorizontal="@dimen/spacing_lg"
+        android:paddingTop="0dp"
+        android:paddingBottom="@dimen/spacing_sm">
+
+        <!-- 年月 + 收支汇总 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <!-- 左侧：大号年月 -->
+            <TextView
+                android:id="@+id/tvYearMonth"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="2026年5月"
+                android:textSize="@dimen/text_xxl"
+                android:textStyle="bold" />
+
+            <!-- 右侧：收支（紧凑） -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tvHeaderExpense"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="支出 ¥0"
+                    android:textSize="@dimen/text_sm"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvHeaderIncome"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="收入 ¥0"
+                    android:textSize="@dimen/text_sm"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- 分段控制器：全部｜收入｜支出 -->
+        <FrameLayout
+            android:id="@+id/segmentControl"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:layout_marginTop="@dimen/spacing_sm"
+            android:background="@drawable/bg_segment_control">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingHorizontal="4dp">
+
+                <TextView
+                    android:id="@+id/btnFilterAll"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:paddingHorizontal="@dimen/spacing_md"
+                    android:text="全部"
+                    android:textSize="@dimen/text_sm" />
+
+                <TextView
+                    android:id="@+id/btnFilterIncome"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:paddingHorizontal="@dimen/spacing_md"
+                    android:text="收入"
+                    android:textSize="@dimen/text_sm" />
+
+                <TextView
+                    android:id="@+id/btnFilterExpense"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:paddingHorizontal="@dimen/spacing_md"
+                    android:text="支出"
+                    android:textSize="@dimen/text_sm" />
+            </LinearLayout>
+        </FrameLayout>
+    </LinearLayout>
+
+    <!-- 底部渐变遮罩（透明→半透明黑，确保导航栏可见） -->
+    <View
+        android:id="@+id/bottomGradient"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/bottom_gradient_height"
+        android:layout_gravity="bottom" />
+
+    <!-- 底部导航栏（无背景板，悬浮） -->
+    <include
+        android:id="@+id/bottomNav"
+        layout="@layout/layout_bottom_nav"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom" />
+
+</FrameLayout>
