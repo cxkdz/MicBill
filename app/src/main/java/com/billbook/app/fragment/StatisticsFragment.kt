@@ -85,10 +85,11 @@ class StatisticsFragment : Fragment() {
         } else {
             cachedRankings.map { PieEntry(it.third.toFloat(), it.second) }
         }
+        val textColor = requireContext().getColor(com.billbook.app.R.color.text_primary)
         val dataSet = PieDataSet(entries, "").apply {
             colors = ColorTemplate.MATERIAL_COLORS.toList()
             valueTextSize = 12f
-            valueTextColor = Color.WHITE
+            valueTextColor = textColor
         }
         val formatter: ValueFormatter = if (showPercentage) {
             object : ValueFormatter() {

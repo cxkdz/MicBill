@@ -7,6 +7,7 @@ import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.graphics.drawable.LayerDrawable
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
@@ -24,6 +25,7 @@ import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.widget.ViewPager2
 import com.billbook.app.adapter.DayPagerAdapter
+import com.billbook.app.animation.ExpandAnimationController
 import com.billbook.app.db.BillDao
 import com.billbook.app.fragment.BudgetFragment
 import com.billbook.app.fragment.SettingsFragment
@@ -31,8 +33,12 @@ import com.billbook.app.fragment.StatisticsFragment
 import com.billbook.app.model.Bill
 import com.billbook.app.model.ThemePalette
 import com.billbook.app.util.AutoContrast
+import com.billbook.app.util.BackgroundApplier
 import com.billbook.app.util.ThemeManager
 import com.billbook.app.view.DioramaView
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 import kotlin.math.sin
 
 class MainActivity : AppCompatActivity() {
@@ -71,6 +77,9 @@ class MainActivity : AppCompatActivity() {
 
     // WindowInsets controller for status bar icon color
     private lateinit var insetsController: WindowInsetsControllerCompat
+
+    // 展开动画控制器
+    private var expandController: ExpandAnimationController? = null
 
     // Current theme state for animation
     private var currentTextColor: Int = Color.parseColor("#1A1A2E")
@@ -111,6 +120,7 @@ class MainActivity : AppCompatActivity() {
         setupBottomNav()
         setupFilter()
         applyThemeBackground()
+        setupExpandOverlay()
 
         if (savedInstanceState == null) {
             selectNavItem(0)
@@ -352,8 +362,11 @@ class MainActivity : AppCompatActivity() {
     // ==================== Navigation ====================
 
     private fun setupBottomNav() {
-        findViewById<FrameLayout>(R.id.fabAdd).setOnClickListener {
-            startActivity(Intent(this, AddBillActivity::class.java))
+        val fabAdd = findViewById<FrameLayout>(R.id.fabAdd)
+        fabAdd.setOnClickListener {
+            expandController?.expand() ?: run {
+                startActivity(Intent(this, AddBillActivity::class.java))
+            }
         }
         findViewById<LinearLayout>(R.id.navItemBills).setOnClickListener {
             selectNavItem(0)
@@ -380,6 +393,176 @@ class MainActivity : AppCompatActivity() {
         tvEmpty.visibility = View.GONE
         headerLayer.visibility = View.VISIBLE
         refreshBillData()
+    }
+
+    // ==================== 展开动画 ====================
+
+    private fun setupExpandOverlay() {
+        val fabAdd = findViewById<FrameLayout>(R.id.fabAdd)
+        val overlayView = LayoutInflater.from(this).inflate(R.layout.layout_expand_overlay, null)
+
+        // 添加 overlay 到根布局
+        val rootView = findViewById<FrameLayout>(android.R.id.content)
+        rootView.addView(overlayView, FrameLayout.LayoutParams(
+            FrameLayout.LayoutParams.MATCH_PARENT,
+            FrameLayout.LayoutParams.MATCH_PARENT
+        ))
+
+        // 创建动画控制器
+        expandController = ExpandAnimationController(
+            overlayRoot = overlayView.findViewById(R.id.expandOverlayRoot),
+            dimBackground = overlayView.findViewById(R.id.dimBackground),
+            expandContainer = overlayView.findViewById(R.id.expandContainer),
+            expandContent = overlayView.findViewById(R.id.expandContent),
+            mainContentRoot = backgroundPlane,
+            fabAdd = fabAdd,
+            resources = resources
+        )
+
+        // 设置关闭按钮
+        overlayView.findViewById<ImageView>(R.id.btnExpandClose).setOnClickListener {
+            expandController?.collapse()
+        }
+
+        // 设置记账表单
+        setupOverlayForm(overlayView)
+    }
+
+    private fun setupOverlayForm(overlayView: View) {
+        val billDao = BillDao(this)
+        val categoryDao = com.billbook.app.db.CategoryDao(this)
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.CHINA)
+
+        var billType = Bill.TYPE_EXPENSE
+        var selectedCategoryId = 0L
+        var selectedCategoryName = ""
+        var selectedCategoryIcon = ""
+        var selectedPayType = Bill.PAY_WECHAT
+        var selectedTime = System.currentTimeMillis()
+
+        val chipExpense = overlayView.findViewById<TextView>(R.id.chipExpense)
+        val chipIncome = overlayView.findViewById<TextView>(R.id.chipIncome)
+        val etMoney = overlayView.findViewById<android.widget.EditText>(R.id.etMoney)
+        val rvCategories = overlayView.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.rvCategories)
+        val chipGroupPayType = overlayView.findViewById<com.google.android.material.chip.ChipGroup>(R.id.chipGroupPayType)
+        val tvTime = overlayView.findViewById<TextView>(R.id.tvTime)
+        val etRemark = overlayView.findViewById<android.widget.EditText>(R.id.etRemark)
+        val btnSave = overlayView.findViewById<com.google.android.material.button.MaterialButton>(R.id.btnSave)
+
+        // 收支切换
+        fun updateTypeSelection() {
+            if (billType == Bill.TYPE_EXPENSE) {
+                chipExpense.setBackgroundResource(R.drawable.bg_neu_button)
+                chipExpense.setTextColor(getColor(R.color.expense_red))
+                chipIncome.setBackgroundColor(Color.TRANSPARENT)
+                chipIncome.setTextColor(getColor(R.color.text_hint))
+            } else {
+                chipIncome.setBackgroundResource(R.drawable.bg_neu_button)
+                chipIncome.setTextColor(getColor(R.color.income_green))
+                chipExpense.setBackgroundColor(Color.TRANSPARENT)
+                chipExpense.setTextColor(getColor(R.color.text_hint))
+            }
+        }
+
+        fun loadCategories() {
+            val categories = categoryDao.getAll(billType)
+            val adapter = com.billbook.app.adapter.CategoryGridAdapter(categories) { category ->
+                selectedCategoryId = category.id
+                selectedCategoryName = category.name
+                selectedCategoryIcon = category.icon
+            }
+            rvCategories.layoutManager = androidx.recyclerview.widget.GridLayoutManager(this, 4)
+            rvCategories.adapter = adapter
+        }
+
+        chipExpense.setOnClickListener {
+            billType = Bill.TYPE_EXPENSE
+            updateTypeSelection()
+            loadCategories()
+        }
+        chipIncome.setOnClickListener {
+            billType = Bill.TYPE_INCOME
+            updateTypeSelection()
+            loadCategories()
+        }
+
+        updateTypeSelection()
+        loadCategories()
+
+        // 支付渠道
+        chipGroupPayType.setOnCheckedStateChangeListener { _, checkedIds ->
+            selectedPayType = when {
+                checkedIds.contains(R.id.chipWechat) -> Bill.PAY_WECHAT
+                checkedIds.contains(R.id.chipAlipay) -> Bill.PAY_ALIPAY
+                checkedIds.contains(R.id.chipCash) -> Bill.PAY_CASH
+                checkedIds.contains(R.id.chipBank) -> Bill.PAY_BANK
+                else -> Bill.PAY_OTHER
+            }
+        }
+
+        // 时间选择
+        tvTime.text = dateFormat.format(selectedTime)
+        tvTime.setOnClickListener {
+            val cal = Calendar.getInstance()
+            cal.timeInMillis = selectedTime
+            android.app.DatePickerDialog(this, { _, year, month, day ->
+                android.app.TimePickerDialog(this, { _, hour, minute ->
+                    cal.set(year, month, day, hour, minute, 0)
+                    selectedTime = cal.timeInMillis
+                    tvTime.text = dateFormat.format(selectedTime)
+                }, cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), true).show()
+            }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)).show()
+        }
+
+        // 保存
+        btnSave.setOnClickListener {
+            val moneyStr = etMoney.text.toString().trim()
+            val money = moneyStr.toDoubleOrNull()
+
+            if (money == null || money <= 0) {
+                android.widget.Toast.makeText(this, "请输入有效金额", android.widget.Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            if (selectedCategoryId == 0L) {
+                android.widget.Toast.makeText(this, "请选择分类", android.widget.Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            val remark = etRemark.text.toString().trim()
+            val bill = Bill(
+                money = money,
+                type = billType,
+                categoryId = selectedCategoryId,
+                categoryName = selectedCategoryName,
+                categoryIcon = selectedCategoryIcon,
+                payType = selectedPayType,
+                billTime = selectedTime,
+                remark = remark,
+                source = Bill.SOURCE_MANUAL
+            )
+            billDao.insert(bill)
+            android.widget.Toast.makeText(this, "记账成功", android.widget.Toast.LENGTH_SHORT).show()
+
+            // 清空表单并关闭
+            etMoney.text.clear()
+            etRemark.text.clear()
+            selectedCategoryId = 0L
+            expandController?.collapse()
+
+            // 刷新账单数据
+            if (currentNavIndex == 0) refreshBillData()
+        }
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun onBackPressed() {
+        if (expandController?.state == ExpandAnimationController.State.EXPANDED ||
+            expandController?.state == ExpandAnimationController.State.EXPANDING) {
+            expandController?.collapse()
+        } else {
+            super.onBackPressed()
+        }
     }
 
     private fun loadFragment(fragment: Fragment) {

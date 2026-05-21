@@ -140,10 +140,11 @@ class QueryFragment : Fragment() {
     private fun loadQueryPieChart(categoryMap: Map<String, Double>) {
         val total = categoryMap.values.sum()
         val entries = categoryMap.map { PieEntry((it.value / total * 100).toFloat(), it.key) }
+        val textColor = requireContext().getColor(com.billbook.app.R.color.text_primary)
         val dataSet = PieDataSet(entries, "").apply {
             colors = ColorTemplate.MATERIAL_COLORS.toList()
             valueTextSize = 11f
-            valueTextColor = Color.WHITE
+            valueTextColor = textColor
         }
         val pieData = PieData(dataSet).apply {
             setValueFormatter(PercentFormatter())
