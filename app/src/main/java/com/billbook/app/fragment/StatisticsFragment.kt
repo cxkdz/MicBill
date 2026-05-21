@@ -37,6 +37,8 @@ class StatisticsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        com.billbook.app.util.BackgroundApplier.applyToFragment(view, com.billbook.app.util.ThemeManager(requireContext()))
+        com.billbook.app.util.FrostGlassApplier.applyToFragment(requireActivity(), view)
         billDao = BillDao(requireContext())
 
         binding.btnPieToggle.setOnClickListener {

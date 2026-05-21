@@ -2,6 +2,7 @@ package com.billbook.app.fragment
 
 import android.app.DatePickerDialog
 import com.billbook.app.util.BackgroundApplier
+import com.billbook.app.util.FrostGlassApplier
 import com.billbook.app.util.ThemeManager
 import android.graphics.Color
 import android.os.Bundle
@@ -40,6 +41,7 @@ class QueryFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         BackgroundApplier.applyToFragment(view, ThemeManager(requireContext()))
+        FrostGlassApplier.applyToFragment(requireActivity(), view)
         billDao = BillDao(requireContext())
 
         // 默认查询本月

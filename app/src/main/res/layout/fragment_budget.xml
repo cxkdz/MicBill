@@ -1,234 +1,249 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <LinearLayout
+    <!-- 气泡动画层（在内容下方绘制，不拦截触摸） -->
+    <com.billbook.app.animation.CardBubbleView
+        android:id="@+id/cardBubbleView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="@dimen/spacing_md">
+        android:layout_height="match_parent"
+        android:clickable="false"
+        android:focusable="false" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="本月预算"
-            android:textColor="@color/text_primary"
-            android:textSize="@dimen/text_xl"
-            android:textStyle="bold" />
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-        <!-- 无预算提示 -->
-        <TextView
-            android:id="@+id/tvNoBudget"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="48dp"
-            android:gravity="center"
-            android:text="尚未设置本月预算\n点击下方按钮设置"
-            android:textColor="@color/text_hint"
-            android:textSize="@dimen/text_md" />
-
-        <!-- 总预算信息卡片 -->
         <LinearLayout
-            android:id="@+id/layoutBudgetInfo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/spacing_md"
-            android:background="@drawable/bg_glass_card"
             android:orientation="vertical"
-            android:padding="@dimen/spacing_lg"
-            android:visibility="gone">
+            android:padding="@dimen/spacing_md">
 
-            <LinearLayout
+            <TextView
+                android:id="@+id/tvBudgetTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="本月预算"
+                android:textColor="@color/text_primary"
+                android:textSize="@dimen/text_xl"
+                android:textStyle="bold" />
+
+            <!-- 无预算提示 -->
+            <TextView
+                android:id="@+id/tvNoBudget"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:layout_marginTop="48dp"
+                android:gravity="center"
+                android:text="尚未设置本月预算\n点击下方按钮设置"
+                android:textColor="@color/text_hint"
+                android:textSize="@dimen/text_md" />
+
+            <!-- 总预算信息卡片 -->
+            <LinearLayout
+                android:id="@+id/layoutBudgetInfo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_md"
+                android:background="@drawable/bg_frost_card"
+                android:orientation="vertical"
+                android:padding="@dimen/spacing_lg"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/tvBudgetAmount"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="总预算：¥0.00"
+                        android:textColor="@color/text_primary"
+                        android:textSize="@dimen/text_lg"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvPercent"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="已使用 0%"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="@dimen/text_sm" />
+                </LinearLayout>
+
+                <!-- 进度条（凹陷效果） -->
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_sm"
+                    android:background="@drawable/bg_frost_card"
+                    android:padding="2dp">
+
+                    <ProgressBar
+                        android:id="@+id/progressBudget"
+                        android:layout_width="match_parent"
+                        android:layout_height="10dp"
+                        android:max="100"
+                        android:progressDrawable="@drawable/bg_progress_bar" />
+                </FrameLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_sm"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/tvSpentAmount"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="已花费：¥0.00"
+                        android:textColor="@color/expense_red"
+                        android:textSize="@dimen/text_sm" />
+
+                    <TextView
+                        android:id="@+id/tvRemainingAmount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="剩余：¥0.00"
+                        android:textColor="@color/income_green"
+                        android:textSize="@dimen/text_sm"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0.5dp"
+                    android:layout_marginVertical="@dimen/spacing_sm"
+                    android:background="@color/divider" />
 
                 <TextView
-                    android:id="@+id/tvBudgetAmount"
-                    android:layout_width="0dp"
+                    android:id="@+id/tvStatus"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="总预算：¥0.00"
+                    android:text="预算充足"
                     android:textColor="@color/text_primary"
-                    android:textSize="@dimen/text_lg"
+                    android:textSize="@dimen/text_md"
                     android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/tvPercent"
+                    android:id="@+id/tvDailyBudget"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="已使用 0%"
-                    android:textColor="@color/text_secondary"
+                    android:layout_marginTop="@dimen/spacing_xs"
+                    android:text="建议每日消费：¥0.00"
+                    android:textColor="@color/orange_primary"
                     android:textSize="@dimen/text_sm" />
             </LinearLayout>
 
-            <!-- 进度条（凹陷效果） -->
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/spacing_sm"
-                android:background="@drawable/bg_glass_card"
-                android:padding="2dp">
-
-                <ProgressBar
-                    android:id="@+id/progressBudget"
-                    android:layout_width="match_parent"
-                    android:layout_height="10dp"
-                    android:max="100"
-                    android:progressDrawable="@drawable/bg_progress_bar" />
-            </FrameLayout>
-
+            <!-- 操作按钮 -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/spacing_sm"
+                android:layout_marginTop="@dimen/spacing_md"
                 android:orientation="horizontal">
 
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnSetBudget"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:text="设置总预算"
+                    android:textSize="@dimen/text_md"
+                    app:cornerRadius="@dimen/radius_md" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnClearBudget"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="@dimen/spacing_sm"
+                    android:text="清除预算"
+                    android:textSize="@dimen/text_md"
+                    app:cornerRadius="@dimen/radius_md"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+            </LinearLayout>
+
+            <!-- 分类预算区域 -->
+            <TextView
+                android:id="@+id/tvCategoryTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_xl"
+                android:text="分类预算"
+                android:textColor="@color/text_primary"
+                android:textSize="@dimen/text_lg"
+                android:textStyle="bold" />
+
+            <!-- 已分配信息 -->
+            <LinearLayout
+                android:id="@+id/layoutAllocatedInfo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_sm"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
                 <TextView
-                    android:id="@+id/tvSpentAmount"
+                    android:id="@+id/tvAllocated"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="已花费：¥0.00"
-                    android:textColor="@color/expense_red"
+                    android:text="已分配：¥0.00"
+                    android:textColor="@color/text_secondary"
                     android:textSize="@dimen/text_sm" />
 
                 <TextView
-                    android:id="@+id/tvRemainingAmount"
+                    android:id="@+id/tvAvailable"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="剩余：¥0.00"
+                    android:text="可分配：¥0.00"
                     android:textColor="@color/income_green"
                     android:textSize="@dimen/text_sm"
                     android:textStyle="bold" />
             </LinearLayout>
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="0.5dp"
-                android:layout_marginVertical="@dimen/spacing_sm"
-                android:background="@color/divider" />
-
-            <TextView
-                android:id="@+id/tvStatus"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="预算充足"
-                android:textColor="@color/text_primary"
-                android:textSize="@dimen/text_md"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/tvDailyBudget"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/spacing_xs"
-                android:text="建议每日消费：¥0.00"
-                android:textColor="@color/orange_primary"
-                android:textSize="@dimen/text_sm" />
-        </LinearLayout>
-
-        <!-- 操作按钮 -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/spacing_md"
-            android:orientation="horizontal">
-
+            <!-- 添加分类按钮 -->
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnSetBudget"
-                android:layout_width="0dp"
+                android:id="@+id/btnAddCategory"
+                android:layout_width="match_parent"
                 android:layout_height="48dp"
-                android:layout_weight="1"
-                android:text="设置总预算"
-                android:textSize="@dimen/text_md"
-                app:cornerRadius="@dimen/radius_md" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnClearBudget"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_weight="1"
-                android:layout_marginStart="@dimen/spacing_sm"
-                android:text="清除预算"
+                android:layout_marginTop="@dimen/spacing_sm"
+                android:text="+ 添加分类预算"
                 android:textSize="@dimen/text_md"
                 app:cornerRadius="@dimen/radius_md"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
-        </LinearLayout>
 
-        <!-- 分类预算区域 -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/spacing_xl"
-            android:text="分类预算"
-            android:textColor="@color/text_primary"
-            android:textSize="@dimen/text_lg"
-            android:textStyle="bold" />
-
-        <!-- 已分配信息 -->
-        <LinearLayout
-            android:id="@+id/layoutAllocatedInfo"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/spacing_sm"
-            android:orientation="horizontal"
-            android:visibility="gone">
-
-            <TextView
-                android:id="@+id/tvAllocated"
-                android:layout_width="0dp"
+            <!-- 分类预算列表 -->
+            <LinearLayout
+                android:id="@+id/layoutCategoryList"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="已分配：¥0.00"
-                android:textColor="@color/text_secondary"
-                android:textSize="@dimen/text_sm" />
+                android:layout_marginTop="@dimen/spacing_sm"
+                android:orientation="vertical" />
 
+            <!-- 无分类提示 -->
             <TextView
-                android:id="@+id/tvAvailable"
-                android:layout_width="wrap_content"
+                android:id="@+id/tvNoCategory"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="可分配：¥0.00"
-                android:textColor="@color/income_green"
+                android:layout_marginTop="@dimen/spacing_md"
+                android:gravity="center"
+                android:text="暂无分类预算\n设置总预算后可添加分类"
+                android:textColor="@color/text_hint"
                 android:textSize="@dimen/text_sm"
-                android:textStyle="bold" />
+                android:visibility="gone" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/spacing_lg" />
         </LinearLayout>
-
-        <!-- 添加分类按钮 -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnAddCategory"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_marginTop="@dimen/spacing_sm"
-            android:text="+ 添加分类预算"
-            android:textSize="@dimen/text_md"
-            app:cornerRadius="@dimen/radius_md"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
-
-        <!-- 分类预算列表 -->
-        <LinearLayout
-            android:id="@+id/layoutCategoryList"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/spacing_sm"
-            android:orientation="vertical" />
-
-        <!-- 无分类提示 -->
-        <TextView
-            android:id="@+id/tvNoCategory"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/spacing_md"
-            android:gravity="center"
-            android:text="暂无分类预算\n设置总预算后可添加分类"
-            android:textColor="@color/text_hint"
-            android:textSize="@dimen/text_sm"
-            android:visibility="gone" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/spacing_lg" />
-    </LinearLayout>
-</ScrollView>
+    </ScrollView>
+</FrameLayout>

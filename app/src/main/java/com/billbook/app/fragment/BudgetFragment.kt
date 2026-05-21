@@ -14,8 +14,10 @@ import com.billbook.app.R
 import com.billbook.app.databinding.FragmentBudgetBinding
 import com.billbook.app.databinding.ItemBudgetCategoryBinding
 import com.billbook.app.model.BudgetCategory
+import com.billbook.app.util.AutoContrast
 import com.billbook.app.util.BackgroundApplier
 import com.billbook.app.util.BudgetManager
+import com.billbook.app.util.BudgetThemeApplier
 import com.billbook.app.util.ThemeManager
 
 class BudgetFragment : Fragment() {
@@ -23,6 +25,7 @@ class BudgetFragment : Fragment() {
     private var _binding: FragmentBudgetBinding? = null
     private val binding get() = _binding!!
     private lateinit var budgetManager: BudgetManager
+    private var pageBg: Int = 0
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentBudgetBinding.inflate(inflater, container, false)
@@ -33,6 +36,25 @@ class BudgetFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         BackgroundApplier.applyToFragment(view, ThemeManager(requireContext()))
         budgetManager = BudgetManager(requireContext())
+
+        pageBg = BudgetThemeApplier.getPageComposite(requireActivity())
+
+        // 磨砂玻璃卡片阴影（轻薄，避免遮挡半透明效果）
+        binding.layoutBudgetInfo.elevation = 3f * resources.displayMetrics.density
+
+        // 气泡上浮动画 — 仅在预算卡片区域内
+        binding.layoutBudgetInfo.post {
+            val cardLoc = IntArray(2)
+            val bubbleLoc = IntArray(2)
+            binding.layoutBudgetInfo.getLocationOnScreen(cardLoc)
+            binding.cardBubbleView.getLocationOnScreen(bubbleLoc)
+            val left = (cardLoc[0] - bubbleLoc[0]).toFloat()
+            val top = (cardLoc[1] - bubbleLoc[1]).toFloat()
+            val right = left + binding.layoutBudgetInfo.width
+            val bottom = top + binding.layoutBudgetInfo.height
+            binding.cardBubbleView.setTargetBounds(left, top, right, bottom)
+            binding.cardBubbleView.start()
+        }
 
         setupBudgetInput()
         setupCategoryBudget()
@@ -249,27 +271,26 @@ class BudgetFragment : Fragment() {
         val percentText = "已使用 %.1f%%".format(info.percentUsed)
         binding.tvPercent.text = percentText
 
+        val isDarkCard = AutoContrast.isDark(pageBg) // 卡片与页面背景同亮度级
+        val statusColorRed = if (isDarkCard) 0xFFFF6B6B.toInt() else resources.getColor(android.R.color.holo_red_dark, null)
+        val statusColorOrange = if (isDarkCard) 0xFFFFB84D.toInt() else resources.getColor(android.R.color.holo_orange_dark, null)
+        val statusColorGreen = if (isDarkCard) 0xFF6BCB77.toInt() else resources.getColor(android.R.color.holo_green_dark, null)
+
         when {
             info.isOverBudget -> {
                 binding.tvStatus.text = "即使没钱，也要好好照顾自己"
-                binding.tvStatus.setTextColor(resources.getColor(android.R.color.holo_red_dark, null))
-                binding.progressBudget.progressTintList = ColorStateList.valueOf(
-                    resources.getColor(android.R.color.holo_red_dark, null)
-                )
+                binding.tvStatus.setTextColor(statusColorRed)
+                binding.progressBudget.progressTintList = ColorStateList.valueOf(statusColorRed)
             }
             info.percentUsed >= 80 -> {
                 binding.tvStatus.text = "要没钱了哦，我们一起节约呢"
-                binding.tvStatus.setTextColor(resources.getColor(android.R.color.holo_orange_dark, null))
-                binding.progressBudget.progressTintList = ColorStateList.valueOf(
-                    resources.getColor(android.R.color.holo_orange_dark, null)
-                )
+                binding.tvStatus.setTextColor(statusColorOrange)
+                binding.progressBudget.progressTintList = ColorStateList.valueOf(statusColorOrange)
             }
             else -> {
                 binding.tvStatus.text = "资金满满，大牛一直陪着你"
-                binding.tvStatus.setTextColor(resources.getColor(android.R.color.holo_green_dark, null))
-                binding.progressBudget.progressTintList = ColorStateList.valueOf(
-                    resources.getColor(android.R.color.holo_green_dark, null)
-                )
+                binding.tvStatus.setTextColor(statusColorGreen)
+                binding.progressBudget.progressTintList = ColorStateList.valueOf(statusColorGreen)
             }
         }
 
@@ -286,6 +307,9 @@ class BudgetFragment : Fragment() {
         binding.layoutAllocatedInfo.visibility = View.VISIBLE
         binding.tvAllocated.text = "已分配：¥%.2f".format(allocated)
         binding.tvAvailable.text = "可分配：¥%.2f".format(available)
+
+        // 自动对比度：卡片背景 + 文字颜色
+        BudgetThemeApplier.apply(binding.layoutBudgetInfo, pageBg)
     }
 
     private fun refreshCategoryList() {
@@ -318,27 +342,26 @@ class BudgetFragment : Fragment() {
             itemBinding.progressCategory.max = 100
             itemBinding.progressCategory.progress = info.percentUsed.toInt().coerceAtMost(100)
 
+            val isDarkItemCard = AutoContrast.isDark(pageBg)
+            val itemStatusRed = if (isDarkItemCard) 0xFFFF6B6B.toInt() else resources.getColor(android.R.color.holo_red_dark, null)
+            val itemStatusOrange = if (isDarkItemCard) 0xFFFFB84D.toInt() else resources.getColor(android.R.color.holo_orange_dark, null)
+            val itemStatusGreen = if (isDarkItemCard) 0xFF6BCB77.toInt() else resources.getColor(android.R.color.holo_green_dark, null)
+
             when {
                 info.isOverBudget -> {
                     itemBinding.tvCategoryStatus.text = "已超支！"
-                    itemBinding.tvCategoryStatus.setTextColor(resources.getColor(android.R.color.holo_red_dark, null))
-                    itemBinding.progressCategory.progressTintList = ColorStateList.valueOf(
-                        resources.getColor(android.R.color.holo_red_dark, null)
-                    )
+                    itemBinding.tvCategoryStatus.setTextColor(itemStatusRed)
+                    itemBinding.progressCategory.progressTintList = ColorStateList.valueOf(itemStatusRed)
                 }
                 info.percentUsed >= 80 -> {
                     itemBinding.tvCategoryStatus.text = "即将用完"
-                    itemBinding.tvCategoryStatus.setTextColor(resources.getColor(android.R.color.holo_orange_dark, null))
-                    itemBinding.progressCategory.progressTintList = ColorStateList.valueOf(
-                        resources.getColor(android.R.color.holo_orange_dark, null)
-                    )
+                    itemBinding.tvCategoryStatus.setTextColor(itemStatusOrange)
+                    itemBinding.progressCategory.progressTintList = ColorStateList.valueOf(itemStatusOrange)
                 }
                 else -> {
                     itemBinding.tvCategoryStatus.text = "预算充足"
-                    itemBinding.tvCategoryStatus.setTextColor(resources.getColor(android.R.color.holo_green_dark, null))
-                    itemBinding.progressCategory.progressTintList = ColorStateList.valueOf(
-                        resources.getColor(android.R.color.holo_green_dark, null)
-                    )
+                    itemBinding.tvCategoryStatus.setTextColor(itemStatusGreen)
+                    itemBinding.progressCategory.progressTintList = ColorStateList.valueOf(itemStatusGreen)
                 }
             }
 
@@ -359,11 +382,15 @@ class BudgetFragment : Fragment() {
                     .show()
             }
 
+            // 自动对比度：卡片背景 + 文字颜色（磨砂玻璃）
+            BudgetThemeApplier.applyCategoryCard(itemView, pageBg)
+            (itemView as? androidx.cardview.widget.CardView)?.cardElevation = 2f * resources.displayMetrics.density
             binding.layoutCategoryList.addView(itemView)
         }
     }
 
     override fun onDestroyView() {
+        binding.cardBubbleView.stop()
         super.onDestroyView()
         _binding = null
     }

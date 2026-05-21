@@ -64,6 +64,8 @@ class SettingsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         themeManager = ThemeManager(requireContext())
+        com.billbook.app.util.BackgroundApplier.applyToFragment(view, themeManager)
+        com.billbook.app.util.FrostGlassApplier.applyToFragment(requireActivity(), view)
 
         setupThemeEditor()
         setupDarkModeSwitch()
@@ -389,7 +391,11 @@ class SettingsFragment : Fragment() {
             } catch (_: Exception) {}
         } else {
             binding.tvCustomBgStatus.text = "当前：纯色背景"
-            binding.tvCustomBgStatus.setTextColor(resources.getColor(android.R.color.darker_gray, null))
+            binding.tvCustomBgStatus.setTextColor(
+                com.billbook.app.util.AutoContrast.autoSecondaryTextFor(
+                    com.billbook.app.util.BudgetThemeApplier.getPageComposite(requireActivity())
+                )
+            )
             binding.btnClearImage.visibility = View.GONE
             binding.layoutOpacity.visibility = View.GONE
             binding.layoutBgPreview.visibility = View.GONE

@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#80000000"
+    android:clickable="true"
+    android:focusable="true">
+
+    <!-- 日历卡片 -->
+    <LinearLayout
+        android:id="@+id/datePickerCard"
+        android:layout_width="320dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@drawable/bg_anime_dialog"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <!-- 年份导航 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="36dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/btnPrevYear"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:background="@drawable/bg_anime_nav_arrow"
+                android:padding="6dp"
+                android:src="@drawable/ic_arrow_prev_white"
+                android:clickable="true"
+                android:focusable="true" />
+
+            <TextView
+                android:id="@+id/tvYearTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:textColor="@color/anime_text_secondary"
+                android:textSize="14sp" />
+
+            <ImageView
+                android:id="@+id/btnNextYear"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:background="@drawable/bg_anime_nav_arrow"
+                android:padding="6dp"
+                android:src="@drawable/ic_arrow_next_white"
+                android:clickable="true"
+                android:focusable="true" />
+        </LinearLayout>
+
+        <!-- 月份导航 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginTop="4dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/btnPrevMonth"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:background="@drawable/bg_anime_nav_arrow"
+                android:padding="8dp"
+                android:src="@drawable/ic_arrow_prev_white"
+                android:clickable="true"
+                android:focusable="true" />
+
+            <TextView
+                android:id="@+id/tvMonthTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:textColor="@color/anime_text_primary"
+                android:textSize="17sp"
+                android:textStyle="bold" />
+
+            <ImageView
+                android:id="@+id/btnNextMonth"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:background="@drawable/bg_anime_nav_arrow"
+                android:padding="8dp"
+                android:src="@drawable/ic_arrow_next_white"
+                android:clickable="true"
+                android:focusable="true" />
+        </LinearLayout>
+
+        <!-- 星期标题 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="32dp"
+            android:layout_marginTop="12dp"
+            android:orientation="horizontal">
+
+            <TextView android:id="@+id/weekday0" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:text="日" android:textColor="#E87C7C" android:textSize="12sp" />
+            <TextView android:id="@+id/weekday1" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:text="一" android:textColor="@color/anime_text_secondary" android:textSize="12sp" />
+            <TextView android:id="@+id/weekday2" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:text="二" android:textColor="@color/anime_text_secondary" android:textSize="12sp" />
+            <TextView android:id="@+id/weekday3" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:text="三" android:textColor="@color/anime_text_secondary" android:textSize="12sp" />
+            <TextView android:id="@+id/weekday4" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:text="四" android:textColor="@color/anime_text_secondary" android:textSize="12sp" />
+            <TextView android:id="@+id/weekday5" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:text="五" android:textColor="@color/anime_text_secondary" android:textSize="12sp" />
+            <TextView android:id="@+id/weekday6" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:text="六" android:textColor="#E87C7C" android:textSize="12sp" />
+        </LinearLayout>
+
+        <!-- 日期网格 -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvDays"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:overScrollMode="never" />
+
+        <!-- 底部按钮 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/btnToday"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:background="@drawable/bg_anime_pay_chip"
+                android:gravity="center"
+                android:paddingHorizontal="16dp"
+                android:text="今天"
+                android:textColor="@color/anime_text_secondary"
+                android:textSize="13sp"
+                android:clickable="true"
+                android:focusable="true" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <TextView
+                android:id="@+id/btnCancel"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:gravity="center"
+                android:paddingHorizontal="16dp"
+                android:text="取消"
+                android:textColor="@color/anime_text_hint"
+                android:textSize="13sp"
+                android:clickable="true"
+                android:focusable="true" />
+
+            <TextView
+                android:id="@+id/btnConfirm"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:layout_marginStart="12dp"
+                android:background="@drawable/bg_anime_pay_chip_selected"
+                android:gravity="center"
+                android:paddingHorizontal="20dp"
+                android:text="确定"
+                android:textColor="@color/anime_text_primary"
+                android:textSize="13sp"
+                android:clickable="true"
+                android:focusable="true" />
+        </LinearLayout>
+    </LinearLayout>
+</FrameLayout>

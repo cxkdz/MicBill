@@ -559,18 +559,18 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
-        // 时间选择
+        // 时间选择 — 二次元沉浸式日期选择器
         tvTime.text = dateFormat.format(selectedTime)
         tvTime.setOnClickListener {
-            val cal = Calendar.getInstance()
-            cal.timeInMillis = selectedTime
-            android.app.DatePickerDialog(this, { _, year, month, day ->
-                android.app.TimePickerDialog(this, { _, hour, minute ->
-                    cal.set(year, month, day, hour, minute, 0)
-                    selectedTime = cal.timeInMillis
-                    tvTime.text = dateFormat.format(selectedTime)
-                }, cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), true).show()
-            }, cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH)).show()
+            com.billbook.app.animation.AnimeDatePickerDialog(
+                context = this,
+                initialTimeMillis = selectedTime
+            ) { year, month, day, hour, minute ->
+                val cal = Calendar.getInstance()
+                cal.set(year, month, day, hour, minute, 0)
+                selectedTime = cal.timeInMillis
+                tvTime.text = dateFormat.format(selectedTime)
+            }.show()
         }
 
         // 保存

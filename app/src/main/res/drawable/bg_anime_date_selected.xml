@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 外层光晕 -->
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="#156B8DD6" />
+        </shape>
+    </item>
+    <!-- 主体 -->
+    <item
+        android:bottom="2dp"
+        android:left="2dp"
+        android:right="2dp"
+        android:top="2dp">
+        <shape android:shape="oval">
+            <solid android:color="#CC6B8DD6" />
+        </shape>
+    </item>
+</layer-list>
