@@ -419,6 +419,14 @@ class MainActivity : AppCompatActivity() {
             resources = resources
         )
 
+        // 顶部栏适配状态栏 insets
+        val topBar = overlayView.findViewById<View>(R.id.topBar)
+        ViewCompat.setOnApplyWindowInsetsListener(topBar) { view, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.statusBars())
+            view.updatePadding(top = insets.top)
+            windowInsets
+        }
+
         // 设置关闭按钮
         overlayView.findViewById<ImageView>(R.id.btnExpandClose).setOnClickListener {
             expandController?.collapse()
@@ -443,30 +451,57 @@ class MainActivity : AppCompatActivity() {
         val chipExpense = overlayView.findViewById<TextView>(R.id.chipExpense)
         val chipIncome = overlayView.findViewById<TextView>(R.id.chipIncome)
         val etMoney = overlayView.findViewById<android.widget.EditText>(R.id.etMoney)
+        val tvAmountDisplay = overlayView.findViewById<TextView>(R.id.tvAmountDisplay)
+        val bubbleTip = overlayView.findViewById<com.billbook.app.animation.BubbleTipView>(R.id.bubbleTip)
+        val bubbleInputHint = overlayView.findViewById<com.billbook.app.animation.BubbleTipView>(R.id.bubbleInputHint)
         val rvCategories = overlayView.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.rvCategories)
-        val chipGroupPayType = overlayView.findViewById<com.google.android.material.chip.ChipGroup>(R.id.chipGroupPayType)
         val tvTime = overlayView.findViewById<TextView>(R.id.tvTime)
         val etRemark = overlayView.findViewById<android.widget.EditText>(R.id.etRemark)
-        val btnSave = overlayView.findViewById<com.google.android.material.button.MaterialButton>(R.id.btnSave)
+        val btnSave = overlayView.findViewById<com.billbook.app.animation.GlowButton>(R.id.btnSave)
+        val btnCancel = overlayView.findViewById<TextView>(R.id.btnCancel)
+
+        // 支付渠道 TextViews
+        val chipWechat = overlayView.findViewById<TextView>(R.id.chipWechat)
+        val chipAlipay = overlayView.findViewById<TextView>(R.id.chipAlipay)
+        val chipCash = overlayView.findViewById<TextView>(R.id.chipCash)
+        val chipBank = overlayView.findViewById<TextView>(R.id.chipBank)
+        val payChips = listOf(chipWechat, chipAlipay, chipCash, chipBank)
+
+        fun updatePayChipSelection(selected: TextView) {
+            payChips.forEach { chip ->
+                if (chip == selected) {
+                    chip.setBackgroundResource(R.drawable.bg_anime_pay_chip_selected)
+                    chip.setTextColor(0xE0FFFFFF.toInt())
+                } else {
+                    chip.setBackgroundResource(R.drawable.bg_anime_pay_chip)
+                    chip.setTextColor(0x80FFFFFF.toInt())
+                }
+            }
+        }
+
+        chipWechat.setOnClickListener { selectedPayType = Bill.PAY_WECHAT; updatePayChipSelection(chipWechat) }
+        chipAlipay.setOnClickListener { selectedPayType = Bill.PAY_ALIPAY; updatePayChipSelection(chipAlipay) }
+        chipCash.setOnClickListener { selectedPayType = Bill.PAY_CASH; updatePayChipSelection(chipCash) }
+        chipBank.setOnClickListener { selectedPayType = Bill.PAY_BANK; updatePayChipSelection(chipBank) }
 
         // 收支切换
         fun updateTypeSelection() {
             if (billType == Bill.TYPE_EXPENSE) {
-                chipExpense.setBackgroundResource(R.drawable.bg_neu_button)
-                chipExpense.setTextColor(getColor(R.color.expense_red))
+                chipExpense.setBackgroundResource(R.drawable.bg_anime_pay_chip_selected)
+                chipExpense.setTextColor(0xE0FFFFFF.toInt())
                 chipIncome.setBackgroundColor(Color.TRANSPARENT)
-                chipIncome.setTextColor(getColor(R.color.text_hint))
+                chipIncome.setTextColor(getColor(R.color.anime_text_hint))
             } else {
-                chipIncome.setBackgroundResource(R.drawable.bg_neu_button)
-                chipIncome.setTextColor(getColor(R.color.income_green))
+                chipIncome.setBackgroundResource(R.drawable.bg_anime_pay_chip_selected)
+                chipIncome.setTextColor(0xE0FFFFFF.toInt())
                 chipExpense.setBackgroundColor(Color.TRANSPARENT)
-                chipExpense.setTextColor(getColor(R.color.text_hint))
+                chipExpense.setTextColor(getColor(R.color.anime_text_hint))
             }
         }
 
         fun loadCategories() {
             val categories = categoryDao.getAll(billType)
-            val adapter = com.billbook.app.adapter.CategoryGridAdapter(categories) { category ->
+            val adapter = com.billbook.app.adapter.AnimeCategoryAdapter(categories) { category ->
                 selectedCategoryId = category.id
                 selectedCategoryName = category.name
                 selectedCategoryIcon = category.icon
@@ -489,16 +524,40 @@ class MainActivity : AppCompatActivity() {
         updateTypeSelection()
         loadCategories()
 
-        // 支付渠道
-        chipGroupPayType.setOnCheckedStateChangeListener { _, checkedIds ->
-            selectedPayType = when {
-                checkedIds.contains(R.id.chipWechat) -> Bill.PAY_WECHAT
-                checkedIds.contains(R.id.chipAlipay) -> Bill.PAY_ALIPAY
-                checkedIds.contains(R.id.chipCash) -> Bill.PAY_CASH
-                checkedIds.contains(R.id.chipBank) -> Bill.PAY_BANK
-                else -> Bill.PAY_OTHER
-            }
+        // 输入提示气泡
+        bubbleInputHint.setTipText("点击输入金额")
+
+        // 金额输入：点击显示区域或气泡触发键盘
+        val triggerKeyboard = {
+            etMoney.requestFocus()
+            val imm = getSystemService(android.content.Context.INPUT_METHOD_SERVICE) as android.view.inputmethod.InputMethodManager
+            imm.showSoftInput(etMoney, android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT)
+            // 输入后隐藏提示气泡
+            bubbleInputHint.animate().alpha(0f).setDuration(200).withEndAction {
+                bubbleInputHint.visibility = View.GONE
+            }.start()
         }
+        tvAmountDisplay.setOnClickListener { triggerKeyboard() }
+        bubbleInputHint.setOnClickListener { triggerKeyboard() }
+
+        // 金额输入监听：同步显示 + 更新气泡
+        etMoney.addTextChangedListener(object : android.text.TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: android.text.Editable?) {
+                val text = s?.toString() ?: ""
+                if (text.isNotEmpty()) {
+                    tvAmountDisplay.text = text
+                    tvAmountDisplay.setTextColor(0xE0FFFFFF.toInt())
+                    val amount = text.toDoubleOrNull() ?: 0.0
+                    bubbleTip.updateForAmount(amount)
+                } else {
+                    tvAmountDisplay.text = ""
+                    tvAmountDisplay.setTextColor(getColor(R.color.anime_text_hint))
+                    bubbleTip.updateForAmount(0.0)
+                }
+            }
+        })
 
         // 时间选择
         tvTime.text = dateFormat.format(selectedTime)
@@ -529,29 +588,37 @@ class MainActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            val remark = etRemark.text.toString().trim()
-            val bill = Bill(
-                money = money,
-                type = billType,
-                categoryId = selectedCategoryId,
-                categoryName = selectedCategoryName,
-                categoryIcon = selectedCategoryIcon,
-                payType = selectedPayType,
-                billTime = selectedTime,
-                remark = remark,
-                source = Bill.SOURCE_MANUAL
-            )
-            billDao.insert(bill)
-            android.widget.Toast.makeText(this, "记账成功", android.widget.Toast.LENGTH_SHORT).show()
+            // 弹簧动画后保存
+            btnSave.playClickEffect {
+                val remark = etRemark.text.toString().trim()
+                val bill = Bill(
+                    money = money,
+                    type = billType,
+                    categoryId = selectedCategoryId,
+                    categoryName = selectedCategoryName,
+                    categoryIcon = selectedCategoryIcon,
+                    payType = selectedPayType,
+                    billTime = selectedTime,
+                    remark = remark,
+                    source = Bill.SOURCE_MANUAL
+                )
+                billDao.insert(bill)
+                android.widget.Toast.makeText(this, "记账成功", android.widget.Toast.LENGTH_SHORT).show()
 
-            // 清空表单并关闭
-            etMoney.text.clear()
-            etRemark.text.clear()
-            selectedCategoryId = 0L
+                // 清空表单并关闭
+                etMoney.text.clear()
+                etRemark.text.clear()
+                selectedCategoryId = 0L
+                expandController?.collapse()
+
+                // 刷新账单数据
+                if (currentNavIndex == 0) refreshBillData()
+            }
+        }
+
+        // 取消按钮
+        btnCancel.setOnClickListener {
             expandController?.collapse()
-
-            // 刷新账单数据
-            if (currentNavIndex == 0) refreshBillData()
         }
     }
 

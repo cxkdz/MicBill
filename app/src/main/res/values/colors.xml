@@ -66,4 +66,18 @@
     <!-- Dynamic Glass Overlay -->
     <color name="glass_overlay_light">#20000000</color>
     <color name="glass_overlay_dark">#18FFFFFF</color>
+
+    <!-- 二次元沉浸式 -->
+    <color name="anime_bg_top">#1A1A2E</color>
+    <color name="anime_bg_mid">#16213E</color>
+    <color name="anime_bg_bottom">#0F3460</color>
+    <color name="anime_card_fill">#15FFFFFF</color>
+    <color name="anime_card_border">#20FFFFFF</color>
+    <color name="anime_card_selected">#25FFFFFF</color>
+    <color name="anime_text_primary">#E0FFFFFF</color>
+    <color name="anime_text_secondary">#80FFFFFF</color>
+    <color name="anime_text_hint">#50FFFFFF</color>
+    <color name="anime_input_fill">#10FFFFFF</color>
+    <color name="anime_bubble_fill">#20FFFFFF</color>
+    <color name="anime_particle">#30FFFFFF</color>
 </resources>

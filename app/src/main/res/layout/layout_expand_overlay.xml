@@ -8,7 +8,7 @@
     android:focusable="true"
     android:visibility="gone">
 
-    <!-- 压暗背景 -->
+    <!-- Layer 1: 压暗背景 -->
     <View
         android:id="@+id/dimBackground"
         android:layout_width="match_parent"
@@ -16,7 +16,7 @@
         android:background="#000000"
         android:alpha="0" />
 
-    <!-- 毛玻璃容器（从 FAB 展开，全屏尺寸用 scale 控制视觉大小） -->
+    <!-- 毛玻璃容器（从 FAB 展开） -->
     <FrameLayout
         android:id="@+id/expandContainer"
         android:layout_width="match_parent"
@@ -33,232 +33,304 @@
             android:alpha="0"
             android:orientation="vertical">
 
-            <!-- 关闭按钮栏 -->
+            <!-- ========== 顶部栏（状态栏区域：返回 + 标题） ========== -->
             <FrameLayout
+                android:id="@+id/topBar"
                 android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
+                android:layout_height="48dp"
                 android:paddingHorizontal="8dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:text="记一笔"
-                    android:textColor="@color/text_primary"
-                    android:textSize="@dimen/text_lg"
-                    android:textStyle="bold" />
-
+                <!-- 返回按钮 -->
                 <ImageView
                     android:id="@+id/btnExpandClose"
                     android:layout_width="48dp"
                     android:layout_height="48dp"
-                    android:layout_gravity="end|center_vertical"
+                    android:layout_gravity="start|center_vertical"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:padding="12dp"
-                    android:src="@drawable/ic_close" />
+                    android:src="@drawable/ic_arrow_back" />
             </FrameLayout>
 
-            <!-- 记账表单 -->
+            <!-- ========== 收支切换（状态栏下方独立一行） ========== -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:paddingTop="4dp"
+                android:paddingBottom="8dp">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="32dp"
+                    android:layout_marginTop="4dp"
+                    android:background="@drawable/bg_anime_pay_chip"
+                    android:orientation="horizontal"
+                    android:padding="2dp">
+
+                    <TextView
+                        android:id="@+id/chipExpense"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/bg_anime_pay_chip_selected"
+                        android:gravity="center"
+                        android:paddingHorizontal="18dp"
+                        android:text="支出"
+                        android:textColor="#E0FFFFFF"
+                        android:textSize="@dimen/text_xs" />
+
+                    <TextView
+                        android:id="@+id/chipIncome"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:paddingHorizontal="18dp"
+                        android:text="收入"
+                        android:textColor="@color/anime_text_hint"
+                        android:textSize="@dimen/text_xs" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- ========== 主体内容 ========== -->
             <ScrollView
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="1">
+                android:layout_weight="1"
+                android:clipToPadding="false"
+                android:paddingBottom="16dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:padding="@dimen/spacing_md">
-
-                    <!-- 收支类型切换 -->
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:background="@drawable/bg_neu_nav_item_active"
-                        android:orientation="horizontal"
-                        android:padding="3dp">
-
-                        <TextView
-                            android:id="@+id/chipExpense"
-                            android:layout_width="wrap_content"
-                            android:layout_height="36dp"
-                            android:background="@drawable/bg_neu_button"
-                            android:gravity="center"
-                            android:paddingHorizontal="@dimen/spacing_md"
-                            android:text="支出"
-                            android:textColor="@color/expense_red"
-                            android:textSize="@dimen/text_sm" />
-
-                        <TextView
-                            android:id="@+id/chipIncome"
-                            android:layout_width="wrap_content"
-                            android:layout_height="36dp"
-                            android:gravity="center"
-                            android:paddingHorizontal="@dimen/spacing_md"
-                            android:text="收入"
-                            android:textColor="@color/text_hint"
-                            android:textSize="@dimen/text_sm" />
-                    </LinearLayout>
-
-                    <!-- 金额输入 -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/spacing_lg"
-                        android:background="@drawable/bg_neu_card"
-                        android:orientation="vertical"
-                        android:padding="@dimen/spacing_lg">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="金额"
-                            android:textColor="@color/text_hint"
-                            android:textSize="@dimen/text_sm" />
-
-                        <EditText
-                            android:id="@+id/etMoney"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="@dimen/spacing_sm"
-                            android:background="@drawable/bg_neu_input"
-                            android:hint="0.00"
-                            android:inputType="numberDecimal"
-                            android:textColor="@color/text_primary"
-                            android:textColorHint="@color/text_hint"
-                            android:textSize="@dimen/text_xxl"
-                            android:textStyle="bold" />
-                    </LinearLayout>
+                    android:paddingHorizontal="20dp">
 
                     <!-- 分类选择 -->
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/spacing_lg"
+                        android:layout_marginTop="4dp"
                         android:text="选择分类"
-                        android:textColor="@color/text_primary"
-                        android:textSize="@dimen/text_md"
-                        android:textStyle="bold" />
+                        android:textColor="@color/anime_text_secondary"
+                        android:textSize="@dimen/text_sm" />
 
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/rvCategories"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/spacing_sm" />
+                        android:layout_marginTop="8dp"
+                        android:overScrollMode="never" />
+
+                    <!-- 金额显示区 -->
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="24dp">
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="¥"
+                                android:textColor="@color/anime_text_secondary"
+                                android:textSize="@dimen/text_xl"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/tvAmountDisplay"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="4dp"
+                                android:hint="0.00"
+                                android:textColor="@color/anime_text_primary"
+                                android:textColorHint="@color/anime_text_hint"
+                                android:textSize="36sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+
+                        <!-- 小箭头提示：在这里输入 -->
+                        <com.billbook.app.animation.BubbleTipView
+                            android:id="@+id/bubbleInputHint"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal|bottom"
+                            android:layout_marginBottom="-6dp" />
+                    </FrameLayout>
+
+                    <!-- 隐藏的金额输入框（触发数字键盘） -->
+                    <EditText
+                        android:id="@+id/etMoney"
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:alpha="0"
+                        android:inputType="numberDecimal"
+                        android:focusable="true"
+                        android:focusableInTouchMode="true" />
+
+                    <!-- 气泡提示（金额相关） -->
+                    <com.billbook.app.animation.BubbleTipView
+                        android:id="@+id/bubbleTip"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginTop="16dp" />
 
                     <!-- 支付渠道 -->
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/spacing_lg"
+                        android:layout_marginTop="24dp"
                         android:text="支付渠道"
-                        android:textColor="@color/text_primary"
-                        android:textSize="@dimen/text_md"
-                        android:textStyle="bold" />
+                        android:textColor="@color/anime_text_secondary"
+                        android:textSize="@dimen/text_sm" />
 
-                    <com.google.android.material.chip.ChipGroup
-                        android:id="@+id/chipGroupPayType"
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/spacing_sm"
-                        app:singleSelection="true">
+                        android:layout_marginTop="8dp"
+                        android:orientation="horizontal">
 
-                        <com.google.android.material.chip.Chip
+                        <TextView
                             android:id="@+id/chipWechat"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:checked="true"
+                            android:layout_width="0dp"
+                            android:layout_height="36dp"
+                            android:layout_weight="1"
+                            android:layout_marginEnd="6dp"
+                            android:background="@drawable/bg_anime_pay_chip_selected"
+                            android:gravity="center"
                             android:text="微信"
-                            app:chipCornerRadius="@dimen/radius_sm"
-                            style="@style/Widget.MaterialComponents.Chip.Choice" />
+                            android:textColor="@color/anime_text_primary"
+                            android:textSize="@dimen/text_xs" />
 
-                        <com.google.android.material.chip.Chip
+                        <TextView
                             android:id="@+id/chipAlipay"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
+                            android:layout_width="0dp"
+                            android:layout_height="36dp"
+                            android:layout_weight="1"
+                            android:layout_marginHorizontal="3dp"
+                            android:background="@drawable/bg_anime_pay_chip"
+                            android:gravity="center"
                             android:text="支付宝"
-                            app:chipCornerRadius="@dimen/radius_sm"
-                            style="@style/Widget.MaterialComponents.Chip.Choice" />
+                            android:textColor="@color/anime_text_secondary"
+                            android:textSize="@dimen/text_xs" />
 
-                        <com.google.android.material.chip.Chip
+                        <TextView
                             android:id="@+id/chipCash"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
+                            android:layout_width="0dp"
+                            android:layout_height="36dp"
+                            android:layout_weight="1"
+                            android:layout_marginHorizontal="3dp"
+                            android:background="@drawable/bg_anime_pay_chip"
+                            android:gravity="center"
                             android:text="现金"
-                            app:chipCornerRadius="@dimen/radius_sm"
-                            style="@style/Widget.MaterialComponents.Chip.Choice" />
+                            android:textColor="@color/anime_text_secondary"
+                            android:textSize="@dimen/text_xs" />
 
-                        <com.google.android.material.chip.Chip
+                        <TextView
                             android:id="@+id/chipBank"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
+                            android:layout_width="0dp"
+                            android:layout_height="36dp"
+                            android:layout_weight="1"
+                            android:layout_marginStart="6dp"
+                            android:background="@drawable/bg_anime_pay_chip"
+                            android:gravity="center"
                             android:text="银行卡"
-                            app:chipCornerRadius="@dimen/radius_sm"
-                            style="@style/Widget.MaterialComponents.Chip.Choice" />
-                    </com.google.android.material.chip.ChipGroup>
+                            android:textColor="@color/anime_text_secondary"
+                            android:textSize="@dimen/text_xs" />
+                    </LinearLayout>
 
                     <!-- 时间选择 -->
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/spacing_lg"
+                        android:layout_marginTop="20dp"
                         android:text="消费时间"
-                        android:textColor="@color/text_primary"
-                        android:textSize="@dimen/text_md"
-                        android:textStyle="bold" />
+                        android:textColor="@color/anime_text_secondary"
+                        android:textSize="@dimen/text_sm" />
 
                     <TextView
                         android:id="@+id/tvTime"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/spacing_sm"
-                        android:background="@drawable/bg_date_picker"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:padding="@dimen/spacing_md"
+                        android:layout_height="44dp"
+                        android:layout_marginTop="8dp"
+                        android:background="@drawable/bg_anime_input"
+                        android:gravity="center_vertical"
+                        android:paddingHorizontal="16dp"
                         android:text="点击选择时间"
-                        android:textColor="@color/text_primary"
-                        android:textSize="@dimen/text_md" />
+                        android:textColor="@color/anime_text_primary"
+                        android:textSize="@dimen/text_sm" />
 
                     <!-- 备注 -->
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/spacing_lg"
+                        android:layout_marginTop="20dp"
                         android:text="备注"
-                        android:textColor="@color/text_primary"
-                        android:textSize="@dimen/text_md"
-                        android:textStyle="bold" />
+                        android:textColor="@color/anime_text_secondary"
+                        android:textSize="@dimen/text_sm" />
 
                     <EditText
                         android:id="@+id/etRemark"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/spacing_sm"
-                        android:background="@drawable/bg_neu_input"
+                        android:layout_height="44dp"
+                        android:layout_marginTop="8dp"
+                        android:background="@drawable/bg_anime_input"
                         android:hint="选填"
                         android:inputType="text"
-                        android:textColor="@color/text_primary"
-                        android:textColorHint="@color/text_hint"
-                        android:textSize="@dimen/text_md" />
+                        android:paddingHorizontal="16dp"
+                        android:textColor="@color/anime_text_primary"
+                        android:textColorHint="@color/anime_text_hint"
+                        android:textSize="@dimen/text_sm" />
 
                     <View
                         android:layout_width="match_parent"
-                        android:layout_height="80dp" />
+                        android:layout_height="24dp" />
                 </LinearLayout>
             </ScrollView>
 
-            <!-- 保存按钮 -->
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnSave"
+            <!-- ========== 底部按钮区 ========== -->
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:layout_marginHorizontal="@dimen/spacing_md"
-                android:layout_marginVertical="@dimen/spacing_sm"
-                android:text="保存"
-                android:textSize="@dimen/text_lg"
-                app:cornerRadius="@dimen/radius_md" />
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:paddingHorizontal="24dp"
+                android:paddingBottom="20dp"
+                android:paddingTop="8dp">
+
+                <com.billbook.app.animation.GlowButton
+                    android:id="@+id/btnSave"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:background="@drawable/bg_anime_button"
+                    android:gravity="center"
+                    android:text="确认记账"
+                    android:textColor="#FFFFFF"
+                    android:textSize="@dimen/text_lg"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/btnCancel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:gravity="center"
+                    android:text="取消"
+                    android:textColor="@color/anime_text_hint"
+                    android:textSize="@dimen/text_sm" />
+            </LinearLayout>
         </LinearLayout>
     </FrameLayout>
+
+    <!-- Layer 4: 粒子动画层（不拦截触摸） -->
+    <com.billbook.app.animation.ParticleView
+        android:id="@+id/particleView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clickable="false"
+        android:focusable="false" />
 </FrameLayout>

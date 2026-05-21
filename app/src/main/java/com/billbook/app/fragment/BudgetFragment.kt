@@ -251,21 +251,21 @@ class BudgetFragment : Fragment() {
 
         when {
             info.isOverBudget -> {
-                binding.tvStatus.text = "已超预算！超出 ¥%.2f".format(-info.remaining)
+                binding.tvStatus.text = "即使没钱，也要好好照顾自己"
                 binding.tvStatus.setTextColor(resources.getColor(android.R.color.holo_red_dark, null))
                 binding.progressBudget.progressTintList = ColorStateList.valueOf(
                     resources.getColor(android.R.color.holo_red_dark, null)
                 )
             }
-            info.percentUsed >= budgetManager.getAlertPercent() -> {
-                binding.tvStatus.text = "预算即将用完，注意控制消费"
+            info.percentUsed >= 80 -> {
+                binding.tvStatus.text = "要没钱了哦，我们一起节约呢"
                 binding.tvStatus.setTextColor(resources.getColor(android.R.color.holo_orange_dark, null))
                 binding.progressBudget.progressTintList = ColorStateList.valueOf(
                     resources.getColor(android.R.color.holo_orange_dark, null)
                 )
             }
             else -> {
-                binding.tvStatus.text = "预算充足，继续加油！"
+                binding.tvStatus.text = "资金满满，大牛一直陪着你"
                 binding.tvStatus.setTextColor(resources.getColor(android.R.color.holo_green_dark, null))
                 binding.progressBudget.progressTintList = ColorStateList.valueOf(
                     resources.getColor(android.R.color.holo_green_dark, null)

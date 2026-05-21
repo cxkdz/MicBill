@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 外层发光 -->
+    <item>
+        <shape android:shape="oval">
+            <solid android:color="#08FFFFFF" />
+        </shape>
+    </item>
+    <!-- 主体 -->
+    <item
+        android:bottom="2dp"
+        android:left="2dp"
+        android:right="2dp"
+        android:top="2dp">
+        <shape android:shape="oval">
+            <solid android:color="#25FFFFFF" />
+            <stroke
+                android:width="1.5dp"
+                android:color="#50FFFFFF" />
+        </shape>
+    </item>
+</layer-list>

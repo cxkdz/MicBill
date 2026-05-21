@@ -6,14 +6,16 @@ import androidx.core.graphics.ColorUtils
 
 /**
  * 可动画圆角的毛玻璃背景 Drawable
- * 用于展开动画中圆角从 100dp → 0dp 的平滑过渡
+ * 深色二次元风格：深蓝渐变 + 微光描边
  */
 class GlassMorphDrawable : GradientDrawable() {
 
     init {
         shape = RECTANGLE
-        setColor(ColorUtils.setAlphaComponent(Color.WHITE, (255 * 0.92f).toInt()))
-        setStroke(2, ColorUtils.setAlphaComponent(Color.WHITE, (255 * 0.3f).toInt()))
-        cornerRadius = 100f * 3 // 初始圆角，足够大以形成药丸形
+        // 深色半透明背景
+        setColor(Color.parseColor("#E61A1A2E"))
+        // 微光描边
+        setStroke(1, ColorUtils.setAlphaComponent(Color.WHITE, (255 * 0.12f).toInt()))
+        cornerRadius = 100f * 3
     }
 }
