@@ -64,13 +64,15 @@ class SettingsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         themeManager = ThemeManager(requireContext())
-        com.billbook.app.util.BackgroundApplier.applyToFragment(view, themeManager)
-        com.billbook.app.util.FrostGlassApplier.applyToFragment(requireActivity(), view)
+        val mode = themeManager.getTextColorMode()
+        com.billbook.app.util.BackgroundApplier.applyToFragment(view, themeManager, mode)
+        com.billbook.app.util.FrostGlassApplier.applyToFragment(requireActivity(), view, mode)
 
         setupThemeEditor()
         setupDarkModeSwitch()
         setupTiltAngle()
         setupCustomImageBg()
+        setupTextColorToggle()
         setupCategoryManage()
         setupBudgetAndQuery()
         setupImportBills()
@@ -404,6 +406,27 @@ class SettingsFragment : Fragment() {
 
     private fun updateOpacityDisplay() {
         binding.tvOpacityValue.text = "${themeManager.getBgOpacity()}%"
+    }
+
+    private fun setupTextColorToggle() {
+        val mode = themeManager.getTextColorMode()
+        binding.tvTextColorStatus.text = when (mode) {
+            1 -> "深色文字"
+            2 -> "浅色文字"
+            else -> "自动"
+        }
+
+        binding.btnTextColorToggle.setOnClickListener {
+            val current = themeManager.getTextColorMode()
+            val next = (current + 1) % 3
+            themeManager.setTextColorMode(next)
+            binding.tvTextColorStatus.text = when (next) {
+                1 -> "深色文字"
+                2 -> "浅色文字"
+                else -> "自动"
+            }
+            requireActivity().recreate()
+        }
     }
 
     private fun setupCategoryManage() {

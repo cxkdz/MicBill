@@ -33,6 +33,7 @@ class StatisticsFragment : Fragment() {
     private var cachedRankings: List<Triple<String, String, Double>> = emptyList()
     private var cachedYear = 0
     private var cachedMonth = 0
+    private var textColorMode = 0
 
     // 二次元可爱风配色（高饱和度、区分度高）
     private val animeColors = intArrayOf(
@@ -57,8 +58,10 @@ class StatisticsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        com.billbook.app.util.BackgroundApplier.applyToFragment(view, ThemeManager(requireContext()))
-        com.billbook.app.util.FrostGlassApplier.applyToFragment(requireActivity(), view)
+        val tm = ThemeManager(requireContext())
+        textColorMode = tm.getTextColorMode()
+        com.billbook.app.util.BackgroundApplier.applyToFragment(view, tm, textColorMode)
+        com.billbook.app.util.FrostGlassApplier.applyToFragment(requireActivity(), view, textColorMode)
         billDao = BillDao(requireContext())
 
         binding.btnPieToggle.setOnClickListener {
@@ -113,8 +116,16 @@ class StatisticsFragment : Fragment() {
 
         val pageBg = com.billbook.app.util.BudgetThemeApplier.getPageComposite(requireActivity())
         val isDark = AutoContrast.isDark(pageBg)
-        val valueTextColor = if (isDark) Color.parseColor("#E0FFFFFF") else Color.parseColor("#E03D4A5C")
-        val labelColor = if (isDark) Color.parseColor("#C0FFFFFF") else Color.parseColor("#C03D4A5C")
+        val valueTextColor = when (textColorMode) {
+            1 -> Color.parseColor("#E03D4A5C")
+            2 -> Color.parseColor("#E0FFFFFF")
+            else -> if (isDark) Color.parseColor("#E0FFFFFF") else Color.parseColor("#E03D4A5C")
+        }
+        val labelColor = when (textColorMode) {
+            1 -> Color.parseColor("#C03D4A5C")
+            2 -> Color.parseColor("#C0FFFFFF")
+            else -> if (isDark) Color.parseColor("#C0FFFFFF") else Color.parseColor("#C03D4A5C")
+        }
 
         val dataSet = PieDataSet(entries, "").apply {
             colors = animeColors.take(entries.size)
@@ -220,8 +231,16 @@ class StatisticsFragment : Fragment() {
 
         val pageBg = com.billbook.app.util.BudgetThemeApplier.getPageComposite(requireActivity())
         val isDark = AutoContrast.isDark(pageBg)
-        val axisColor = if (isDark) Color.parseColor("#80FFFFFF") else Color.parseColor("#803D4A5C")
-        val labelColor = if (isDark) Color.parseColor("#C0FFFFFF") else Color.parseColor("#C03D4A5C")
+        val axisColor = when (textColorMode) {
+            1 -> Color.parseColor("#803D4A5C")
+            2 -> Color.parseColor("#80FFFFFF")
+            else -> if (isDark) Color.parseColor("#80FFFFFF") else Color.parseColor("#803D4A5C")
+        }
+        val labelColor = when (textColorMode) {
+            1 -> Color.parseColor("#C03D4A5C")
+            2 -> Color.parseColor("#C0FFFFFF")
+            else -> if (isDark) Color.parseColor("#C0FFFFFF") else Color.parseColor("#C03D4A5C")
+        }
 
         val expenseColor = Color.parseColor("#FF6B8A") // 粉红
         val incomeColor = Color.parseColor("#95E1A3")  // 薄荷绿

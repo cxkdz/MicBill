@@ -26,6 +26,7 @@ class BudgetFragment : Fragment() {
     private val binding get() = _binding!!
     private lateinit var budgetManager: BudgetManager
     private var pageBg: Int = 0
+    private var textColorMode: Int = 0
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentBudgetBinding.inflate(inflater, container, false)
@@ -34,7 +35,9 @@ class BudgetFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        BackgroundApplier.applyToFragment(view, ThemeManager(requireContext()))
+        val tm = ThemeManager(requireContext())
+        textColorMode = tm.getTextColorMode()
+        BackgroundApplier.applyToFragment(view, tm, textColorMode)
         budgetManager = BudgetManager(requireContext())
 
         pageBg = BudgetThemeApplier.getPageComposite(requireActivity())
@@ -309,7 +312,7 @@ class BudgetFragment : Fragment() {
         binding.tvAvailable.text = "可分配：¥%.2f".format(available)
 
         // 自动对比度：卡片背景 + 文字颜色
-        BudgetThemeApplier.apply(binding.layoutBudgetInfo, pageBg)
+        BudgetThemeApplier.apply(binding.layoutBudgetInfo, pageBg, textColorMode)
     }
 
     private fun refreshCategoryList() {
@@ -383,7 +386,7 @@ class BudgetFragment : Fragment() {
             }
 
             // 自动对比度：卡片背景 + 文字颜色（磨砂玻璃）
-            BudgetThemeApplier.applyCategoryCard(itemView, pageBg)
+            BudgetThemeApplier.applyCategoryCard(itemView, pageBg, textColorMode)
             (itemView as? androidx.cardview.widget.CardView)?.cardElevation = 2f * resources.displayMetrics.density
             binding.layoutCategoryList.addView(itemView)
         }

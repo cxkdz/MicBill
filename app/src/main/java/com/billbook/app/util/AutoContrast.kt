@@ -144,6 +144,28 @@ object AutoContrast {
         return if (isDark(cardBg)) Color.parseColor("#A0FFFFFF") else Color.parseColor("#B03D4A5C")
     }
 
+    // ==================== Mode-Aware Text Color ====================
+    // mode: 0=自动, 1=强制深色, 2=强制浅色
+    // 强制模式使用不透明色，确保视觉上明确区分
+
+    fun textColorFor(cardBg: Int, mode: Int): Int {
+        if (mode == 1) return Color.parseColor("#FF3D4A5C")
+        if (mode == 2) return Color.parseColor("#FFFFFFFF")
+        return autoTextColorFor(cardBg)
+    }
+
+    fun secondaryTextFor(cardBg: Int, mode: Int): Int {
+        if (mode == 1) return Color.parseColor("#FF8895A7")
+        if (mode == 2) return Color.parseColor("#E0FFFFFF")
+        return autoSecondaryTextFor(cardBg)
+    }
+
+    fun hintTextFor(cardBg: Int, mode: Int): Int {
+        if (mode == 1) return Color.parseColor("#FFA8B4C4")
+        if (mode == 2) return Color.parseColor("#C0FFFFFF")
+        return autoHintTextFor(cardBg)
+    }
+
     // ==================== HSL Conversion ====================
 
     fun rgbToHsl(color: Int): FloatArray {

@@ -27,8 +27,10 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        BackgroundApplier.applyToFragment(view, ThemeManager(requireContext()))
-        com.billbook.app.util.FrostGlassApplier.applyToFragment(requireActivity(), view)
+        val tm = ThemeManager(requireContext())
+        val mode = tm.getTextColorMode()
+        BackgroundApplier.applyToFragment(view, tm, mode)
+        com.billbook.app.util.FrostGlassApplier.applyToFragment(requireActivity(), view, mode)
         billDao = BillDao(requireContext())
         refreshData()
     }

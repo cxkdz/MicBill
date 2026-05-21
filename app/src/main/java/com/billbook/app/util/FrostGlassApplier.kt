@@ -5,7 +5,9 @@ import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.TextView
+import com.google.android.material.button.MaterialButton
 
 /**
  * 通用磨砂玻璃卡片适配器。
@@ -22,7 +24,7 @@ object FrostGlassApplier {
      * 为 Fragment 中所有 bg_glass_card 卡片应用磨砂玻璃主题。
      * 应在 BackgroundApplier.applyToFragment 之后调用。
      */
-    fun applyToFragment(activity: Activity, rootView: View) {
+    fun applyToFragment(activity: Activity, rootView: View, textColorMode: Int = 0) {
         val pageBg = BudgetThemeApplier.getPageComposite(activity)
         val cardColor = frostCardColor(pageBg)
         val isDarkCard = AutoContrast.isDark(cardColor)
@@ -34,7 +36,7 @@ object FrostGlassApplier {
 
         val shadowColor = if (isDarkCard) Color.parseColor("#50000000") else Color.parseColor("#40FFFFFF")
 
-        applyRecursively(rootView, semiColor, cardColor, shadowColor)
+        applyRecursively(rootView, semiColor, cardColor, shadowColor, textColorMode, false)
     }
 
     private fun frostCardColor(pageBg: Int): Int {
@@ -48,30 +50,49 @@ object FrostGlassApplier {
         }
     }
 
-    private fun applyRecursively(view: View, semiColor: Int, cardColor: Int, shadowColor: Int) {
+    private fun applyRecursively(view: View, semiColor: Int, cardColor: Int, shadowColor: Int, textColorMode: Int, insideCard: Boolean) {
         val bg = view.background
+        var isGlassCard = false
         if (bg is GradientDrawable) {
             val currentColor = bg.color?.defaultColor ?: 0
             // 只处理接近透明白色的 bg_glass_card（alpha < 40, 接近白色）
             if (Color.alpha(currentColor) < 40 && isNearWhite(currentColor)) {
                 bg.setColor(semiColor)
+                isGlassCard = true
             }
         }
 
-        if (view is TextView) {
+        val inCard = insideCard || isGlassCard
+
+        if (view is TextView && inCard) {
             // 文字阴影（BackgroundApplier 也会设，这里用卡片色决定阴影方向）
             view.setShadowLayer(2.5f, 0f, 1f, shadowColor)
-            // 文字颜色：高饱和色保持，灰色系根据卡片明暗切换
-            if (!AutoContrast.isSaturatedColor(view.currentTextColor)) {
-                view.setTextColor(AutoContrast.autoTextColorFor(cardColor))
+            // 文字颜色：跳过按钮文字，高饱和色保持，灰色系根据原始亮度级别 + mode 切换
+            if (!isButtonText(view) && !AutoContrast.isSaturatedColor(view.currentTextColor)) {
+                val lum = AutoContrast.relativeLuminance(view.currentTextColor)
+                val newColor = when {
+                    lum > 0.5 -> AutoContrast.textColorFor(cardColor, textColorMode)
+                    lum > 0.05 -> AutoContrast.secondaryTextFor(cardColor, textColorMode)
+                    else -> AutoContrast.hintTextFor(cardColor, textColorMode)
+                }
+                view.setTextColor(newColor)
             }
         }
 
         if (view is ViewGroup) {
             for (i in 0 until view.childCount) {
-                applyRecursively(view.getChildAt(i), semiColor, cardColor, shadowColor)
+                applyRecursively(view.getChildAt(i), semiColor, cardColor, shadowColor, textColorMode, inCard)
             }
         }
+    }
+
+    private fun isButtonText(view: View): Boolean {
+        if (view is Button || view is MaterialButton) return true
+        try {
+            val id = view.resources.getResourceEntryName(view.id)
+            return id == "btnEdit" || id == "btnDelete"
+        } catch (_: Exception) {}
+        return false
     }
 
     private fun isNearWhite(color: Int): Boolean {

@@ -5,9 +5,11 @@ import android.graphics.drawable.GradientDrawable
 import android.graphics.drawable.LayerDrawable
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.TextView
 import androidx.cardview.widget.CardView
 import com.billbook.app.R
+import com.google.android.material.button.MaterialButton
 
 /**
  * 预算页面磨砂玻璃主题适配器。
@@ -53,16 +55,16 @@ object BudgetThemeApplier {
         }
     }
 
-    fun apply(rootView: View, pageBg: Int) {
+    fun apply(rootView: View, pageBg: Int, textColorMode: Int = 0) {
         val cardColor = frostCardColor(pageBg)
         applyCardBackground(rootView, cardColor)
-        applyTextColors(rootView, cardColor)
+        applyTextColors(rootView, cardColor, textColorMode)
     }
 
-    fun applyCategoryCard(itemView: View, pageBg: Int) {
+    fun applyCategoryCard(itemView: View, pageBg: Int, textColorMode: Int = 0) {
         val cardColor = frostCardColor(pageBg)
         applyCardBackground(itemView, cardColor)
-        applyTextColors(itemView, cardColor)
+        applyTextColors(itemView, cardColor, textColorMode)
     }
 
     // ==================== Card Background ====================
@@ -97,15 +99,18 @@ object BudgetThemeApplier {
 
     // ==================== Text Colors ====================
 
-    private fun applyTextColors(view: View, cardColor: Int) {
+    private fun applyTextColors(view: View, cardColor: Int, textColorMode: Int) {
         if (view is ViewGroup) {
             for (i in 0 until view.childCount) {
-                applyTextColors(view.getChildAt(i), cardColor)
+                applyTextColors(view.getChildAt(i), cardColor, textColorMode)
             }
         }
 
         if (view !is TextView) return
         val tv = view as TextView
+
+        // 跳过按钮文字
+        if (isButtonText(tv)) return
 
         val isDarkCard = AutoContrast.isDark(cardColor)
 
@@ -116,22 +121,31 @@ object BudgetThemeApplier {
         // 已知 ID → 直接覆盖（不检查饱和度，优先级最高）
         when (tv.id) {
             R.id.tvBudgetAmount, R.id.tvCategoryName, R.id.tvCategoryBudget -> {
-                tv.setTextColor(AutoContrast.autoTextColorFor(cardColor))
+                tv.setTextColor(AutoContrast.textColorFor(cardColor, textColorMode))
                 return
             }
             R.id.tvPercent, R.id.tvSpentAmount, R.id.tvRemainingAmount,
             R.id.tvDailyBudget, R.id.tvAllocated, R.id.tvAvailable,
             R.id.tvCategoryStatus -> {
-                tv.setTextColor(AutoContrast.autoSecondaryTextFor(cardColor))
+                tv.setTextColor(AutoContrast.secondaryTextFor(cardColor, textColorMode))
                 return
             }
             R.id.tvNoBudget, R.id.tvNoCategory -> {
-                tv.setTextColor(AutoContrast.autoHintTextFor(cardColor))
+                tv.setTextColor(AutoContrast.hintTextFor(cardColor, textColorMode))
                 return
             }
         }
 
         // 未知 ID → 高饱和色保持不变
         if (AutoContrast.isSaturatedColor(tv.currentTextColor)) return
+    }
+
+    private fun isButtonText(view: View): Boolean {
+        if (view is Button || view is MaterialButton) return true
+        try {
+            val id = view.resources.getResourceEntryName(view.id)
+            return id == "btnEdit" || id == "btnDelete"
+        } catch (_: Exception) {}
+        return false
     }
 }

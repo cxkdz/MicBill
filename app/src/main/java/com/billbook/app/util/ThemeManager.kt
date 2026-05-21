@@ -33,6 +33,7 @@ class ThemeManager(context: Context) {
         const val KEY_PALETTE = "current_palette"
         const val KEY_TILT_ANGLE = "tilt_angle"
         const val KEY_CUSTOM_DIORAMA_URI = "custom_diorama_uri"
+        const val KEY_TEXT_COLOR_MODE = "text_color_mode"
 
         const val BG_MODE_COLOR = 0
         const val BG_MODE_CUSTOM_IMAGE = 1
@@ -356,6 +357,16 @@ class ThemeManager(context: Context) {
 
     fun clearCustomDioramaImage() {
         prefs.edit().remove(KEY_CUSTOM_DIORAMA_URI).apply()
+    }
+
+    // ========== 文字颜色模式 ==========
+
+    fun getTextColorMode(): Int {
+        return prefs.getInt(KEY_TEXT_COLOR_MODE, 0)
+    }
+
+    fun setTextColorMode(mode: Int) {
+        prefs.edit().putInt(KEY_TEXT_COLOR_MODE, mode.coerceIn(0, 2)).apply()
     }
 
     fun getEffectivePalette(): ThemePalette {

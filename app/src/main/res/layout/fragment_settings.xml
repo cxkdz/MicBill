@@ -336,6 +336,56 @@
             android:textSize="@dimen/text_sm"
             android:textStyle="bold" />
 
+        <!-- 文字颜色切换 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_sm"
+            android:background="@drawable/bg_glass_card"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="@dimen/spacing_lg">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="文字颜色"
+                    android:textColor="@color/text_primary"
+                    android:textSize="@dimen/text_md"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvTextColorStatus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="自动"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="@dimen/text_sm" />
+            </LinearLayout>
+
+            <FrameLayout
+                android:id="@+id/btnTextColorToggle"
+                android:layout_width="72dp"
+                android:layout_height="48dp"
+                android:background="@drawable/selector_neu_button">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="切换"
+                    android:textColor="@color/text_primary"
+                    android:textSize="@dimen/text_sm" />
+            </FrameLayout>
+        </LinearLayout>
+
         <!-- 分类管理 -->
         <LinearLayout
             android:layout_width="match_parent"

@@ -40,8 +40,10 @@ class QueryFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        BackgroundApplier.applyToFragment(view, ThemeManager(requireContext()))
-        FrostGlassApplier.applyToFragment(requireActivity(), view)
+        val tm = ThemeManager(requireContext())
+        val mode = tm.getTextColorMode()
+        BackgroundApplier.applyToFragment(view, tm, mode)
+        FrostGlassApplier.applyToFragment(requireActivity(), view, mode)
         billDao = BillDao(requireContext())
 
         // 默认查询本月

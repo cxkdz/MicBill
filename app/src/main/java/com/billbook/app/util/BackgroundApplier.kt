@@ -6,7 +6,9 @@ import android.graphics.drawable.GradientDrawable
 import android.graphics.drawable.LayerDrawable
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.TextView
+import com.google.android.material.button.MaterialButton
 
 object BackgroundApplier {
 
@@ -21,12 +23,12 @@ object BackgroundApplier {
      * 2. 文字阴影
      * 3. 文字颜色自适应背景亮度（低对比灰色系自动切换黑白，高饱和色保持不变）
      */
-    fun applyToFragment(view: View, themeManager: ThemeManager) {
+    fun applyToFragment(view: View, themeManager: ThemeManager, textColorMode: Int = 0) {
         view.setBackgroundColor(Color.TRANSPARENT)
         val palette = themeManager.getEffectivePalette()
         val composite = computeComposite(palette, themeManager)
         val shadowColor = AutoContrast.textShadowColor(composite)
-        adaptRecursively(view, composite, shadowColor)
+        adaptRecursively(view, composite, shadowColor, textColorMode)
     }
 
     fun applyToExtraViews(activity: Activity, vararg views: View) {
@@ -47,7 +49,7 @@ object BackgroundApplier {
      * 递归遍历所有子 View，同时应用阴影和文字颜色自适应。
      * @param effectiveBg 当前层级的有效背景色（祖先中最近的有背景的 View 决定）
      */
-    private fun adaptRecursively(view: View, effectiveBg: Int, shadowColor: Int) {
+    private fun adaptRecursively(view: View, effectiveBg: Int, shadowColor: Int, textColorMode: Int) {
         // 计算当前 View 的有效背景色
         var currentBg = effectiveBg
         val bg = view.background
@@ -58,13 +60,15 @@ object BackgroundApplier {
         // 文字阴影
         if (view is TextView) {
             view.setShadowLayer(3f, 0f, 1f, shadowColor)
-            adaptTextColor(view, currentBg)
+            if (!isButtonText(view)) {
+                adaptTextColor(view, currentBg, textColorMode)
+            }
         }
 
         // 递归子 View
         if (view is ViewGroup) {
             for (i in 0 until view.childCount) {
-                adaptRecursively(view.getChildAt(i), currentBg, shadowColor)
+                adaptRecursively(view.getChildAt(i), currentBg, shadowColor, textColorMode)
             }
         }
     }
@@ -100,31 +104,31 @@ object BackgroundApplier {
 
     /**
      * 自适应文字颜色。
-     * 高饱和色保持不变；灰色系根据背景亮度自动切换黑白。
+     * 高饱和色保持不变；灰色系根据原始亮度级别和 textColorMode 切换。
      */
-    private fun adaptTextColor(tv: TextView, bg: Int) {
+    private fun adaptTextColor(tv: TextView, bg: Int, mode: Int) {
         val current = tv.currentTextColor
 
         // 高饱和色 / 语义色 → 保持
         if (AutoContrast.isSaturatedColor(current)) return
 
-        // 灰色系 → 根据背景亮度切换
-        val dark = AutoContrast.isDark(bg)
+        // 灰色系 → 根据原始亮度级别区分 primary/secondary/hint，再根据 mode 决定最终颜色
         val lum = AutoContrast.relativeLuminance(current)
         val newColor = when {
-            // 亮度 > 0.5 的浅灰文字（text_hint #A8B4C4 等）→ 主文字色
-            lum > 0.5 -> {
-                if (dark) Color.parseColor("#E0FFFFFF") else Color.parseColor("#E63D4A5C")
-            }
-            // 中间亮度灰色（text_primary #3D4A5C、text_secondary #8895A7 等）
-            lum > 0.05 -> {
-                if (dark) Color.parseColor("#C0FFFFFF") else Color.parseColor("#E63D4A5C")
-            }
-            // 接近纯黑的文字
-            else -> {
-                if (dark) Color.parseColor("#E0FFFFFF") else Color.parseColor("#E63D4A5C")
-            }
+            lum > 0.3 -> AutoContrast.textColorFor(bg, mode)       // 亮灰（text_hint 原色等）
+            lum > 0.05 -> AutoContrast.secondaryTextFor(bg, mode)  // 中灰（text_secondary）
+            else -> AutoContrast.textColorFor(bg, mode)            // 暗灰（text_primary）
         }
         tv.setTextColor(newColor)
+    }
+
+    private fun isButtonText(view: View): Boolean {
+        if (view is Button || view is MaterialButton) return true
+        try {
+            val id = view.resources.getResourceEntryName(view.id)
+            // 只跳过预算页面卡片内的明确按钮
+            return id == "btnEdit" || id == "btnDelete"
+        } catch (_: Exception) {}
+        return false
     }
 }
