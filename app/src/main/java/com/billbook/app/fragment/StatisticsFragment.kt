@@ -163,7 +163,7 @@ class StatisticsFragment : Fragment() {
 
             // 中心文字
             setDrawCenterText(true)
-            centerText = if (showPercentage) "消费\n占比" else "消费\n分类"
+            centerText = if (showPercentage) "消费\n占比" else "消费\n金额"
             setCenterTextSize(13f)
             setCenterTextColor(labelColor)
             setCenterTextTypeface(Typeface.DEFAULT_BOLD)
