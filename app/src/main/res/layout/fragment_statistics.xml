@@ -123,7 +123,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="消费分类占比"
+                android:text="本月消费分类占比"
                 android:textColor="@color/text_primary"
                 android:textSize="@dimen/text_lg"
                 android:textStyle="bold" />
