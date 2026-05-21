@@ -116,6 +116,87 @@
             android:layout_marginTop="4dp"
             android:overScrollMode="never" />
 
+        <!-- 时间选择器 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginTop="12dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/btnPrevHour"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:background="@drawable/bg_anime_nav_arrow"
+                android:padding="6dp"
+                android:src="@drawable/ic_arrow_prev_white"
+                android:clickable="true"
+                android:focusable="true" />
+
+            <TextView
+                android:id="@+id/tvHour"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="00"
+                android:textColor="@color/anime_text_primary"
+                android:textSize="17sp"
+                android:textStyle="bold" />
+
+            <ImageView
+                android:id="@+id/btnNextHour"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:background="@drawable/bg_anime_nav_arrow"
+                android:padding="6dp"
+                android:src="@drawable/ic_arrow_next_white"
+                android:clickable="true"
+                android:focusable="true" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="8dp"
+                android:gravity="center"
+                android:text=":"
+                android:textColor="@color/anime_text_secondary"
+                android:textSize="17sp"
+                android:textStyle="bold" />
+
+            <ImageView
+                android:id="@+id/btnPrevMinute"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:background="@drawable/bg_anime_nav_arrow"
+                android:padding="6dp"
+                android:src="@drawable/ic_arrow_prev_white"
+                android:clickable="true"
+                android:focusable="true" />
+
+            <TextView
+                android:id="@+id/tvMinute"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="00"
+                android:textColor="@color/anime_text_primary"
+                android:textSize="17sp"
+                android:textStyle="bold" />
+
+            <ImageView
+                android:id="@+id/btnNextMinute"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:background="@drawable/bg_anime_nav_arrow"
+                android:padding="6dp"
+                android:src="@drawable/ic_arrow_next_white"
+                android:clickable="true"
+                android:focusable="true" />
+        </LinearLayout>
+
         <!-- 底部按钮 -->
         <LinearLayout
             android:layout_width="match_parent"

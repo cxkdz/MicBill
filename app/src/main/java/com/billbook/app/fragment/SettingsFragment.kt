@@ -317,19 +317,52 @@ class SettingsFragment : Fragment() {
             requireActivity().recreate()
         }
 
-        binding.seekBarOpacity.progress = themeManager.getBgOpacity()
-        binding.seekBarOpacity.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                if (fromUser) {
-                    themeManager.setBgOpacity(progress)
-                    updateOpacityDisplay()
+        binding.layoutOpacity.setOnClickListener { showOpacityDialog() }
+    }
+
+    private fun showOpacityDialog() {
+        val container = android.widget.LinearLayout(requireContext()).apply {
+            orientation = android.widget.LinearLayout.VERTICAL
+            val dp = resources.displayMetrics.density
+            setPadding((48 * dp).toInt(), (24 * dp).toInt(), (48 * dp).toInt(), (8 * dp).toInt())
+        }
+
+        val tvValue = android.widget.TextView(requireContext()).apply {
+            text = "${themeManager.getBgOpacity()}%"
+            textSize = 20f
+            setTypeface(null, android.graphics.Typeface.BOLD)
+            gravity = android.view.Gravity.CENTER
+            setTextColor(resources.getColor(com.billbook.app.R.color.text_primary, null))
+        }
+        container.addView(tvValue)
+
+        val seekBar = SeekBar(requireContext()).apply {
+            max = 100
+            progress = themeManager.getBgOpacity()
+            setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+                override fun onProgressChanged(sb: SeekBar?, progress: Int, fromUser: Boolean) {
+                    tvValue.text = "$progress%"
                 }
-            }
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {
+                override fun onStartTrackingTouch(sb: SeekBar?) {}
+                override fun onStopTrackingTouch(sb: SeekBar?) {
+                    themeManager.setBgOpacity(sb?.progress ?: 30)
+                }
+            })
+        }
+        val lp = android.widget.LinearLayout.LayoutParams(
+            android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
+            android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
+        )
+        lp.topMargin = (16 * resources.displayMetrics.density).toInt()
+        container.addView(seekBar, lp)
+
+        AlertDialog.Builder(requireContext())
+            .setTitle("背景透明度")
+            .setView(container)
+            .setPositiveButton("完成") { _, _ ->
                 requireActivity().recreate()
             }
-        })
+            .show()
     }
 
     private fun openImagePicker() {
@@ -352,10 +385,9 @@ class SettingsFragment : Fragment() {
             AlertDialog.Builder(requireContext())
                 .setTitle("图片已导入")
                 .setMessage("是否现在调整背景透明度？\n\n透明度越高，背景越淡，文字越清晰。\n建议设为20%-40%。")
-                .setPositiveButton("调整") { _, _ -> binding.seekBarOpacity.requestFocus() }
+                .setPositiveButton("调整") { _, _ -> showOpacityDialog() }
                 .setNegativeButton("使用默认") { _, _ ->
                     themeManager.setBgOpacity(30)
-                    binding.seekBarOpacity.progress = 30
                     updateOpacityDisplay()
                 }
                 .setNeutralButton("稍后设置", null)

@@ -35,6 +35,14 @@ class AnimeDatePickerDialog(
     private lateinit var btnCancel: TextView
     private lateinit var btnConfirm: TextView
 
+    // 时间选择器
+    private lateinit var btnPrevHour: ImageView
+    private lateinit var btnNextHour: ImageView
+    private lateinit var tvHour: TextView
+    private lateinit var btnPrevMinute: ImageView
+    private lateinit var btnNextMinute: ImageView
+    private lateinit var tvMinute: TextView
+
     private lateinit var dayAdapter: DateDayAdapter
 
     private val cal = Calendar.getInstance()
@@ -59,6 +67,7 @@ class AnimeDatePickerDialog(
         setupRecyclerView()
         setupListeners()
         updateTitles()
+        updateTimeDisplay()
         loadDays()
 
         playEntryAnimation()
@@ -76,6 +85,13 @@ class AnimeDatePickerDialog(
         btnToday = findViewById(R.id.btnToday)
         btnCancel = findViewById(R.id.btnCancel)
         btnConfirm = findViewById(R.id.btnConfirm)
+
+        btnPrevHour = findViewById(R.id.btnPrevHour)
+        btnNextHour = findViewById(R.id.btnNextHour)
+        tvHour = findViewById(R.id.tvHour)
+        btnPrevMinute = findViewById(R.id.btnPrevMinute)
+        btnNextMinute = findViewById(R.id.btnNextMinute)
+        tvMinute = findViewById(R.id.tvMinute)
     }
 
     private fun setupRecyclerView() {
@@ -130,10 +146,45 @@ class AnimeDatePickerDialog(
             selectedYear = today.get(Calendar.YEAR)
             selectedMonth = today.get(Calendar.MONTH)
             selectedDay = today.get(Calendar.DAY_OF_MONTH)
+            selectedHour = today.get(Calendar.HOUR_OF_DAY)
+            selectedMinute = today.get(Calendar.MINUTE)
             cal.set(selectedYear, selectedMonth, 1)
             updateTitles()
+            updateTimeDisplay()
             loadDays()
             dayAdapter.setSelectedDay(selectedDay)
+        }
+
+        // 小时 -1
+        btnPrevHour.setOnClickListener {
+            animateNavClick(it) {
+                selectedHour = if (selectedHour <= 0) 23 else selectedHour - 1
+                updateTimeDisplay()
+            }
+        }
+
+        // 小时 +1
+        btnNextHour.setOnClickListener {
+            animateNavClick(it) {
+                selectedHour = if (selectedHour >= 23) 0 else selectedHour + 1
+                updateTimeDisplay()
+            }
+        }
+
+        // 分钟 -1
+        btnPrevMinute.setOnClickListener {
+            animateNavClick(it) {
+                selectedMinute = if (selectedMinute <= 0) 59 else selectedMinute - 1
+                updateTimeDisplay()
+            }
+        }
+
+        // 分钟 +1
+        btnNextMinute.setOnClickListener {
+            animateNavClick(it) {
+                selectedMinute = if (selectedMinute >= 59) 0 else selectedMinute + 1
+                updateTimeDisplay()
+            }
         }
 
         btnCancel.setOnClickListener {
@@ -141,17 +192,12 @@ class AnimeDatePickerDialog(
         }
 
         btnConfirm.setOnClickListener {
-            showTimePicker()
-        }
-    }
-
-    private fun showTimePicker() {
-        android.app.TimePickerDialog(context, { _, hour, minute ->
-            selectedHour = hour
-            selectedMinute = minute
+            if (selectedDay <= 0) {
+                selectedDay = 1
+            }
             onDateTimeSelected(selectedYear, selectedMonth, selectedDay, selectedHour, selectedMinute)
             playExitAnimation { dismiss() }
-        }, selectedHour, selectedMinute, true).show()
+        }
     }
 
     private fun updateTitles() {
@@ -159,6 +205,11 @@ class AnimeDatePickerDialog(
         val monthNames = arrayOf("一月", "二月", "三月", "四月", "五月", "六月",
             "七月", "八月", "九月", "十月", "十一月", "十二月")
         tvMonthTitle.text = monthNames[selectedMonth]
+    }
+
+    private fun updateTimeDisplay() {
+        tvHour.text = String.format("%02d", selectedHour)
+        tvMinute.text = String.format("%02d", selectedMinute)
     }
 
     private fun loadDays() {

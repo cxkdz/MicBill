@@ -287,34 +287,49 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
+                android:background="@drawable/bg_glass_card"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
+                android:padding="@dimen/spacing_lg"
                 android:visibility="gone">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="透明度"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="@dimen/text_sm" />
-
-                <SeekBar
-                    android:id="@+id/seekBarOpacity"
+                <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:layout_marginHorizontal="12dp"
-                    android:max="100"
-                    android:progress="30" />
+                    android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/tvOpacityValue"
-                    android:layout_width="40dp"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:text="30%"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="@dimen/text_sm" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="背景透明度"
+                        android:textColor="@color/text_primary"
+                        android:textSize="@dimen/text_md"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvOpacityValue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="30%"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="@dimen/text_sm" />
+                </LinearLayout>
+
+                <FrameLayout
+                    android:layout_width="72dp"
+                    android:layout_height="48dp"
+                    android:background="@drawable/selector_neu_button">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:text="调整"
+                        android:textColor="@color/text_primary"
+                        android:textSize="@dimen/text_sm" />
+                </FrameLayout>
             </LinearLayout>
 
             <TextView
