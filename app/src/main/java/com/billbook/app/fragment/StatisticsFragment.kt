@@ -119,13 +119,13 @@ class StatisticsFragment : Fragment() {
         val dataSet = PieDataSet(entries, "").apply {
             colors = animeColors.take(entries.size)
             valueTextSize = 11f
-            valueTextColor = Color.WHITE
-            valueLinePart1Length = 0.4f
-            valueLinePart2Length = 0.6f
-            valueLineColor = Color.parseColor("#50FFFFFF")
-            valueLineWidth = 1.2f
+            setValueTextColor(Color.WHITE)
+            setValueLinePart1Length(0.4f)
+            setValueLinePart2Length(0.6f)
+            setValueLineColor(Color.parseColor("#50FFFFFF"))
+            setValueLineWidth(1.2f)
             sliceSpace = 2f
-            selectionShift = 10f // 点击时扇形块向外偏移
+            selectionShift = 10f
             valueFormatter = if (showPercentage) {
                 object : ValueFormatter() {
                     override fun getFormattedValue(value: Float): String = "%.1f%%".format(value)
@@ -135,7 +135,6 @@ class StatisticsFragment : Fragment() {
                     override fun getFormattedValue(value: Float): String = "¥%.0f".format(value)
                 }
             }
-            // 使用 value line position outside 让数值显示在扇形块外部
             yValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
         }
 
@@ -228,29 +227,29 @@ class StatisticsFragment : Fragment() {
         val incomeColor = Color.parseColor("#95E1A3")  // 薄荷绿
 
         val expenseDataSet = LineDataSet(entriesExpense, "支出").apply {
-            color = expenseColor
+            setColor(expenseColor)
             setCircleColor(expenseColor)
-            lineWidth = 2.5f
-            circleRadius = 4f
+            setLineWidth(2.5f)
+            setCircleRadius(4f)
             valueTextSize = 9f
-            valueTextColor = labelColor
-            mode = LineDataSet.Mode.CUBIC_BEZIER // 平滑曲线
+            setValueTextColor(labelColor)
+            mode = LineDataSet.Mode.CUBIC_BEZIER
             setDrawFilled(true)
-            fillColor = expenseColor
-            fillAlpha = 30
+            setFillColor(expenseColor)
+            setFillAlpha(30)
         }
 
         val incomeDataSet = LineDataSet(entriesIncome, "收入").apply {
-            color = incomeColor
+            setColor(incomeColor)
             setCircleColor(incomeColor)
-            lineWidth = 2.5f
-            circleRadius = 4f
+            setLineWidth(2.5f)
+            setCircleRadius(4f)
             valueTextSize = 9f
-            valueTextColor = labelColor
+            setValueTextColor(labelColor)
             mode = LineDataSet.Mode.CUBIC_BEZIER
             setDrawFilled(true)
-            fillColor = incomeColor
-            fillAlpha = 30
+            setFillColor(incomeColor)
+            setFillAlpha(30)
         }
 
         binding.lineChart.apply {
