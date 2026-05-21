@@ -248,21 +248,55 @@ class SettingsFragment : Fragment() {
 
     private fun setupTiltAngle() {
         val currentAngle = themeManager.getTiltAngle()
-        binding.seekBarTilt.progress = currentAngle
         binding.tvTiltValue.text = "${currentAngle}°"
 
-        binding.seekBarTilt.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-            override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                binding.tvTiltValue.text = "${progress}°"
-                themeManager.setTiltAngle(progress)
-                val mainActivity = activity
-                if (mainActivity is MainActivity) {
-                    mainActivity.updateTiltPreview(progress.toFloat())
+        binding.layoutTiltAngle.setOnClickListener { showTiltAngleDialog() }
+    }
+
+    private fun showTiltAngleDialog() {
+        val container = android.widget.LinearLayout(requireContext()).apply {
+            orientation = android.widget.LinearLayout.VERTICAL
+            val dp = resources.displayMetrics.density
+            setPadding((48 * dp).toInt(), (24 * dp).toInt(), (48 * dp).toInt(), (8 * dp).toInt())
+        }
+
+        val tvAngle = android.widget.TextView(requireContext()).apply {
+            text = "${themeManager.getTiltAngle()}°"
+            textSize = 20f
+            setTypeface(null, android.graphics.Typeface.BOLD)
+            gravity = android.view.Gravity.CENTER
+            setTextColor(resources.getColor(com.billbook.app.R.color.text_primary, null))
+        }
+        container.addView(tvAngle)
+
+        val seekBar = SeekBar(requireContext()).apply {
+            max = 45
+            progress = themeManager.getTiltAngle()
+            setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+                override fun onProgressChanged(sb: SeekBar?, progress: Int, fromUser: Boolean) {
+                    tvAngle.text = "${progress}°"
+                    themeManager.setTiltAngle(progress)
+                    val mainActivity = activity
+                    if (mainActivity is MainActivity) {
+                        mainActivity.updateTiltPreview(progress.toFloat())
+                    }
                 }
-            }
-            override fun onStartTrackingTouch(seekBar: SeekBar?) {}
-            override fun onStopTrackingTouch(seekBar: SeekBar?) {}
-        })
+                override fun onStartTrackingTouch(sb: SeekBar?) {}
+                override fun onStopTrackingTouch(sb: SeekBar?) {}
+            })
+        }
+        val lp = android.widget.LinearLayout.LayoutParams(
+            android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
+            android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
+        )
+        lp.topMargin = (16 * resources.displayMetrics.density).toInt()
+        container.addView(seekBar, lp)
+
+        AlertDialog.Builder(requireContext())
+            .setTitle("倾斜角度")
+            .setView(container)
+            .setPositiveButton("完成", null)
+            .show()
     }
 
     private fun setupCustomImageBg() {

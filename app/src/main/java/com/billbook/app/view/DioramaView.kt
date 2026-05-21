@@ -14,6 +14,7 @@ import android.graphics.Shader
 import android.net.Uri
 import android.util.AttributeSet
 import android.view.View
+import androidx.core.content.ContextCompat
 import com.billbook.app.model.DioramaType
 import com.billbook.app.model.ThemePalette
 
@@ -47,7 +48,28 @@ class DioramaView @JvmOverloads constructor(
         }
     }
 
-    override fun onDraw(canvas: Canvas) {
+
+    fun applyDefaultImage(resId: Int) {
+        try {
+            val drawable = ContextCompat.getDrawable(context, resId)
+            if (drawable is android.graphics.drawable.BitmapDrawable) {
+                customBitmap = drawable.bitmap
+            } else if (drawable != null) {
+                val bitmap = android.graphics.Bitmap.createBitmap(
+                    drawable.intrinsicWidth.coerceAtLeast(1),
+                    drawable.intrinsicHeight.coerceAtLeast(1),
+                    android.graphics.Bitmap.Config.ARGB_8888
+                )
+                val canvas = android.graphics.Canvas(bitmap)
+                drawable.setBounds(0, 0, canvas.width, canvas.height)
+                drawable.draw(canvas)
+                customBitmap = bitmap
+            }
+            invalidate()
+        } catch (_: Exception) {}
+    }
+
+        override fun onDraw(canvas: Canvas) {
         val bmp = customBitmap
         if (bmp != null) {
             drawCustomImage(canvas, bmp)

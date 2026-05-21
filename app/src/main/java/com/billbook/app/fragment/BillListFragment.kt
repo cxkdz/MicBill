@@ -111,14 +111,10 @@ class BillListFragment : Fragment() {
         val bills = billDao.getByMonth(currentYear, currentMonth)
         adapter.submitList(bills)
 
-        val (expense, income) = billDao.getMonthSummary(currentYear, currentMonth)
-        activity.findViewById<TextView>(R.id.tvHeaderExpense)?.text = "支出 ¥%.0f".format(expense)
-        activity.findViewById<TextView>(R.id.tvHeaderIncome)?.text = "收入 ¥%.0f".format(income)
     }
 
     private fun filterByType(type: Int) {
-        val typeName = if (type == Bill.TYPE_EXPENSE) "支出" else "收入"
-        requireActivity().findViewById<TextView>(R.id.tvYearMonth)?.text = "${currentYear}年${currentMonth}月 [$typeName]"
+        requireActivity().findViewById<TextView>(R.id.tvYearMonth)?.text = "${currentYear}年${currentMonth}月"
         val bills = billDao.getByMonth(currentYear, currentMonth).filter { it.type == type }
         adapter.submitList(bills)
     }

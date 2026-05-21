@@ -33,6 +33,7 @@ class AddBillActivity : AppCompatActivity() {
     private var billType = Bill.TYPE_EXPENSE
     private var selectedCategoryId = 0L
     private var selectedCategoryName = ""
+    private var selectedCategoryIcon = ""
     private var selectedPayType = Bill.PAY_WECHAT
     private var selectedTime = System.currentTimeMillis()
     private var editBillId = 0L // 编辑模式的账单ID
@@ -137,6 +138,7 @@ class AddBillActivity : AppCompatActivity() {
         val adapter = CategoryGridAdapter(categories) { category ->
             selectedCategoryId = category.id
             selectedCategoryName = category.name
+            selectedCategoryIcon = category.icon
         }
         binding.rvCategories.layoutManager = GridLayoutManager(this, 4)
         binding.rvCategories.adapter = adapter
@@ -199,6 +201,7 @@ class AddBillActivity : AppCompatActivity() {
                     type = billType,
                     categoryId = selectedCategoryId,
                     categoryName = selectedCategoryName,
+                    categoryIcon = selectedCategoryIcon,
                     payType = selectedPayType,
                     billTime = selectedTime,
                     remark = remark
@@ -212,6 +215,7 @@ class AddBillActivity : AppCompatActivity() {
                     type = billType,
                     categoryId = selectedCategoryId,
                     categoryName = selectedCategoryName,
+                    categoryIcon = selectedCategoryIcon,
                     payType = selectedPayType,
                     billTime = selectedTime,
                     remark = remark,
@@ -235,6 +239,7 @@ class AddBillActivity : AppCompatActivity() {
 
         selectedCategoryId = bill.categoryId
         selectedCategoryName = bill.categoryName
+        selectedCategoryIcon = bill.categoryIcon
         selectedPayType = bill.payType
         selectedTime = bill.billTime
         updateTimeDisplay()

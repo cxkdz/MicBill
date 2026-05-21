@@ -17,6 +17,7 @@ import com.billbook.app.model.Bill
 import com.github.mikephil.charting.data.PieData
 import com.github.mikephil.charting.data.PieDataSet
 import com.github.mikephil.charting.data.PieEntry
+import com.github.mikephil.charting.formatter.PercentFormatter
 import com.github.mikephil.charting.utils.ColorTemplate
 import java.text.SimpleDateFormat
 import java.util.*
@@ -137,15 +138,19 @@ class QueryFragment : Fragment() {
     }
 
     private fun loadQueryPieChart(categoryMap: Map<String, Double>) {
-        val entries = categoryMap.map { PieEntry(it.value.toFloat(), it.key) }
+        val total = categoryMap.values.sum()
+        val entries = categoryMap.map { PieEntry((it.value / total * 100).toFloat(), it.key) }
         val dataSet = PieDataSet(entries, "").apply {
             colors = ColorTemplate.MATERIAL_COLORS.toList()
             valueTextSize = 11f
             valueTextColor = Color.WHITE
         }
+        val pieData = PieData(dataSet).apply {
+            setValueFormatter(PercentFormatter())
+        }
 
         binding.pieChartQuery.apply {
-            data = PieData(dataSet)
+            data = pieData
             description.text = "分类支出占比"
             description.textSize = 12f
             isRotationEnabled = true

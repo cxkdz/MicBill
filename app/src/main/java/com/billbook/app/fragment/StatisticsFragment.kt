@@ -13,6 +13,7 @@ import com.billbook.app.model.Bill
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
+import com.github.mikephil.charting.formatter.ValueFormatter
 import com.github.mikephil.charting.utils.ColorTemplate
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -24,6 +25,10 @@ class StatisticsFragment : Fragment() {
     private val binding get() = _binding!!
     private lateinit var billDao: BillDao
     private val dateFormat = SimpleDateFormat("yyyy年MM月", Locale.CHINA)
+    private var showPercentage = true
+    private var cachedRankings: List<Triple<String, String, Double>> = emptyList()
+    private var cachedYear = 0
+    private var cachedMonth = 0
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentStatisticsBinding.inflate(inflater, container, false)
@@ -33,6 +38,13 @@ class StatisticsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         billDao = BillDao(requireContext())
+
+        binding.btnPieToggle.setOnClickListener {
+            showPercentage = !showPercentage
+            binding.btnPieToggle.text = if (showPercentage) "百分比" else "金额"
+            updatePieChart()
+        }
+
         refreshData()
     }
 
@@ -54,28 +66,46 @@ class StatisticsFragment : Fragment() {
         binding.tvBalance.text = String.format("¥%.2f", income - expense)
 
         // 加载图表
-        loadCategoryPieChart(year, month)
+        cachedYear = year
+        cachedMonth = month
+        cachedRankings = billDao.getCategoryRanking(year, month, Bill.TYPE_EXPENSE)
+        updatePieChart()
         loadMonthlyTrendChart()
     }
 
-    private fun loadCategoryPieChart(year: Int, month: Int) {
-        val rankings = billDao.getCategoryRanking(year, month, Bill.TYPE_EXPENSE)
-
-        if (rankings.isEmpty()) {
+    private fun updatePieChart() {
+        if (cachedRankings.isEmpty()) {
             binding.pieChart.setNoDataText("暂无消费数据")
             return
         }
 
-        val entries = rankings.map { PieEntry(it.third.toFloat(), it.second) }
+        val total = cachedRankings.sumOf { it.third }
+        val entries = if (showPercentage) {
+            cachedRankings.map { PieEntry((it.third / total * 100).toFloat(), it.second) }
+        } else {
+            cachedRankings.map { PieEntry(it.third.toFloat(), it.second) }
+        }
         val dataSet = PieDataSet(entries, "").apply {
             colors = ColorTemplate.MATERIAL_COLORS.toList()
             valueTextSize = 12f
             valueTextColor = Color.WHITE
         }
+        val formatter: ValueFormatter = if (showPercentage) {
+            object : ValueFormatter() {
+                override fun getFormattedValue(value: Float): String = "%.1f%%".format(value)
+            }
+        } else {
+            object : ValueFormatter() {
+                override fun getFormattedValue(value: Float): String = "¥%.0f".format(value)
+            }
+        }
+        val pieData = PieData(dataSet).apply {
+            setValueFormatter(formatter)
+        }
 
         binding.pieChart.apply {
-            data = PieData(dataSet)
-            description.text = "${year}年${month}月消费分类"
+            data = pieData
+            description.text = "${cachedYear}年${cachedMonth}月消费分类"
             description.textSize = 14f
             isRotationEnabled = true
             setEntryLabelTextSize(11f)

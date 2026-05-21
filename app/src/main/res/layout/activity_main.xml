@@ -91,16 +91,18 @@
                 android:layout_height="match_parent"
                 android:visibility="gone" />
 
-            <!-- 空状态 -->
-            <TextView
-                android:id="@+id/tvEmpty"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="暂无账单数据"
-                android:textSize="@dimen/text_md"
-                android:visibility="gone" />
         </LinearLayout>
+
+        <!-- 空状态 -->
+        <TextView
+            android:id="@+id/tvEmpty"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="暂无账单数据"
+            android:textColor="@color/text_secondary"
+            android:textSize="@dimen/text_md"
+            android:visibility="gone" />
     </FrameLayout>
 
     <!-- Layer 3: 浮动 Header（不参与3D倾斜） -->
@@ -114,7 +116,7 @@
         android:paddingTop="0dp"
         android:paddingBottom="@dimen/spacing_sm">
 
-        <!-- 年月 + 收支汇总 -->
+        <!-- 年月 + 分段控制器 -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -131,76 +133,50 @@
                 android:textSize="@dimen/text_xxl"
                 android:textStyle="bold" />
 
-            <!-- 右侧：收支（紧凑） -->
-            <LinearLayout
+            <!-- 右侧：分段控制器 -->
+            <FrameLayout
+                android:id="@+id/segmentControl"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="vertical">
+                android:layout_height="36dp"
+                android:background="@drawable/bg_segment_control">
 
-                <TextView
-                    android:id="@+id/tvHeaderExpense"
+                <LinearLayout
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="支出 ¥0"
-                    android:textSize="@dimen/text_sm"
-                    android:textStyle="bold" />
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="4dp">
 
-                <TextView
-                    android:id="@+id/tvHeaderIncome"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:text="收入 ¥0"
-                    android:textSize="@dimen/text_sm"
-                    android:textStyle="bold" />
-            </LinearLayout>
+                    <TextView
+                        android:id="@+id/btnFilterAll"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:paddingHorizontal="@dimen/spacing_md"
+                        android:text="全部"
+                        android:textSize="@dimen/text_sm" />
+
+                    <TextView
+                        android:id="@+id/btnFilterIncome"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:paddingHorizontal="@dimen/spacing_md"
+                        android:text="收入"
+                        android:textSize="@dimen/text_sm" />
+
+                    <TextView
+                        android:id="@+id/btnFilterExpense"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:paddingHorizontal="@dimen/spacing_md"
+                        android:text="支出"
+                        android:textSize="@dimen/text_sm" />
+                </LinearLayout>
+            </FrameLayout>
         </LinearLayout>
-
-        <!-- 分段控制器：全部｜收入｜支出 -->
-        <FrameLayout
-            android:id="@+id/segmentControl"
-            android:layout_width="wrap_content"
-            android:layout_height="36dp"
-            android:layout_marginTop="@dimen/spacing_sm"
-            android:background="@drawable/bg_segment_control">
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_gravity="center"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:paddingHorizontal="4dp">
-
-                <TextView
-                    android:id="@+id/btnFilterAll"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:paddingHorizontal="@dimen/spacing_md"
-                    android:text="全部"
-                    android:textSize="@dimen/text_sm" />
-
-                <TextView
-                    android:id="@+id/btnFilterIncome"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:paddingHorizontal="@dimen/spacing_md"
-                    android:text="收入"
-                    android:textSize="@dimen/text_sm" />
-
-                <TextView
-                    android:id="@+id/btnFilterExpense"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:paddingHorizontal="@dimen/spacing_md"
-                    android:text="支出"
-                    android:textSize="@dimen/text_sm" />
-            </LinearLayout>
-        </FrameLayout>
     </LinearLayout>
 
     <!-- 底部渐变遮罩（透明→半透明黑，确保导航栏可见） -->

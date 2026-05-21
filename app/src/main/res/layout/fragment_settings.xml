@@ -59,7 +59,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
-                    android:text="森林"
+                    android:text="渐变灰"
                     android:textColor="@color/text_secondary"
                     android:textSize="@dimen/text_sm" />
             </LinearLayout>
@@ -124,45 +124,52 @@
 
         <!-- 背景倾斜角度 -->
         <LinearLayout
+            android:id="@+id/layoutTiltAngle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/spacing_sm"
             android:background="@drawable/bg_glass_card"
-            android:orientation="vertical"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
             android:padding="@dimen/spacing_lg">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="倾斜角度"
-                android:textColor="@color/text_primary"
-                android:textSize="@dimen/text_md"
-                android:textStyle="bold" />
-
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
+                android:layout_weight="1"
+                android:orientation="vertical">
 
-                <SeekBar
-                    android:id="@+id/seekBarTilt"
-                    android:layout_width="0dp"
+                <TextView
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:max="45"
-                    android:progress="15" />
+                    android:text="倾斜角度"
+                    android:textColor="@color/text_primary"
+                    android:textSize="@dimen/text_md"
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/tvTiltValue"
-                    android:layout_width="48dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:gravity="center"
+                    android:layout_marginTop="4dp"
                     android:text="15°"
                     android:textColor="@color/text_secondary"
                     android:textSize="@dimen/text_sm" />
             </LinearLayout>
+
+            <FrameLayout
+                android:layout_width="72dp"
+                android:layout_height="48dp"
+                android:background="@drawable/selector_neu_button">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="调整"
+                    android:textColor="@color/text_primary"
+                    android:textSize="@dimen/text_sm" />
+            </FrameLayout>
         </LinearLayout>
 
         <!-- 背景设置 -->

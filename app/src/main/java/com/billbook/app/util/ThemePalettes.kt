@@ -9,7 +9,7 @@ object ThemePalettes {
     val PRESETS = listOf(
         // 1. Forest
         ThemePalette(
-            key = "forest", name = "森林", dioramaType = DioramaType.FOREST,
+            key = "forest", name = "渐变灰", dioramaType = DioramaType.FOREST,
             dioramaSkyTop = Color.parseColor("#87CEEB"),
             dioramaSkyBottom = Color.parseColor("#98D8C8"),
             dioramaGround = Color.parseColor("#2D5016"),

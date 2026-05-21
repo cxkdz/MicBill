@@ -53,8 +53,6 @@ class MainActivity : AppCompatActivity() {
     // Layer 3
     private lateinit var headerLayer: LinearLayout
     private lateinit var tvYearMonth: TextView
-    private lateinit var tvHeaderExpense: TextView
-    private lateinit var tvHeaderIncome: TextView
     private lateinit var btnFilterAll: TextView
     private lateinit var btnFilterExpense: TextView
     private lateinit var btnFilterIncome: TextView
@@ -127,8 +125,6 @@ class MainActivity : AppCompatActivity() {
         statusBarGradient = findViewById(R.id.statusBarGradient)
         bottomGradient = findViewById(R.id.bottomGradient)
         tvYearMonth = findViewById(R.id.tvYearMonth)
-        tvHeaderExpense = findViewById(R.id.tvHeaderExpense)
-        tvHeaderIncome = findViewById(R.id.tvHeaderIncome)
         btnFilterAll = findViewById(R.id.btnFilterAll)
         btnFilterExpense = findViewById(R.id.btnFilterExpense)
         btnFilterIncome = findViewById(R.id.btnFilterIncome)
@@ -255,11 +251,11 @@ class MainActivity : AppCompatActivity() {
             refreshBillData()
         }
         btnFilterExpense.setOnClickListener {
-            setSegmentActive(1)
+            setSegmentActive(2)
             filterByType(Bill.TYPE_EXPENSE)
         }
         btnFilterIncome.setOnClickListener {
-            setSegmentActive(2)
+            setSegmentActive(1)
             filterByType(Bill.TYPE_INCOME)
         }
         tvYearMonth.setOnClickListener {
@@ -315,10 +311,6 @@ class MainActivity : AppCompatActivity() {
         val days = billDao.getDaysInMonth(currentYear, currentMonth)
         dayPagerAdapter.submitDays(days)
 
-        val (expense, income) = billDao.getMonthSummary(currentYear, currentMonth)
-        tvHeaderExpense.text = "支出 ¥%.0f".format(expense)
-        tvHeaderIncome.text = "收入 ¥%.0f".format(income)
-
         if (days.isEmpty()) {
             tvEmpty.visibility = View.VISIBLE
             vpDayBills.visibility = View.GONE
@@ -332,8 +324,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun filterByType(type: Int) {
-        val typeName = if (type == Bill.TYPE_EXPENSE) "支出" else "收入"
-        tvYearMonth.text = "${currentYear}年${currentMonth}月 [$typeName]"
+        tvYearMonth.text = "${currentYear}年${currentMonth}月"
 
         val allDays = billDao.getDaysInMonth(currentYear, currentMonth)
         val filteredDays = allDays.mapNotNull { day ->
@@ -345,11 +336,6 @@ class MainActivity : AppCompatActivity() {
         }
 
         dayPagerAdapter.submitDays(filteredDays)
-
-        val totalExpense = filteredDays.sumOf { it.totalExpense }
-        val totalIncome = filteredDays.sumOf { it.totalIncome }
-        tvHeaderExpense.text = "支出 ¥%.0f".format(totalExpense)
-        tvHeaderIncome.text = "收入 ¥%.0f".format(totalIncome)
 
         if (filteredDays.isEmpty()) {
             tvEmpty.visibility = View.VISIBLE
@@ -455,7 +441,7 @@ class MainActivity : AppCompatActivity() {
         if (dioramaUri != null) {
             dioramaLayer.applyCustomImage(dioramaUri)
         } else {
-            dioramaLayer.applyPalette(palette)
+            dioramaLayer.applyDefaultImage(R.drawable.theme_default_bg)
         }
 
         // Layer 2: Background Plane glass morphism (or custom image)
@@ -474,10 +460,6 @@ class MainActivity : AppCompatActivity() {
         // Layer 3: Header text + shadows
         tvYearMonth.setTextColor(currentTextColor)
         tvYearMonth.setShadowLayer(6f, 0f, 2f, shadowColor)
-        tvHeaderExpense.setTextColor(palette.expenseColor)
-        tvHeaderExpense.setShadowLayer(4f, 0f, 1f, shadowColor)
-        tvHeaderIncome.setTextColor(palette.incomeColor)
-        tvHeaderIncome.setShadowLayer(4f, 0f, 1f, shadowColor)
 
         // Day summary text
         tvDayDate.setTextColor(currentSecondaryColor)

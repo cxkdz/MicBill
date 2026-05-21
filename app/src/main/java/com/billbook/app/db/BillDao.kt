@@ -9,6 +9,7 @@ import com.billbook.app.db.DatabaseHelper.Companion.COL_MONEY
 import com.billbook.app.db.DatabaseHelper.Companion.COL_TYPE
 import com.billbook.app.db.DatabaseHelper.Companion.COL_CATEGORY_ID
 import com.billbook.app.db.DatabaseHelper.Companion.COL_CATEGORY_NAME
+import com.billbook.app.db.DatabaseHelper.Companion.COL_CATEGORY_ICON
 import com.billbook.app.db.DatabaseHelper.Companion.COL_PAY_TYPE
 import com.billbook.app.db.DatabaseHelper.Companion.COL_BILL_TIME
 import com.billbook.app.db.DatabaseHelper.Companion.COL_REMARK
@@ -28,6 +29,7 @@ class BillDao(context: Context) {
             put(COL_TYPE, bill.type)
             put(COL_CATEGORY_ID, bill.categoryId)
             put(COL_CATEGORY_NAME, bill.categoryName)
+            put(COL_CATEGORY_ICON, bill.categoryIcon)
             put(COL_PAY_TYPE, bill.payType)
             put(COL_BILL_TIME, bill.billTime)
             put(COL_REMARK, bill.remark)
@@ -49,6 +51,7 @@ class BillDao(context: Context) {
                     put(COL_TYPE, bill.type)
                     put(COL_CATEGORY_ID, bill.categoryId)
                     put(COL_CATEGORY_NAME, bill.categoryName)
+                    put(COL_CATEGORY_ICON, bill.categoryIcon)
                     put(COL_PAY_TYPE, bill.payType)
                     put(COL_BILL_TIME, bill.billTime)
                     put(COL_REMARK, bill.remark)
@@ -73,6 +76,7 @@ class BillDao(context: Context) {
             put(COL_TYPE, bill.type)
             put(COL_CATEGORY_ID, bill.categoryId)
             put(COL_CATEGORY_NAME, bill.categoryName)
+            put(COL_CATEGORY_ICON, bill.categoryIcon)
             put(COL_PAY_TYPE, bill.payType)
             put(COL_BILL_TIME, bill.billTime)
             put(COL_REMARK, bill.remark)
@@ -286,6 +290,7 @@ class BillDao(context: Context) {
             type = cursor.getInt(cursor.getColumnIndexOrThrow(COL_TYPE)),
             categoryId = cursor.getLong(cursor.getColumnIndexOrThrow(COL_CATEGORY_ID)),
             categoryName = cursor.getString(cursor.getColumnIndexOrThrow(COL_CATEGORY_NAME)) ?: "",
+            categoryIcon = cursor.getString(cursor.getColumnIndexOrThrow(COL_CATEGORY_ICON)) ?: "",
             payType = cursor.getString(cursor.getColumnIndexOrThrow(COL_PAY_TYPE)) ?: "",
             billTime = cursor.getLong(cursor.getColumnIndexOrThrow(COL_BILL_TIME)),
             remark = cursor.getString(cursor.getColumnIndexOrThrow(COL_REMARK)) ?: "",

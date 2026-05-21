@@ -8,7 +8,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DB_NAME, null
 
     companion object {
         const val DB_NAME = "billbook.db"
-        const val DB_VERSION = 2
+        const val DB_VERSION = 3
 
         // 账单表
         const val TABLE_BILL = "tb_bill"
@@ -17,6 +17,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DB_NAME, null
         const val COL_TYPE = "type"
         const val COL_CATEGORY_ID = "category_id"
         const val COL_CATEGORY_NAME = "category_name"
+        const val COL_CATEGORY_ICON = "category_icon"
         const val COL_PAY_TYPE = "pay_type"
         const val COL_BILL_TIME = "bill_time"
         const val COL_REMARK = "remark"
@@ -60,6 +61,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DB_NAME, null
                 $COL_TYPE INTEGER NOT NULL DEFAULT 0,
                 $COL_CATEGORY_ID INTEGER NOT NULL DEFAULT 0,
                 $COL_CATEGORY_NAME TEXT NOT NULL DEFAULT '',
+                $COL_CATEGORY_ICON TEXT DEFAULT '',
                 $COL_PAY_TYPE TEXT NOT NULL DEFAULT '微信',
                 $COL_BILL_TIME INTEGER NOT NULL,
                 $COL_REMARK TEXT DEFAULT '',
@@ -129,6 +131,11 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DB_NAME, null
                 )
             """)
             db.execSQL("CREATE INDEX IF NOT EXISTS idx_budget_ym ON $TABLE_BUDGET_CATEGORY($COL_BUDGET_CAT_YEAR_MONTH)")
+        }
+        if (oldVersion < 3) {
+            db.execSQL("ALTER TABLE $TABLE_BILL ADD COLUMN $COL_CATEGORY_ICON TEXT DEFAULT ''")
+            // 回填已有账单的分类图标
+            db.execSQL("UPDATE $TABLE_BILL SET $COL_CATEGORY_ICON = (SELECT $COL_CAT_ICON FROM $TABLE_CATEGORY WHERE $TABLE_CATEGORY.$COL_CAT_NAME = $TABLE_BILL.$COL_CATEGORY_NAME AND $TABLE_CATEGORY.$COL_CAT_TYPE = $TABLE_BILL.$COL_TYPE) WHERE $COL_CATEGORY_ICON = '' OR $COL_CATEGORY_ICON IS NULL")
         }
     }
 
