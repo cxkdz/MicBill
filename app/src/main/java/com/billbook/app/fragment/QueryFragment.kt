@@ -1,6 +1,6 @@
 package com.billbook.app.fragment
 
-import android.app.DatePickerDialog
+import com.billbook.app.animation.AnimeDatePickerDialog
 import com.billbook.app.util.BackgroundApplier
 import com.billbook.app.util.FrostGlassApplier
 import com.billbook.app.util.ThemeManager
@@ -59,17 +59,19 @@ class QueryFragment : Fragment() {
 
     private fun setupDatePickers() {
         binding.tvStartDate.setOnClickListener {
-            DatePickerDialog(requireContext(), { _, year, month, day ->
+            AnimeDatePickerDialog(requireContext(), calStart.timeInMillis) { year, month, day, _, _ ->
                 calStart.set(year, month, day, 0, 0, 0)
+                calStart.set(Calendar.MILLISECOND, 0)
                 updateDateDisplay()
-            }, calStart.get(Calendar.YEAR), calStart.get(Calendar.MONTH), calStart.get(Calendar.DAY_OF_MONTH)).show()
+            }.show()
         }
 
         binding.tvEndDate.setOnClickListener {
-            DatePickerDialog(requireContext(), { _, year, month, day ->
+            AnimeDatePickerDialog(requireContext(), calEnd.timeInMillis) { year, month, day, _, _ ->
                 calEnd.set(year, month, day, 23, 59, 59)
+                calEnd.set(Calendar.MILLISECOND, 999)
                 updateDateDisplay()
-            }, calEnd.get(Calendar.YEAR), calEnd.get(Calendar.MONTH), calEnd.get(Calendar.DAY_OF_MONTH)).show()
+            }.show()
         }
     }
 

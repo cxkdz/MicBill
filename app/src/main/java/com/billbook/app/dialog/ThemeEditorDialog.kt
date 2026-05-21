@@ -51,6 +51,14 @@ class ThemeEditorDialog : DialogFragment() {
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.WRAP_CONTENT
         )
+        // 应用二次元风格背景
+        dialog?.window?.setBackgroundDrawable(
+            android.graphics.drawable.GradientDrawable().apply {
+                setColor(0xE61A1A2E.toInt())
+                cornerRadius = 20 * resources.displayMetrics.density
+                setStroke((1 * resources.displayMetrics.density).toInt(), 0x20FFFFFF)
+            }
+        )
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

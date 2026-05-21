@@ -142,12 +142,14 @@ class SettingsFragment : Fragment() {
             appendLine("\n是否导入？")
         }
 
-        AlertDialog.Builder(requireContext())
-            .setTitle("导入微信账单")
-            .setMessage(message)
-            .setPositiveButton("导入") { _, _ -> executeWechatImport(uri) }
-            .setNegativeButton("取消", null)
-            .show()
+        com.billbook.app.util.AnimeDialogHelper.show(
+            context = requireContext(),
+            title = "导入微信账单",
+            message = message,
+            positiveText = "导入",
+            negativeText = "取消",
+            onPositive = { executeWechatImport(uri) }
+        )
     }
 
     private fun executeWechatImport(uri: Uri) {
@@ -165,11 +167,13 @@ class SettingsFragment : Fragment() {
             try { billDao.insert(bill); insertCount++ } catch (_: Exception) {}
         }
 
-        AlertDialog.Builder(requireContext())
-            .setTitle("导入结果")
-            .setMessage("导入完成！成功导入：$insertCount 条")
-            .setPositiveButton("确定") { _, _ -> activity?.recreate() }
-            .show()
+        com.billbook.app.util.AnimeDialogHelper.show(
+            context = requireContext(),
+            title = "导入结果",
+            message = "导入完成！成功导入：$insertCount 条",
+            positiveText = "确定",
+            onPositive = { activity?.recreate() }
+        )
     }
 
     private fun importAlipayBill(uri: Uri) {
@@ -188,12 +192,14 @@ class SettingsFragment : Fragment() {
             appendLine("\n是否导入？")
         }
 
-        AlertDialog.Builder(requireContext())
-            .setTitle("导入支付宝账单")
-            .setMessage(message)
-            .setPositiveButton("导入") { _, _ -> executeAlipayImport(uri) }
-            .setNegativeButton("取消", null)
-            .show()
+        com.billbook.app.util.AnimeDialogHelper.show(
+            context = requireContext(),
+            title = "导入支付宝账单",
+            message = message,
+            positiveText = "导入",
+            negativeText = "取消",
+            onPositive = { executeAlipayImport(uri) }
+        )
     }
 
     private fun executeAlipayImport(uri: Uri) {
@@ -211,11 +217,13 @@ class SettingsFragment : Fragment() {
             try { billDao.insert(bill); insertCount++ } catch (_: Exception) {}
         }
 
-        AlertDialog.Builder(requireContext())
-            .setTitle("导入结果")
-            .setMessage("导入完成！成功导入：$insertCount 条")
-            .setPositiveButton("确定") { _, _ -> activity?.recreate() }
-            .show()
+        com.billbook.app.util.AnimeDialogHelper.show(
+            context = requireContext(),
+            title = "导入结果",
+            message = "导入完成！成功导入：$insertCount 条",
+            positiveText = "确定",
+            onPositive = { activity?.recreate() }
+        )
     }
 
     private fun setupThemeEditor() {
@@ -258,24 +266,28 @@ class SettingsFragment : Fragment() {
     }
 
     private fun showTiltAngleDialog() {
+        val dp = resources.displayMetrics.density
         val container = android.widget.LinearLayout(requireContext()).apply {
             orientation = android.widget.LinearLayout.VERTICAL
-            val dp = resources.displayMetrics.density
-            setPadding((48 * dp).toInt(), (24 * dp).toInt(), (48 * dp).toInt(), (8 * dp).toInt())
+            setPadding((32 * dp).toInt(), (20 * dp).toInt(), (32 * dp).toInt(), (8 * dp).toInt())
         }
 
+        // 角度数值显示
         val tvAngle = android.widget.TextView(requireContext()).apply {
             text = "${themeManager.getTiltAngle()}°"
-            textSize = 20f
+            textSize = 28f
             setTypeface(null, android.graphics.Typeface.BOLD)
             gravity = android.view.Gravity.CENTER
-            setTextColor(resources.getColor(com.billbook.app.R.color.text_primary, null))
+            setTextColor(0xE0FFFFFF.toInt())
         }
         container.addView(tvAngle)
 
+        // SeekBar
         val seekBar = SeekBar(requireContext()).apply {
             max = 45
             progress = themeManager.getTiltAngle()
+            thumb?.setTint(0xFF6B8DD6.toInt())
+            progressDrawable?.setTint(0xFF6B8DD6.toInt())
             setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
                 override fun onProgressChanged(sb: SeekBar?, progress: Int, fromUser: Boolean) {
                     tvAngle.text = "${progress}°"
@@ -293,14 +305,32 @@ class SettingsFragment : Fragment() {
             android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
             android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
         )
-        lp.topMargin = (16 * resources.displayMetrics.density).toInt()
+        lp.topMargin = (16 * dp).toInt()
         container.addView(seekBar, lp)
 
-        AlertDialog.Builder(requireContext())
-            .setTitle("倾斜角度")
+        // 提示文字
+        container.addView(android.widget.TextView(requireContext()).apply {
+            text = "调整 3D 背景的倾斜透视效果"
+            textSize = 12f
+            setTextColor(0x50FFFFFF.toInt())
+            gravity = android.view.Gravity.CENTER
+            setPadding(0, (8 * dp).toInt(), 0, 0)
+        })
+
+        val dialog = AlertDialog.Builder(requireContext(), android.R.style.Theme_DeviceDefault_Dialog_NoActionBar)
             .setView(container)
             .setPositiveButton("完成", null)
-            .show()
+            .create()
+
+        dialog.setOnShowListener {
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE)?.apply {
+                setTextColor(0xFF6B8DD6.toInt())
+                textSize = 15f
+            }
+        }
+
+        dialog.show()
+        com.billbook.app.util.AnimeDialogHelper.applyAnimeStyle(dialog)
     }
 
     private fun setupCustomImageBg() {
@@ -321,24 +351,28 @@ class SettingsFragment : Fragment() {
     }
 
     private fun showOpacityDialog() {
+        val dp = resources.displayMetrics.density
         val container = android.widget.LinearLayout(requireContext()).apply {
             orientation = android.widget.LinearLayout.VERTICAL
-            val dp = resources.displayMetrics.density
-            setPadding((48 * dp).toInt(), (24 * dp).toInt(), (48 * dp).toInt(), (8 * dp).toInt())
+            setPadding((32 * dp).toInt(), (20 * dp).toInt(), (32 * dp).toInt(), (8 * dp).toInt())
         }
 
+        // 透明度数值显示
         val tvValue = android.widget.TextView(requireContext()).apply {
             text = "${themeManager.getBgOpacity()}%"
-            textSize = 20f
+            textSize = 28f
             setTypeface(null, android.graphics.Typeface.BOLD)
             gravity = android.view.Gravity.CENTER
-            setTextColor(resources.getColor(com.billbook.app.R.color.text_primary, null))
+            setTextColor(0xE0FFFFFF.toInt())
         }
         container.addView(tvValue)
 
+        // SeekBar
         val seekBar = SeekBar(requireContext()).apply {
             max = 100
             progress = themeManager.getBgOpacity()
+            thumb?.setTint(0xFF6B8DD6.toInt())
+            progressDrawable?.setTint(0xFF6B8DD6.toInt())
             setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
                 override fun onProgressChanged(sb: SeekBar?, progress: Int, fromUser: Boolean) {
                     tvValue.text = "$progress%"
@@ -353,16 +387,34 @@ class SettingsFragment : Fragment() {
             android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
             android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
         )
-        lp.topMargin = (16 * resources.displayMetrics.density).toInt()
+        lp.topMargin = (16 * dp).toInt()
         container.addView(seekBar, lp)
 
-        AlertDialog.Builder(requireContext())
-            .setTitle("背景透明度")
+        // 提示文字
+        container.addView(android.widget.TextView(requireContext()).apply {
+            text = "越高越淡，文字越清晰\n建议 20% ~ 40%"
+            textSize = 12f
+            setTextColor(0x50FFFFFF.toInt())
+            gravity = android.view.Gravity.CENTER
+            setPadding(0, (8 * dp).toInt(), 0, 0)
+        })
+
+        val dialog = AlertDialog.Builder(requireContext(), android.R.style.Theme_DeviceDefault_Dialog_NoActionBar)
             .setView(container)
             .setPositiveButton("完成") { _, _ ->
                 requireActivity().recreate()
             }
-            .show()
+            .create()
+
+        dialog.setOnShowListener {
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE)?.apply {
+                setTextColor(0xFF6B8DD6.toInt())
+                textSize = 15f
+            }
+        }
+
+        dialog.show()
+        com.billbook.app.util.AnimeDialogHelper.applyAnimeStyle(dialog)
     }
 
     private fun openImagePicker() {
@@ -382,16 +434,19 @@ class SettingsFragment : Fragment() {
             themeManager.setCustomBackground(uri)
             updateCustomBgStatus()
 
-            AlertDialog.Builder(requireContext())
-                .setTitle("图片已导入")
-                .setMessage("是否现在调整背景透明度？\n\n透明度越高，背景越淡，文字越清晰。\n建议设为20%-40%。")
-                .setPositiveButton("调整") { _, _ -> showOpacityDialog() }
-                .setNegativeButton("使用默认") { _, _ ->
+            com.billbook.app.util.AnimeDialogHelper.show(
+                context = requireContext(),
+                title = "图片已导入",
+                message = "是否现在调整背景透明度？\n\n透明度越高，背景越淡，文字越清晰。\n建议设为20%-40%。",
+                positiveText = "调整",
+                negativeText = "使用默认",
+                neutralText = "稍后设置",
+                onPositive = { showOpacityDialog() },
+                onNegative = {
                     themeManager.setBgOpacity(30)
                     updateOpacityDisplay()
                 }
-                .setNeutralButton("稍后设置", null)
-                .show()
+            )
         } catch (e: Exception) {
             Toast.makeText(requireContext(), "图片读取失败：${e.message}", Toast.LENGTH_SHORT).show()
         }
@@ -469,32 +524,37 @@ class SettingsFragment : Fragment() {
     private fun showCategoryDialog() {
         val categoryDao = CategoryDao(requireContext())
         val categories = categoryDao.getAll()
-        val names = categories.map { "${it.icon} ${it.name}" }.toTypedArray()
+        val items = categories.map { Pair(it.icon, it.name) }
 
-        AlertDialog.Builder(requireContext())
-            .setTitle("分类管理")
-            .setItems(names) { _, which -> showEditCategoryDialog(categories[which]) }
-            .setPositiveButton("关闭", null)
-            .show()
+        com.billbook.app.util.AnimeDialogHelper.showIconListDialog(
+            context = requireContext(),
+            title = "分类管理",
+            items = items,
+            onItemSelected = { index -> showEditCategoryDialog(categories[index]) }
+        )
     }
 
     private fun showAddCategoryDialog() {
-        val types = arrayOf("支出分类", "收入分类")
-        AlertDialog.Builder(requireContext())
-            .setTitle("添加分类类型")
-            .setItems(types) { _, which ->
+        val types = listOf("支出分类", "收入分类")
+        com.billbook.app.util.AnimeDialogHelper.showListDialog(
+            context = requireContext(),
+            title = "添加分类类型",
+            items = types,
+            onItemSelected = { which ->
                 val type = if (which == 0) com.billbook.app.model.Bill.TYPE_EXPENSE else com.billbook.app.model.Bill.TYPE_INCOME
                 showEditCategoryDialog(null, type)
             }
-            .show()
+        )
     }
 
     private fun showEditCategoryDialog(category: Category?, defaultType: Int = 0) {
-        val icons = CategoryIcons.ALL_ICONS.toTypedArray()
+        val icons = CategoryIcons.ALL_ICONS
 
-        AlertDialog.Builder(requireContext())
-            .setTitle(if (category == null) "选择图标" else "修改图标")
-            .setItems(icons) { _, iconIndex ->
+        com.billbook.app.util.AnimeDialogHelper.showListDialog(
+            context = requireContext(),
+            title = if (category == null) "选择图标" else "修改图标",
+            items = icons,
+            onItemSelected = { iconIndex ->
                 val selectedIcon = icons[iconIndex]
                 if (category != null) {
                     val categoryDao = CategoryDao(requireContext())
@@ -505,7 +565,7 @@ class SettingsFragment : Fragment() {
                     Toast.makeText(requireContext(), "选中图标：$selectedIcon，请完善分类信息", Toast.LENGTH_SHORT).show()
                 }
             }
-            .show()
+        )
     }
 
     override fun onDestroyView() {

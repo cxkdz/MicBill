@@ -1,13 +1,11 @@
 package com.billbook.app.fragment
 
-import android.app.AlertDialog
+import com.billbook.app.util.AnimeDialogHelper
 import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
-import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.billbook.app.R
@@ -70,16 +68,18 @@ class BudgetFragment : Fragment() {
         }
 
         binding.btnClearBudget.setOnClickListener {
-            AlertDialog.Builder(requireContext())
-                .setTitle("确认清除")
-                .setMessage("清除总预算将同时删除所有分类预算，确定要清除吗？")
-                .setPositiveButton("确定") { _, _ ->
+            AnimeDialogHelper.show(
+                context = requireContext(),
+                title = "确认清除",
+                message = "清除总预算将同时删除所有分类预算，确定要清除吗？",
+                positiveText = "确定",
+                negativeText = "取消",
+                onPositive = {
                     budgetManager.clearBudget()
                     refreshAll()
                     Toast.makeText(requireContext(), "预算已清除", Toast.LENGTH_SHORT).show()
                 }
-                .setNegativeButton("取消", null)
-                .show()
+            )
         }
     }
 
@@ -94,19 +94,29 @@ class BudgetFragment : Fragment() {
     }
 
     private fun showBudgetInputDialog() {
-        val input = EditText(requireContext()).apply {
-            hint = "请输入本月预算金额"
+        val dp = resources.displayMetrics.density
+        val currentBudget = budgetManager.getBudget()
+        val input = AnimeDialogHelper.createEditText(
+            context = requireContext(),
+            hint = "请输入本月预算金额",
+            prefill = if (currentBudget > 0) currentBudget.toString() else ""
+        ).apply {
             inputType = android.text.InputType.TYPE_CLASS_NUMBER or android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL
-            val currentBudget = budgetManager.getBudget()
-            if (currentBudget > 0) {
-                setText(currentBudget.toString())
-            }
         }
 
-        AlertDialog.Builder(requireContext())
-            .setTitle("设置本月总预算")
-            .setView(input)
-            .setPositiveButton("确定") { _, _ ->
+        val container = android.widget.LinearLayout(requireContext()).apply {
+            orientation = android.widget.LinearLayout.VERTICAL
+            setPadding((24 * dp).toInt(), (8 * dp).toInt(), (24 * dp).toInt(), 0)
+            addView(input)
+        }
+
+        AnimeDialogHelper.show(
+            context = requireContext(),
+            title = "设置本月总预算",
+            customView = container,
+            positiveText = "确定",
+            negativeText = "取消",
+            onPositive = {
                 val amount = input.text.toString().toDoubleOrNull()
                 if (amount != null && amount > 0) {
                     budgetManager.setBudget(amount)
@@ -116,8 +126,7 @@ class BudgetFragment : Fragment() {
                     Toast.makeText(requireContext(), "请输入有效金额", Toast.LENGTH_SHORT).show()
                 }
             }
-            .setNegativeButton("取消", null)
-            .show()
+        )
     }
 
     private fun showAddCategoryDialog() {
@@ -127,30 +136,41 @@ class BudgetFragment : Fragment() {
             return
         }
 
-        // 显示分类选择
-        val categories = BudgetCategory.SUGGESTED_CATEGORIES.map { "${it.second} ${it.first}" }.toTypedArray()
+        val categories = BudgetCategory.SUGGESTED_CATEGORIES.map { Pair(it.second, it.first) }
 
-        AlertDialog.Builder(requireContext())
-            .setTitle("选择预算分类")
-            .setItems(categories) { _, which ->
-                val (name, icon) = BudgetCategory.SUGGESTED_CATEGORIES[which]
+        AnimeDialogHelper.showIconListDialog(
+            context = requireContext(),
+            title = "选择预算分类",
+            items = categories,
+            onItemSelected = { index ->
+                val (name, icon) = BudgetCategory.SUGGESTED_CATEGORIES[index]
                 showSetCategoryAmountDialog(name, icon, null)
-            }
-            .setNeutralButton("自定义") { _, _ ->
-                showCustomCategoryDialog()
-            }
-            .show()
+            },
+            neutralText = "自定义",
+            onNeutral = { showCustomCategoryDialog() }
+        )
     }
 
     private fun showCustomCategoryDialog() {
-        val input = EditText(requireContext()).apply {
+        val dp = resources.displayMetrics.density
+        val input = AnimeDialogHelper.createEditText(
+            context = requireContext(),
             hint = "输入分类名称（如：健身、宠物）"
+        )
+
+        val container = android.widget.LinearLayout(requireContext()).apply {
+            orientation = android.widget.LinearLayout.VERTICAL
+            setPadding((24 * dp).toInt(), (8 * dp).toInt(), (24 * dp).toInt(), 0)
+            addView(input)
         }
 
-        AlertDialog.Builder(requireContext())
-            .setTitle("自定义分类")
-            .setView(input)
-            .setPositiveButton("下一步") { _, _ ->
+        AnimeDialogHelper.show(
+            context = requireContext(),
+            title = "自定义分类",
+            customView = container,
+            positiveText = "下一步",
+            negativeText = "取消",
+            onPositive = {
                 val name = input.text.toString().trim()
                 if (name.isNotEmpty()) {
                     showIconSelectDialog(name)
@@ -158,52 +178,63 @@ class BudgetFragment : Fragment() {
                     Toast.makeText(requireContext(), "请输入分类名称", Toast.LENGTH_SHORT).show()
                 }
             }
-            .setNegativeButton("取消", null)
-            .show()
+        )
     }
 
     private fun showIconSelectDialog(categoryName: String) {
-        val icons = arrayOf("🍜", "🚗", "🛒", "🎮", "🏠", "💊", "📚", "📱", "👔", "🎭", "💪", "🐱", "💄", "✈️", "🎵", "🎬", "⚽", "🎯", "💼", "🔧")
+        val icons = listOf("🍜", "🚗", "🛒", "🎮", "🏠", "💊", "📚", "📱", "👔", "🎭", "💪", "🐱", "💄", "✈️", "🎵", "🎬", "⚽", "🎯", "💼", "🔧")
 
-        AlertDialog.Builder(requireContext())
-            .setTitle("选择图标")
-            .setItems(icons) { _, which ->
+        AnimeDialogHelper.showListDialog(
+            context = requireContext(),
+            title = "选择图标",
+            items = icons,
+            onItemSelected = { which ->
                 showSetCategoryAmountDialog(categoryName, icons[which], null)
             }
-            .show()
+        )
     }
 
     private fun showSetCategoryAmountDialog(name: String, icon: String, existingCategory: BudgetCategory?) {
+        val dp = resources.displayMetrics.density
         val available = if (existingCategory != null) {
             budgetManager.getAvailableToAllocate() + existingCategory.budgetAmount
         } else {
             budgetManager.getAvailableToAllocate()
         }
 
-        val input = EditText(requireContext()).apply {
-            hint = "可分配金额：¥%.2f".format(available)
+        val input = AnimeDialogHelper.createEditText(
+            context = requireContext(),
+            hint = "可分配金额：¥%.2f".format(available),
+            prefill = existingCategory?.budgetAmount?.toString() ?: ""
+        ).apply {
             inputType = android.text.InputType.TYPE_CLASS_NUMBER or android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL
-            existingCategory?.let {
-                setText(it.budgetAmount.toString())
-            }
+        }
+
+        val container = android.widget.LinearLayout(requireContext()).apply {
+            orientation = android.widget.LinearLayout.VERTICAL
+            setPadding((24 * dp).toInt(), (8 * dp).toInt(), (24 * dp).toInt(), 0)
+            addView(input)
         }
 
         val title = if (existingCategory != null) "修改预算金额" else "设置预算金额"
 
-        AlertDialog.Builder(requireContext())
-            .setTitle(title)
-            .setMessage("分类：$icon $name\n可分配余额：¥%.2f".format(available))
-            .setView(input)
-            .setPositiveButton("确定") { _, _ ->
+        AnimeDialogHelper.show(
+            context = requireContext(),
+            title = title,
+            message = "分类：$icon $name\n可分配余额：¥%.2f".format(available),
+            customView = container,
+            positiveText = "确定",
+            negativeText = "取消",
+            onPositive = {
                 val amount = input.text.toString().toDoubleOrNull()
                 if (amount == null || amount <= 0) {
                     Toast.makeText(requireContext(), "请输入有效金额", Toast.LENGTH_SHORT).show()
-                    return@setPositiveButton
+                    return@show
                 }
 
                 if (amount > available) {
                     Toast.makeText(requireContext(), "金额超出可分配范围", Toast.LENGTH_SHORT).show()
-                    return@setPositiveButton
+                    return@show
                 }
 
                 if (existingCategory != null) {
@@ -215,33 +246,36 @@ class BudgetFragment : Fragment() {
                 }
                 refreshAll()
             }
-            .setNegativeButton("取消", null)
-            .show()
+        )
     }
 
     private fun showEditCategoryDialog(info: BudgetManager.CategoryBudgetInfo) {
-        val options = arrayOf("修改金额", "删除分类")
+        val options = listOf("修改金额", "删除分类")
 
-        AlertDialog.Builder(requireContext())
-            .setTitle("${info.category.icon} ${info.category.name}")
-            .setItems(options) { _, which ->
+        AnimeDialogHelper.showListDialog(
+            context = requireContext(),
+            title = "${info.category.icon} ${info.category.name}",
+            items = options,
+            onItemSelected = { which ->
                 when (which) {
                     0 -> showSetCategoryAmountDialog(info.category.name, info.category.icon, info.category)
                     1 -> {
-                        AlertDialog.Builder(requireContext())
-                            .setTitle("确认删除")
-                            .setMessage("确定要删除「${info.category.name}」分类预算吗？")
-                            .setPositiveButton("删除") { _, _ ->
+                        AnimeDialogHelper.show(
+                            context = requireContext(),
+                            title = "确认删除",
+                            message = "确定要删除「${info.category.name}」分类预算吗？",
+                            positiveText = "删除",
+                            negativeText = "取消",
+                            onPositive = {
                                 budgetManager.deleteCategoryBudget(info.category.id)
                                 refreshAll()
                                 Toast.makeText(requireContext(), "已删除", Toast.LENGTH_SHORT).show()
                             }
-                            .setNegativeButton("取消", null)
-                            .show()
+                        )
                     }
                 }
             }
-            .show()
+        )
     }
 
     private fun refreshAll() {
@@ -373,16 +407,18 @@ class BudgetFragment : Fragment() {
             }
 
             itemBinding.btnDelete.setOnClickListener {
-                AlertDialog.Builder(requireContext())
-                    .setTitle("确认删除")
-                    .setMessage("确定要删除「${info.category.name}」分类预算吗？")
-                    .setPositiveButton("删除") { _, _ ->
+                AnimeDialogHelper.show(
+                    context = requireContext(),
+                    title = "确认删除",
+                    message = "确定要删除「${info.category.name}」分类预算吗？",
+                    positiveText = "删除",
+                    negativeText = "取消",
+                    onPositive = {
                         budgetManager.deleteCategoryBudget(info.category.id)
                         refreshAll()
                         Toast.makeText(requireContext(), "已删除", Toast.LENGTH_SHORT).show()
                     }
-                    .setNegativeButton("取消", null)
-                    .show()
+                )
             }
 
             // 自动对比度：卡片背景 + 文字颜色（磨砂玻璃）

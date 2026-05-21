@@ -15,7 +15,7 @@
             android:text="3D 空间主题"
             android:textSize="@dimen/text_xl"
             android:textStyle="bold"
-            android:textColor="#1A1A2E"
+            android:textColor="@color/anime_text_primary"
             android:layout_marginBottom="@dimen/spacing_md" />
 
         <!-- 自定义图片背景 -->
@@ -25,7 +25,7 @@
             android:text="自定义场景背景"
             android:textSize="@dimen/text_md"
             android:textStyle="bold"
-            android:textColor="#1A1A2E"
+            android:textColor="@color/anime_text_primary"
             android:layout_marginBottom="@dimen/spacing_sm" />
 
         <TextView
@@ -33,7 +33,7 @@
             android:layout_height="wrap_content"
             android:text="选择一张图片作为 3D 场景背景"
             android:textSize="@dimen/text_xs"
-            android:textColor="#801A1A2E"
+            android:textColor="@color/anime_text_hint"
             android:layout_marginBottom="@dimen/spacing_sm" />
 
         <!-- 图片预览 -->
@@ -64,14 +64,14 @@
                 android:layout_width="0dp"
                 android:layout_height="44dp"
                 android:layout_weight="1"
-                android:background="@drawable/selector_neu_button">
+                android:background="@drawable/bg_anime_button">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:text="选择图片"
-                    android:textColor="#1A1A2E"
+                    android:textColor="@color/anime_text_primary"
                     android:textSize="@dimen/text_sm" />
             </FrameLayout>
 
@@ -84,7 +84,7 @@
                 android:layout_width="0dp"
                 android:layout_height="44dp"
                 android:layout_weight="1"
-                android:background="@drawable/selector_neu_button"
+                android:background="@drawable/bg_anime_button"
                 android:visibility="gone">
 
                 <TextView
@@ -92,7 +92,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:text="清除图片"
-                    android:textColor="#801A1A2E"
+                    android:textColor="@color/anime_text_hint"
                     android:textSize="@dimen/text_sm" />
             </FrameLayout>
         </LinearLayout>
@@ -101,7 +101,7 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="#15000000"
+            android:background="@color/anime_divider"
             android:layout_marginBottom="@dimen/spacing_md" />
 
         <!-- 按钮行 -->
@@ -118,7 +118,7 @@
                 android:gravity="center"
                 android:paddingHorizontal="@dimen/spacing_lg"
                 android:text="取消"
-                android:textColor="#801A1A2E"
+                android:textColor="@color/anime_text_hint"
                 android:textSize="@dimen/text_md" />
 
             <TextView
@@ -128,7 +128,7 @@
                 android:gravity="center"
                 android:paddingHorizontal="@dimen/spacing_lg"
                 android:text="应用"
-                android:textColor="#6B8DD6"
+                android:textColor="@color/anime_accent"
                 android:textSize="@dimen/text_md"
                 android:textStyle="bold" />
         </LinearLayout>

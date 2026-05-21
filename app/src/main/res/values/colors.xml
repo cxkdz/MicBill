@@ -80,4 +80,6 @@
     <color name="anime_input_fill">#10FFFFFF</color>
     <color name="anime_bubble_fill">#20FFFFFF</color>
     <color name="anime_particle">#30FFFFFF</color>
+    <color name="anime_divider">#15FFFFFF</color>
+    <color name="anime_accent">#FF6B8DD6</color>
 </resources>
