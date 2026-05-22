@@ -20,6 +20,7 @@ import java.util.Calendar
 class AnimeDatePickerDialog(
     context: Context,
     private val initialTimeMillis: Long = System.currentTimeMillis(),
+    private val showDayToggle: Boolean = false,
     private val onDateTimeSelected: (year: Int, month: Int, day: Int, hour: Int, minute: Int) -> Unit
 ) : Dialog(context, android.R.style.Theme_Translucent_NoTitleBar) {
 
@@ -27,6 +28,7 @@ class AnimeDatePickerDialog(
     private lateinit var tvYearTitle: TextView
     private lateinit var tvMonthTitle: TextView
     private lateinit var rvDays: RecyclerView
+    private lateinit var weekdayRow: LinearLayout
     private lateinit var btnPrevYear: ImageView
     private lateinit var btnNextYear: ImageView
     private lateinit var btnPrevMonth: ImageView
@@ -34,6 +36,8 @@ class AnimeDatePickerDialog(
     private lateinit var btnToday: TextView
     private lateinit var btnCancel: TextView
     private lateinit var btnConfirm: TextView
+    private lateinit var switchDayPrecision: android.widget.CheckBox
+    private lateinit var layoutTimePicker: LinearLayout
 
     // 时间选择器
     private lateinit var btnPrevHour: ImageView
@@ -70,6 +74,20 @@ class AnimeDatePickerDialog(
         updateTimeDisplay()
         loadDays()
 
+        layoutTimePicker.visibility = View.GONE
+        if (showDayToggle) {
+            switchDayPrecision.setOnCheckedChangeListener { _, isChecked ->
+                val vis = if (isChecked) View.VISIBLE else View.GONE
+                weekdayRow.visibility = vis
+                rvDays.visibility = vis
+            }
+            switchDayPrecision.isChecked = false
+            weekdayRow.visibility = View.GONE
+            rvDays.visibility = View.GONE
+        } else {
+            switchDayPrecision.visibility = View.GONE
+        }
+
         playEntryAnimation()
     }
 
@@ -78,12 +96,15 @@ class AnimeDatePickerDialog(
         tvYearTitle = findViewById(R.id.tvYearTitle)
         tvMonthTitle = findViewById(R.id.tvMonthTitle)
         rvDays = findViewById(R.id.rvDays)
+        weekdayRow = findViewById(R.id.weekdayRow)
         btnPrevYear = findViewById(R.id.btnPrevYear)
         btnNextYear = findViewById(R.id.btnNextYear)
         btnPrevMonth = findViewById(R.id.btnPrevMonth)
         btnNextMonth = findViewById(R.id.btnNextMonth)
         btnToday = findViewById(R.id.btnToday)
         btnCancel = findViewById(R.id.btnCancel)
+        switchDayPrecision = findViewById(R.id.switchDayPrecision)
+        layoutTimePicker = findViewById(R.id.layoutTimePicker)
         btnConfirm = findViewById(R.id.btnConfirm)
 
         btnPrevHour = findViewById(R.id.btnPrevHour)

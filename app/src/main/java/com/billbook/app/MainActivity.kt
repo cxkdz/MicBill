@@ -289,30 +289,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showMonthPickerDialog() {
-        val dialogView = layoutInflater.inflate(R.layout.dialog_month_picker, null)
-        val yearPicker = dialogView.findViewById<android.widget.NumberPicker>(R.id.pickerYear)
-        val monthPicker = dialogView.findViewById<android.widget.NumberPicker>(R.id.pickerMonth)
-
-        yearPicker.minValue = 2000
-        yearPicker.maxValue = 2099
-        yearPicker.value = currentYear
-        yearPicker.wrapSelectorWheel = false
-
-        monthPicker.minValue = 1
-        monthPicker.maxValue = 12
-        monthPicker.value = currentMonth
-        monthPicker.displayedValues = (1..12).map { "${it}月" }.toTypedArray()
-
-        AlertDialog.Builder(this)
-            .setTitle("选择月份")
-            .setView(dialogView)
-            .setPositiveButton("确定") { _, _ ->
-                currentYear = yearPicker.value
-                currentMonth = monthPicker.value
-                refreshBillData()
-            }
-            .setNegativeButton("取消", null)
-            .show()
+        val cal = java.util.Calendar.getInstance()
+        cal.set(currentYear, currentMonth - 1, 1, 0, 0, 0)
+        com.billbook.app.animation.AnimeDatePickerDialog(this, cal.timeInMillis, showDayToggle = true) { year, month, _, _, _ ->
+            currentYear = year
+            currentMonth = month + 1
+            refreshBillData()
+        }.show()
     }
 
     private fun refreshBillData() {
