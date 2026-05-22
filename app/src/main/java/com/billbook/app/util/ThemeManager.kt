@@ -34,6 +34,7 @@ class ThemeManager(context: Context) {
         const val KEY_TILT_ANGLE = "tilt_angle"
         const val KEY_CUSTOM_DIORAMA_URI = "custom_diorama_uri"
         const val KEY_TEXT_COLOR_MODE = "text_color_mode"
+        const val KEY_SNOW_ENABLED = "snow_enabled"
 
         const val BG_MODE_COLOR = 0
         const val BG_MODE_CUSTOM_IMAGE = 1
@@ -367,6 +368,16 @@ class ThemeManager(context: Context) {
 
     fun setTextColorMode(mode: Int) {
         prefs.edit().putInt(KEY_TEXT_COLOR_MODE, mode.coerceIn(0, 2)).apply()
+    }
+
+    // ========== 雪花效果 ==========
+
+    fun isSnowEnabled(): Boolean {
+        return prefs.getBoolean(KEY_SNOW_ENABLED, true)
+    }
+
+    fun setSnowEnabled(enabled: Boolean) {
+        prefs.edit().putBoolean(KEY_SNOW_ENABLED, enabled).apply()
     }
 
     fun getEffectivePalette(): ThemePalette {

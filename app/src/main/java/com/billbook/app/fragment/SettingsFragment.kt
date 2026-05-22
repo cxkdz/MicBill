@@ -70,6 +70,7 @@ class SettingsFragment : Fragment() {
 
         setupThemeEditor()
         setupDarkModeSwitch()
+        setupSnowSwitch()
         setupTiltAngle()
         setupCustomImageBg()
 
@@ -255,6 +256,18 @@ class SettingsFragment : Fragment() {
             } else {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
             }
+            requireActivity().recreate()
+        }
+    }
+
+    private fun setupSnowSwitch() {
+        val isEnabled = themeManager.isSnowEnabled()
+        binding.switchSnow.isChecked = isEnabled
+        binding.tvSnowStatus.text = if (isEnabled) "开启" else "关闭"
+
+        binding.switchSnow.setOnCheckedChangeListener { _, isChecked ->
+            themeManager.setSnowEnabled(isChecked)
+            binding.tvSnowStatus.text = if (isChecked) "开启" else "关闭"
             requireActivity().recreate()
         }
     }

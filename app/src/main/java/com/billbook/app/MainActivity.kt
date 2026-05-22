@@ -75,6 +75,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var statusBarGradient: View
     private lateinit var bottomGradient: View
 
+    // 雪花动画
+    private lateinit var snowfallView: View
+
     // WindowInsets controller for status bar icon color
     private lateinit var insetsController: WindowInsetsControllerCompat
 
@@ -144,6 +147,7 @@ class MainActivity : AppCompatActivity() {
         tvDayDate = findViewById(R.id.tvDayDate)
         tvDayExpense = findViewById(R.id.tvDayExpense)
         tvDayIncome = findViewById(R.id.tvDayIncome)
+        snowfallView = findViewById(R.id.snowfallView)
 
         // CRITICAL: pivot at bottom edge for correct 3D rotation
         backgroundPlane.post {
@@ -373,6 +377,7 @@ class MainActivity : AppCompatActivity() {
         findViewById<View>(R.id.fragmentContainer).visibility = View.GONE
         vpDayBills.visibility = View.VISIBLE
         daySummary.visibility = View.VISIBLE
+        snowfallView.visibility = View.VISIBLE
         tvEmpty.visibility = View.GONE
         headerLayer.visibility = View.VISIBLE
         refreshBillData()
@@ -662,6 +667,7 @@ class MainActivity : AppCompatActivity() {
     private fun loadFragment(fragment: Fragment) {
         findViewById<View>(R.id.fragmentContainer).visibility = View.VISIBLE
         vpDayBills.visibility = View.GONE
+        snowfallView.visibility = View.GONE
         daySummary.visibility = View.GONE
         tvEmpty.visibility = View.GONE
         headerLayer.visibility = View.GONE

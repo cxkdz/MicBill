@@ -105,6 +105,14 @@
             android:visibility="gone" />
     </FrameLayout>
 
+    <!-- Layer 2.5: 雪花飘落动画层（主页） -->
+    <com.billbook.app.animation.SnowfallView
+        android:id="@+id/snowfallView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clickable="false"
+        android:focusable="false" />
+
     <!-- Layer 3: 浮动 Header（不参与3D倾斜） -->
     <LinearLayout
         android:id="@+id/headerLayer"

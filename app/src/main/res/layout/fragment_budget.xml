@@ -12,6 +12,13 @@
         android:clickable="false"
         android:focusable="false" />
 
+    <!-- 雪花飘落动画层 -->
+    <com.billbook.app.animation.SnowfallView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clickable="false"
+        android:focusable="false" />
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
