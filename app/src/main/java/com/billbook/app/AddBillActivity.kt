@@ -4,6 +4,7 @@ import android.animation.ObjectAnimator
 import android.graphics.Color
 import android.os.Bundle
 import android.view.View
+import android.widget.LinearLayout
 import android.view.animation.DecelerateInterpolator
 import android.widget.EditText
 import android.widget.TextView
@@ -14,8 +15,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
-import androidx.recyclerview.widget.GridLayoutManager
-import com.billbook.app.adapter.AnimeCategoryAdapter
+import com.billbook.app.adapter.CategoryPagerAdapter
 import com.billbook.app.animation.BubbleTipView
 import com.billbook.app.animation.GlowButton
 import com.billbook.app.databinding.ActivityAddBillBinding
@@ -151,15 +151,52 @@ class AddBillActivity : AppCompatActivity() {
         loadCategories()
     }
 
+    private var categoryPagerAdapter: CategoryPagerAdapter? = null
+    private var categoryPageCallback: androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback? = null
+
     private fun loadCategories() {
         val categories = categoryDao.getAll(billType)
-        val adapter = AnimeCategoryAdapter(categories) { category ->
+        val pagerAdapter = CategoryPagerAdapter(categories) { category ->
             selectedCategoryId = category.id
             selectedCategoryName = category.name
             selectedCategoryIcon = category.icon
         }
-        binding.rvCategories.layoutManager = GridLayoutManager(this, 4)
-        binding.rvCategories.adapter = adapter
+        categoryPagerAdapter = pagerAdapter
+        binding.vpCategories.adapter = pagerAdapter
+        setupDotIndicator(categories.size)
+        categoryPageCallback?.let { binding.vpCategories.unregisterOnPageChangeCallback(it) }
+        categoryPageCallback = object : androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                updateDotIndicator(position)
+            }
+        }
+        binding.vpCategories.registerOnPageChangeCallback(categoryPageCallback!!)
+    }
+
+    private val dots = mutableListOf<View>()
+
+    private fun setupDotIndicator(totalItems: Int) {
+        val pageCount = if (totalItems == 0) 0 else (totalItems + 11) / 12
+        binding.layoutDotIndicator.removeAllViews()
+        dots.clear()
+        binding.layoutDotIndicator.visibility = View.VISIBLE
+        val dp = resources.displayMetrics.density
+        for (i in 0 until pageCount) {
+            val dot = View(this).apply {
+                layoutParams = LinearLayout.LayoutParams((8 * dp).toInt(), (8 * dp).toInt()).apply {
+                    marginStart = if (i == 0) 0 else (6 * dp).toInt()
+                }
+                setBackgroundResource(if (i == 0) com.billbook.app.R.drawable.dot_active else com.billbook.app.R.drawable.dot_inactive)
+            }
+            dots.add(dot)
+            binding.layoutDotIndicator.addView(dot)
+        }
+    }
+
+    private fun updateDotIndicator(activeIndex: Int) {
+        dots.forEachIndexed { i, dot ->
+            dot.setBackgroundResource(if (i == activeIndex) com.billbook.app.R.drawable.dot_active else com.billbook.app.R.drawable.dot_inactive)
+        }
     }
 
     // ==================== 金额输入 ====================

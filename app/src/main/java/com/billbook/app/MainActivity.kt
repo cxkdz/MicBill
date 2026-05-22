@@ -437,7 +437,8 @@ class MainActivity : AppCompatActivity() {
         val tvAmountDisplay = overlayView.findViewById<TextView>(R.id.tvAmountDisplay)
         val bubbleTip = overlayView.findViewById<com.billbook.app.animation.BubbleTipView>(R.id.bubbleTip)
         val bubbleInputHint = overlayView.findViewById<com.billbook.app.animation.BubbleTipView>(R.id.bubbleInputHint)
-        val rvCategories = overlayView.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.rvCategories)
+        val vpCategories = overlayView.findViewById<androidx.viewpager2.widget.ViewPager2>(R.id.vpCategories)
+        val layoutDotIndicator = overlayView.findViewById<android.widget.LinearLayout>(R.id.layoutDotIndicator)
         val tvTime = overlayView.findViewById<TextView>(R.id.tvTime)
         val etRemark = overlayView.findViewById<android.widget.EditText>(R.id.etRemark)
         val btnSave = overlayView.findViewById<com.billbook.app.animation.GlowButton>(R.id.btnSave)
@@ -482,15 +483,58 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        val categoryDots = mutableListOf<View>()
+        var categoryPagerAdapter: com.billbook.app.adapter.CategoryPagerAdapter? = null
+        var categoryPageCallback: androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback? = null
+
+        fun updateCategoryDots(activeIndex: Int) {
+            categoryDots.forEachIndexed { i, dot ->
+                dot.setBackgroundResource(if (i == activeIndex) R.drawable.dot_active else R.drawable.dot_inactive)
+            }
+        }
+
+        fun setupCategoryDots(totalItems: Int) {
+            val pageCount = if (totalItems == 0) 0 else (totalItems + 11) / 12
+            layoutDotIndicator.removeAllViews()
+            categoryDots.clear()
+            layoutDotIndicator.visibility = View.VISIBLE
+            val dp = resources.displayMetrics.density
+            for (i in 0 until pageCount) {
+                val dot = View(this).apply {
+                    layoutParams = android.widget.LinearLayout.LayoutParams((8 * dp).toInt(), (8 * dp).toInt()).apply {
+                        marginStart = if (i == 0) 0 else (6 * dp).toInt()
+                    }
+                    setBackgroundResource(if (i == 0) R.drawable.dot_active else R.drawable.dot_inactive)
+                }
+                categoryDots.add(dot)
+                layoutDotIndicator.addView(dot)
+            }
+        }
+
         fun loadCategories() {
             val categories = categoryDao.getAll(billType)
-            val adapter = com.billbook.app.adapter.AnimeCategoryAdapter(categories) { category ->
+            val pagerAdapter = com.billbook.app.adapter.CategoryPagerAdapter(categories) { category ->
                 selectedCategoryId = category.id
                 selectedCategoryName = category.name
                 selectedCategoryIcon = category.icon
             }
-            rvCategories.layoutManager = androidx.recyclerview.widget.GridLayoutManager(this, 4)
-            rvCategories.adapter = adapter
+            categoryPagerAdapter = pagerAdapter
+            vpCategories.adapter = pagerAdapter
+            vpCategories.setPageTransformer(object : androidx.viewpager2.widget.ViewPager2.PageTransformer {
+                override fun transformPage(page: View, position: Float) {
+                    page.scaleY = 1f - 0.15f * kotlin.math.abs(position)
+                    page.scaleX = 1f - 0.15f * kotlin.math.abs(position)
+                    page.alpha = 1f - 0.4f * kotlin.math.abs(position)
+                }
+            })
+            setupCategoryDots(categories.size)
+            categoryPageCallback?.let { vpCategories.unregisterOnPageChangeCallback(it) }
+            categoryPageCallback = object : androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback() {
+                override fun onPageSelected(position: Int) {
+                    updateCategoryDots(position)
+                }
+            }
+            vpCategories.registerOnPageChangeCallback(categoryPageCallback!!)
         }
 
         chipExpense.setOnClickListener {

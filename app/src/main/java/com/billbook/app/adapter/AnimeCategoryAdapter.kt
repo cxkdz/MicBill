@@ -26,6 +26,15 @@ class AnimeCategoryAdapter(
     var selectedPosition: Int = -1
         private set
 
+    fun setSelectedCategoryId(id: Long) {
+        val newPos = categories.indexOfFirst { it.id == id }
+        if (newPos == selectedPosition) return
+        val old = selectedPosition
+        selectedPosition = newPos
+        if (old != -1) notifyItemChanged(old)
+        if (newPos != -1) notifyItemChanged(newPos)
+    }
+
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val iconContainer: FrameLayout = view.findViewById(R.id.iconContainer)
         val tvIcon: TextView = view.findViewById(R.id.tvIcon)
