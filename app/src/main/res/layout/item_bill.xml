@@ -8,14 +8,29 @@
     android:paddingVertical="@dimen/spacing_sm">
 
     <!-- 分类图标 -->
-    <TextView
-        android:id="@+id/tvCategoryIcon"
+    <FrameLayout
         android:layout_width="@dimen/icon_category"
-        android:layout_height="@dimen/icon_category"
-        android:gravity="center"
-        android:background="@drawable/bg_glass_icon_circle"
-        android:text="📦"
-        android:textSize="20sp" />
+        android:layout_height="@dimen/icon_category">
+
+        <ImageView
+            android:id="@+id/ivCategoryIcon"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/bg_glass_icon_circle"
+            android:padding="8dp"
+            android:scaleType="centerInside"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/tvCategoryIcon"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:background="@drawable/bg_glass_icon_circle"
+            android:text="📦"
+            android:textSize="20sp"
+            android:visibility="visible" />
+    </FrameLayout>
 
     <!-- 分类名和备注 -->
     <LinearLayout

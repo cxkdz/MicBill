@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <rect x="100" y="200" width="312" height="200" rx="15" fill="#FFE0B2"/>
+  <polygon points="256,100 80,220 432,220" fill="#FF8A65"/>
+  <rect x="210" y="300" width="92" height="100" rx="10" fill="#8D6E63"/>
+  <circle cx="285" cy="355" r="8" fill="#FFD54F"/>
+  <rect x="140" y="260" width="55" height="55" rx="8" fill="#90CAF9"/>
+  <line x1="167" y1="260" x2="167" y2="315" stroke="#E3F2FD" stroke-width="4"/>
+  <line x1="140" y1="287" x2="195" y2="287" stroke="#E3F2FD" stroke-width="4"/>
+  <rect x="317" y="260" width="55" height="55" rx="8" fill="#90CAF9"/>
+  <line x1="344" y1="260" x2="344" y2="315" stroke="#E3F2FD" stroke-width="4"/>
+  <line x1="317" y1="287" x2="372" y2="287" stroke="#E3F2FD" stroke-width="4"/>
+  <rect x="220" y="220" width="72" height="15" rx="5" fill="#FFCC80"/>
+  <text x="256" y="232" text-anchor="middle" font-family="Arial" font-size="12" font-weight="bold" fill="#E65100">出租</text>
+  <text x="256" y="460" text-anchor="middle" font-family="Arial" font-size="28" font-weight="bold" fill="#E65100">房租收入</text>
+</svg>

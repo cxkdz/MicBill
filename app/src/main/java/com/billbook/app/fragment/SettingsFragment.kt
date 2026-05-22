@@ -20,6 +20,7 @@ import com.billbook.app.databinding.FragmentSettingsBinding
 import com.billbook.app.db.CategoryDao
 import com.billbook.app.model.Category
 import com.billbook.app.util.CategoryIcons
+import com.billbook.app.util.CategoryIconMapper
 import com.billbook.app.util.ThemeManager
 import com.billbook.app.util.WeChatBillParser
 import com.billbook.app.util.AlipayBillParser
@@ -516,15 +517,130 @@ class SettingsFragment : Fragment() {
 
     private fun showCategoryDialog() {
         val categoryDao = CategoryDao(requireContext())
-        val categories = categoryDao.getAll()
-        val items = categories.map { Pair(it.icon, it.name) }
+        val allCategories = categoryDao.getAll()
+        val expenseCategories = allCategories.filter { it.type == 0 }
+        val incomeCategories = allCategories.filter { it.type == 1 }
 
-        com.billbook.app.util.AnimeDialogHelper.showIconListDialog(
-            context = requireContext(),
-            title = "分类管理",
-            items = items,
-            onItemSelected = { index -> showEditCategoryDialog(categories[index]) }
-        )
+        val dp = resources.displayMetrics.density
+        val container = android.widget.LinearLayout(requireContext()).apply {
+            orientation = android.widget.LinearLayout.VERTICAL
+            setPadding((24 * dp).toInt(), (20 * dp).toInt(), (24 * dp).toInt(), (12 * dp).toInt())
+        }
+
+        // 标题
+        container.addView(android.widget.TextView(requireContext()).apply {
+            text = "分类管理"
+            setTextColor(0xE0FFFFFF.toInt())
+            textSize = 18f
+            setTypeface(null, android.graphics.Typeface.BOLD)
+            setPadding(0, 0, 0, (12 * dp).toInt())
+        })
+
+        // 列表
+        val scrollView = android.widget.ScrollView(requireContext())
+        val listLayout = android.widget.LinearLayout(requireContext()).apply {
+            orientation = android.widget.LinearLayout.VERTICAL
+        }
+
+        // 添加分组标题和分类项的函数
+        fun addCategoryGroup(title: String, categories: List<com.billbook.app.model.Category>, startIndex: Int) {
+            // 分组标题
+            listLayout.addView(android.widget.TextView(requireContext()).apply {
+                text = title
+                setTextColor(0x80FFFFFF.toInt())
+                textSize = 13f
+                setPadding((12 * dp).toInt(), (16 * dp).toInt(), (12 * dp).toInt(), (8 * dp).toInt())
+            })
+
+            categories.forEachIndexed { index, category ->
+                val itemView = android.widget.LinearLayout(requireContext()).apply {
+                    orientation = android.widget.LinearLayout.HORIZONTAL
+                    gravity = android.view.Gravity.CENTER_VERTICAL
+                    setPadding((12 * dp).toInt(), (12 * dp).toInt(), (12 * dp).toInt(), (12 * dp).toInt())
+                }
+
+                // 图标 - 优先使用自定义的iconResId
+                val iconResId = if (category.iconResId != 0) category.iconResId else CategoryIconMapper.getIconResId(category.name, category.type)
+                if (iconResId != 0) {
+                    val iconView = android.widget.ImageView(requireContext()).apply {
+                        layoutParams = android.widget.LinearLayout.LayoutParams((36 * dp).toInt(), (36 * dp).toInt())
+                        setImageResource(iconResId)
+                        scaleType = android.widget.ImageView.ScaleType.CENTER_INSIDE
+                        setPadding((4 * dp).toInt(), (4 * dp).toInt(), (4 * dp).toInt(), (4 * dp).toInt())
+                    }
+                    itemView.addView(iconView)
+                } else {
+                    val iconView = android.widget.TextView(requireContext()).apply {
+                        layoutParams = android.widget.LinearLayout.LayoutParams((36 * dp).toInt(), (36 * dp).toInt())
+                        text = category.icon
+                        textSize = 20f
+                        gravity = android.view.Gravity.CENTER
+                    }
+                    itemView.addView(iconView)
+                }
+
+                // 名称
+                val nameView = android.widget.TextView(requireContext()).apply {
+                    layoutParams = android.widget.LinearLayout.LayoutParams(0, android.widget.LinearLayout.LayoutParams.WRAP_CONTENT, 1f).apply {
+                        marginStart = (12 * dp).toInt()
+                    }
+                    text = category.name
+                    setTextColor(0xB0FFFFFF.toInt())
+                    textSize = 15f
+                }
+                itemView.addView(nameView)
+
+                itemView.setOnClickListener {
+                    showEditCategoryDialog(category)
+                }
+
+                // 按压反馈
+                itemView.isClickable = true
+                itemView.isFocusable = true
+                itemView.setBackgroundResource(android.R.drawable.list_selector_background)
+
+                listLayout.addView(itemView)
+
+                // 分割线
+                if (index < categories.size - 1) {
+                    listLayout.addView(View(requireContext()).apply {
+                        layoutParams = android.widget.LinearLayout.LayoutParams(
+                            android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
+                            (1 * dp).toInt()
+                        )
+                        setBackgroundColor(0x15FFFFFF)
+                    })
+                }
+            }
+        }
+
+        // 支出分类
+        addCategoryGroup("支出分类", expenseCategories, 0)
+
+        // 分组间距
+        listLayout.addView(View(requireContext()).apply {
+            layoutParams = android.widget.LinearLayout.LayoutParams(
+                android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
+                (8 * dp).toInt()
+            )
+        })
+
+        // 收入分类
+        addCategoryGroup("收入分类", incomeCategories, expenseCategories.size)
+
+        scrollView.addView(listLayout)
+        container.addView(scrollView, android.widget.LinearLayout.LayoutParams(
+            android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
+            0, 1f
+        ))
+
+        val dialog = AlertDialog.Builder(requireContext(), android.R.style.Theme_DeviceDefault_Dialog_NoActionBar)
+            .setView(container)
+            .setCancelable(true)
+            .create()
+
+        dialog.show()
+        com.billbook.app.util.AnimeDialogHelper.applyAnimeStyle(dialog)
     }
 
     private fun showAddCategoryDialog() {
@@ -541,24 +657,383 @@ class SettingsFragment : Fragment() {
     }
 
     private fun showEditCategoryDialog(category: Category?, defaultType: Int = 0) {
-        val icons = CategoryIcons.ALL_ICONS
+        val dp = resources.displayMetrics.density
+        var dialog: AlertDialog? = null
+        val container = android.widget.LinearLayout(requireContext()).apply {
+            orientation = android.widget.LinearLayout.VERTICAL
+            setPadding((24 * dp).toInt(), (20 * dp).toInt(), (24 * dp).toInt(), (12 * dp).toInt())
+        }
 
-        com.billbook.app.util.AnimeDialogHelper.showListDialog(
-            context = requireContext(),
-            title = if (category == null) "选择图标" else "修改图标",
-            items = icons,
-            onItemSelected = { iconIndex ->
-                val selectedIcon = icons[iconIndex]
-                if (category != null) {
-                    val categoryDao = CategoryDao(requireContext())
-                    category.icon = selectedIcon
-                    categoryDao.update(category)
-                    Toast.makeText(requireContext(), "图标已更新", Toast.LENGTH_SHORT).show()
+        val isEdit = category != null
+        val categoryDao = CategoryDao(requireContext())
+
+        // 标题
+        container.addView(android.widget.TextView(requireContext()).apply {
+            text = if (isEdit) "编辑分类" else "添加分类"
+            setTextColor(0xE0FFFFFF.toInt())
+            textSize = 18f
+            setTypeface(null, android.graphics.Typeface.BOLD)
+            setPadding(0, 0, 0, (16 * dp).toInt())
+        })
+
+        // 分类名称输入框
+        val nameInput = android.widget.EditText(requireContext()).apply {
+            setText(category?.name ?: "")
+            hint = "请输入分类名称"
+            setTextColor(0xE0FFFFFF.toInt())
+            setHintTextColor(0x50FFFFFF.toInt())
+            textSize = 16f
+            setPadding((16 * dp).toInt(), (12 * dp).toInt(), (16 * dp).toInt(), (12 * dp).toInt())
+            background = android.graphics.drawable.GradientDrawable().apply {
+                setColor(0x15FFFFFF)
+                cornerRadius = 12 * dp
+                setStroke((1 * dp).toInt(), 0x20FFFFFF)
+            }
+            setSingleLine(true)
+        }
+        container.addView(nameInput, android.widget.LinearLayout.LayoutParams(
+            android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
+            android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
+        ).apply {
+            bottomMargin = (16 * dp).toInt()
+        })
+
+        // 选中的图标预览
+        val currentIconResId = category?.let {
+            if (it.iconResId != 0) it.iconResId else CategoryIconMapper.getIconResId(it.name, it.type)
+        } ?: 0
+        var selectedIconResId = currentIconResId
+
+        val previewContainer = android.widget.LinearLayout(requireContext()).apply {
+            orientation = android.widget.LinearLayout.HORIZONTAL
+            gravity = android.view.Gravity.CENTER_VERTICAL
+            setPadding((12 * dp).toInt(), (12 * dp).toInt(), (12 * dp).toInt(), (12 * dp).toInt())
+            background = android.graphics.drawable.GradientDrawable().apply {
+                setColor(0x10FFFFFF)
+                cornerRadius = 12 * dp
+            }
+        }
+
+        val previewIcon = android.widget.ImageView(requireContext()).apply {
+            layoutParams = android.widget.LinearLayout.LayoutParams((48 * dp).toInt(), (48 * dp).toInt())
+            if (selectedIconResId != 0) {
+                setImageResource(selectedIconResId)
+            } else {
+                setImageResource(R.drawable.ic_misc_more)
+                alpha = 0.5f
+            }
+            scaleType = android.widget.ImageView.ScaleType.CENTER_INSIDE
+        }
+        previewContainer.addView(previewIcon)
+
+        val previewText = android.widget.TextView(requireContext()).apply {
+            text = if (selectedIconResId != 0) "已选择图标" else "请选择图标"
+            setTextColor(0x80FFFFFF.toInt())
+            textSize = 14f
+            setPadding((12 * dp).toInt(), 0, 0, 0)
+        }
+        previewContainer.addView(previewText)
+
+        container.addView(previewContainer, android.widget.LinearLayout.LayoutParams(
+            android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
+            android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
+        ).apply {
+            bottomMargin = (12 * dp).toInt()
+        })
+
+        // 存储所有图标View的引用及其是否为"已使用"状态
+        val allIconViews = mutableListOf<Pair<android.widget.ImageView, Boolean>>()
+
+        // 更新预览的函数
+        fun updatePreview(iconResId: Int) {
+            selectedIconResId = iconResId
+            previewIcon.setImageResource(iconResId)
+            previewIcon.alpha = 1.0f
+            previewText.text = "已选择图标"
+
+            // 更新所有图标的高亮状态
+            allIconViews.forEach { (iconView, isUsed) ->
+                val viewIconResId = iconView.tag as? Int ?: 0
+                if (viewIconResId == selectedIconResId) {
+                    iconView.background = android.graphics.drawable.GradientDrawable().apply {
+                        setColor(0x30FFFFFF)
+                        cornerRadius = 12 * dp
+                        setStroke((2 * dp).toInt(), 0x60FFFFFF)
+                    }
+                    iconView.alpha = 1.0f
                 } else {
-                    Toast.makeText(requireContext(), "选中图标：$selectedIcon，请完善分类信息", Toast.LENGTH_SHORT).show()
+                    iconView.background = android.graphics.drawable.GradientDrawable().apply {
+                        setColor(if (isUsed) 0x08FFFFFF else 0x10FFFFFF)
+                        cornerRadius = 12 * dp
+                        setStroke((1 * dp).toInt(), if (isUsed) 0x10FFFFFF else 0x15FFFFFF)
+                    }
+                    iconView.alpha = if (isUsed) 0.7f else 1.0f
                 }
             }
-        )
+        }
+
+        // 图标网格
+        val scrollView = android.widget.ScrollView(requireContext()).apply {
+            layoutParams = android.widget.LinearLayout.LayoutParams(
+                android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
+                0, 1f
+            )
+        }
+        val gridLayout = android.widget.LinearLayout(requireContext()).apply {
+            orientation = android.widget.LinearLayout.VERTICAL
+        }
+
+        // 获取已使用的图标
+        val allCategories = categoryDao.getAll()
+        val usedIconResIds = allCategories.mapNotNull { cat ->
+            val resId = if (cat.iconResId != 0) cat.iconResId else CategoryIconMapper.getIconResId(cat.name, cat.type)
+            if (resId != 0) resId else null
+        }.toSet()
+
+        // 获取类型特定图标和通用图标
+        val isIncome = category?.type == 1 || defaultType == 1
+        val typeSpecificIcons = if (isIncome) {
+            CategoryIconMapper.getAllIncomeIconResIds()
+        } else {
+            CategoryIconMapper.getAllExpenseIconResIds()
+        }
+        val miscIcons = CategoryIconMapper.allMiscIconResIds
+
+        // 合并图标并排序：未使用的在前，已使用的在后
+        val allIcons = (typeSpecificIcons + miscIcons).distinct()
+        val unusedIcons = allIcons.filter { it !in usedIconResIds }
+        val usedIcons = allIcons.filter { it in usedIconResIds }
+
+        // 每行显示 4 个图标
+        val iconsPerRow = 4
+        var currentRow = android.widget.LinearLayout(requireContext()).apply {
+            orientation = android.widget.LinearLayout.HORIZONTAL
+            gravity = android.view.Gravity.CENTER
+        }
+
+        // 添加分组标题
+        fun addGroupTitle(title: String) {
+            gridLayout.addView(android.widget.TextView(requireContext()).apply {
+                text = title
+                setTextColor(0x80FFFFFF.toInt())
+                textSize = 13f
+                setPadding((4 * dp).toInt(), (12 * dp).toInt(), (4 * dp).toInt(), (8 * dp).toInt())
+                layoutParams = android.widget.LinearLayout.LayoutParams(
+                    android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
+                    android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
+                )
+            })
+        }
+
+        // 创建图标项
+        fun createIconItem(iconResId: Int, isUsed: Boolean) {
+            val iconContainer = android.widget.FrameLayout(requireContext()).apply {
+                layoutParams = android.widget.LinearLayout.LayoutParams(
+                    0,
+                    android.widget.LinearLayout.LayoutParams.WRAP_CONTENT,
+                    1f
+                ).apply {
+                    setMargins((4 * dp).toInt(), (4 * dp).toInt(), (4 * dp).toInt(), (4 * dp).toInt())
+                }
+            }
+
+            val iconView = android.widget.ImageView(requireContext()).apply {
+                layoutParams = android.widget.FrameLayout.LayoutParams(
+                    android.widget.FrameLayout.LayoutParams.MATCH_PARENT,
+                    (56 * dp).toInt()
+                )
+                setImageResource(iconResId)
+                tag = iconResId
+                scaleType = android.widget.ImageView.ScaleType.CENTER_INSIDE
+                setPadding((12 * dp).toInt(), (12 * dp).toInt(), (12 * dp).toInt(), (12 * dp).toInt())
+                background = android.graphics.drawable.GradientDrawable().apply {
+                    setColor(if (isUsed) 0x08FFFFFF else 0x10FFFFFF)
+                    cornerRadius = 12 * dp
+                    setStroke((1 * dp).toInt(), if (isUsed) 0x10FFFFFF else 0x15FFFFFF)
+                }
+                if (isUsed) alpha = 0.7f
+
+                // 高亮当前选中的图标
+                if (iconResId == selectedIconResId) {
+                    background = android.graphics.drawable.GradientDrawable().apply {
+                        setColor(0x30FFFFFF)
+                        cornerRadius = 12 * dp
+                        setStroke((2 * dp).toInt(), 0x60FFFFFF)
+                    }
+                    alpha = 1.0f
+                }
+            }
+
+            allIconViews.add(Pair(iconView, isUsed))
+
+            iconView.setOnClickListener {
+                updatePreview(iconResId)
+            }
+
+            iconContainer.addView(iconView)
+            currentRow.addView(iconContainer)
+        }
+
+        // 显示未使用的图标
+        if (unusedIcons.isNotEmpty()) {
+            addGroupTitle("可选图标")
+            unusedIcons.forEachIndexed { index, iconResId ->
+                createIconItem(iconResId, false)
+
+                // 换行
+                if ((index + 1) % iconsPerRow == 0) {
+                    gridLayout.addView(currentRow)
+                    currentRow = android.widget.LinearLayout(requireContext()).apply {
+                        orientation = android.widget.LinearLayout.HORIZONTAL
+                        gravity = android.view.Gravity.CENTER
+                    }
+                }
+            }
+
+            // 添加最后一行（如果不满）
+            if (unusedIcons.size % iconsPerRow != 0) {
+                gridLayout.addView(currentRow)
+                currentRow = android.widget.LinearLayout(requireContext()).apply {
+                    orientation = android.widget.LinearLayout.HORIZONTAL
+                    gravity = android.view.Gravity.CENTER
+                }
+            }
+        }
+
+        // 显示已使用的图标
+        if (usedIcons.isNotEmpty()) {
+            addGroupTitle("已使用图标")
+            usedIcons.forEachIndexed { index, iconResId ->
+                createIconItem(iconResId, true)
+
+                // 换行
+                if ((index + 1) % iconsPerRow == 0) {
+                    gridLayout.addView(currentRow)
+                    currentRow = android.widget.LinearLayout(requireContext()).apply {
+                        orientation = android.widget.LinearLayout.HORIZONTAL
+                        gravity = android.view.Gravity.CENTER
+                    }
+                }
+            }
+
+            // 添加最后一行（如果不满）
+            if (usedIcons.size % iconsPerRow != 0) {
+                gridLayout.addView(currentRow)
+            }
+        }
+
+        scrollView.addView(gridLayout)
+        container.addView(scrollView)
+
+        // 按钮容器
+        val buttonContainer = android.widget.LinearLayout(requireContext()).apply {
+            orientation = android.widget.LinearLayout.HORIZONTAL
+            gravity = android.view.Gravity.END
+            setPadding(0, (16 * dp).toInt(), 0, 0)
+        }
+
+        // 删除按钮（仅编辑模式显示）
+        if (isEdit) {
+            val deleteButton = android.widget.TextView(requireContext()).apply {
+                text = "删除"
+                setTextColor(0xFFFF5252.toInt())
+                textSize = 15f
+                setPadding((16 * dp).toInt(), (10 * dp).toInt(), (16 * dp).toInt(), (10 * dp).toInt())
+                background = android.graphics.drawable.GradientDrawable().apply {
+                    setColor(0x15FF5252)
+                    cornerRadius = 8 * dp
+                }
+                setOnClickListener {
+                    com.billbook.app.util.AnimeDialogHelper.show(
+                        context = requireContext(),
+                        title = "确认删除",
+                        message = "确定要删除分类「${category!!.name}」吗？",
+                        positiveText = "删除",
+                        negativeText = "取消",
+                        onPositive = {
+                            val result = categoryDao.delete(category!!.id)
+                            if (result > 0) {
+                                Toast.makeText(requireContext(), "分类已删除", Toast.LENGTH_SHORT).show()
+                                dialog?.dismiss()
+                                showCategoryDialog()
+                            } else {
+                                Toast.makeText(requireContext(), "默认分类无法删除", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    )
+                }
+            }
+            buttonContainer.addView(deleteButton)
+        }
+
+        // 间距
+        buttonContainer.addView(android.view.View(requireContext()).apply {
+            layoutParams = android.widget.LinearLayout.LayoutParams(0, 1, 1f)
+        })
+
+        // 取消按钮
+        val cancelButton = android.widget.TextView(requireContext()).apply {
+            text = "取消"
+            setTextColor(0x80FFFFFF.toInt())
+            textSize = 15f
+            setPadding((16 * dp).toInt(), (10 * dp).toInt(), (16 * dp).toInt(), (10 * dp).toInt())
+            background = android.graphics.drawable.GradientDrawable().apply {
+                setColor(0x15FFFFFF)
+                cornerRadius = 8 * dp
+            }
+            setOnClickListener { dialog?.dismiss() }
+        }
+        buttonContainer.addView(cancelButton)
+
+        // 保存按钮
+        val saveButton = android.widget.TextView(requireContext()).apply {
+            text = "保存"
+            setTextColor(0xFFFFFFFF.toInt())
+            textSize = 15f
+            setPadding((16 * dp).toInt(), (10 * dp).toInt(), (16 * dp).toInt(), (10 * dp).toInt())
+            background = android.graphics.drawable.GradientDrawable().apply {
+                setColor(0xFF6B8DD6.toInt())
+                cornerRadius = 8 * dp
+            }
+            setOnClickListener {
+                val name = nameInput.text.toString().trim()
+                if (name.isEmpty()) {
+                    Toast.makeText(requireContext(), "请输入分类名称", Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+
+                if (isEdit) {
+                    // 更新分类
+                    category!!.name = name
+                    category!!.iconResId = selectedIconResId
+                    categoryDao.update(category!!)
+                    Toast.makeText(requireContext(), "分类已更新", Toast.LENGTH_SHORT).show()
+                } else {
+                    // 添加新分类
+                    val newCategory = Category(
+                        name = name,
+                        iconResId = selectedIconResId,
+                        type = defaultType,
+                        sortOrder = allCategories.size
+                    )
+                    categoryDao.insert(newCategory)
+                    Toast.makeText(requireContext(), "分类已添加", Toast.LENGTH_SHORT).show()
+                }
+                dialog?.dismiss()
+                showCategoryDialog()
+            }
+        }
+        buttonContainer.addView(saveButton)
+
+        container.addView(buttonContainer)
+
+        dialog = AlertDialog.Builder(requireContext(), android.R.style.Theme_DeviceDefault_Dialog_NoActionBar)
+            .setView(container)
+            .setCancelable(true)
+            .create()
+
+        dialog.show()
+        com.billbook.app.util.AnimeDialogHelper.applyAnimeStyle(dialog)
     }
 
     override fun onDestroyView() {

@@ -7,6 +7,7 @@ import com.billbook.app.db.DatabaseHelper.Companion.TABLE_CATEGORY
 import com.billbook.app.db.DatabaseHelper.Companion.COL_CAT_ID
 import com.billbook.app.db.DatabaseHelper.Companion.COL_CAT_NAME
 import com.billbook.app.db.DatabaseHelper.Companion.COL_CAT_ICON
+import com.billbook.app.db.DatabaseHelper.Companion.COL_CAT_ICON_RES_ID
 import com.billbook.app.db.DatabaseHelper.Companion.COL_CAT_TYPE
 import com.billbook.app.db.DatabaseHelper.Companion.COL_CAT_SORT
 import com.billbook.app.db.DatabaseHelper.Companion.COL_CAT_DEFAULT
@@ -60,6 +61,7 @@ class CategoryDao(context: Context) {
         val values = ContentValues().apply {
             put(COL_CAT_NAME, category.name)
             put(COL_CAT_ICON, category.icon)
+            put(COL_CAT_ICON_RES_ID, category.iconResId)
             put(COL_CAT_TYPE, category.type)
             put(COL_CAT_SORT, category.sortOrder)
             put(COL_CAT_DEFAULT, if (category.isDefault) 1 else 0)
@@ -72,6 +74,7 @@ class CategoryDao(context: Context) {
         val values = ContentValues().apply {
             put(COL_CAT_NAME, category.name)
             put(COL_CAT_ICON, category.icon)
+            put(COL_CAT_ICON_RES_ID, category.iconResId)
             put(COL_CAT_SORT, category.sortOrder)
         }
         return db.update(TABLE_CATEGORY, values, "$COL_CAT_ID = ?", arrayOf(category.id.toString()))
@@ -87,6 +90,7 @@ class CategoryDao(context: Context) {
             id = cursor.getLong(cursor.getColumnIndexOrThrow(COL_CAT_ID)),
             name = cursor.getString(cursor.getColumnIndexOrThrow(COL_CAT_NAME)) ?: "",
             icon = cursor.getString(cursor.getColumnIndexOrThrow(COL_CAT_ICON)) ?: "",
+            iconResId = cursor.getInt(cursor.getColumnIndexOrThrow(COL_CAT_ICON_RES_ID)),
             type = cursor.getInt(cursor.getColumnIndexOrThrow(COL_CAT_TYPE)),
             sortOrder = cursor.getInt(cursor.getColumnIndexOrThrow(COL_CAT_SORT)),
             isDefault = cursor.getInt(cursor.getColumnIndexOrThrow(COL_CAT_DEFAULT)) == 1

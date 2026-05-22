@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <rect x="100" y="200" width="312" height="200" rx="15" fill="#FFE0B2"/>
+  <polygon points="256,100 80,220 432,220" fill="#FFB74D"/>
+  <rect x="200" y="300" width="112" height="100" rx="10" fill="#8D6E63"/>
+  <circle cx="290" cy="355" r="8" fill="#FFD54F"/>
+  <rect x="140" y="250" width="55" height="55" rx="8" fill="#90CAF9"/>
+  <line x1="167" y1="250" x2="167" y2="305" stroke="#E3F2FD" stroke-width="4"/>
+  <line x1="140" y1="277" x2="195" y2="277" stroke="#E3F2FD" stroke-width="4"/>
+  <rect x="317" y="250" width="55" height="55" rx="8" fill="#90CAF9"/>
+  <line x1="344" y1="250" x2="344" y2="305" stroke="#E3F2FD" stroke-width="4"/>
+  <line x1="317" y1="277" x2="372" y2="277" stroke="#E3F2FD" stroke-width="4"/>
+  <rect x="220" y="220" width="72" height="20" rx="5" fill="#FFCC80"/>
+  <circle cx="160" cy="150" r="20" fill="#FFF176"/>
+  <circle cx="160" cy="150" r="12" fill="#FFEE58"/>
+  <text x="256" y="450" text-anchor="middle" font-family="Arial" font-size="28" font-weight="bold" fill="#E65100">住房</text>
+</svg>

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <circle cx="160" cy="256" r="80" fill="#B39DDB"/>
+  <circle cx="160" cy="220" r="30" fill="#E1BEE7"/>
+  <rect x="130" y="260" width="60" height="40" rx="15" fill="#E1BEE7"/>
+  <circle cx="352" cy="256" r="80" fill="#80CBC4"/>
+  <circle cx="352" cy="220" r="30" fill="#B2DFDB"/>
+  <rect x="322" y="260" width="60" height="40" rx="15" fill="#B2DFDB"/>
+  <path d="M250 256 L290 256" stroke="#66BB6A" stroke-width="10" stroke-linecap="round"/>
+  <path d="M280 236 L300 256 L280 276" fill="none" stroke="#66BB6A" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="210" y="240" width="30" height="15" rx="5" fill="#FFF9C4"/>
+  <text x="225" y="252" text-anchor="middle" font-family="Arial" font-size="10" font-weight="bold" fill="#F57F17">$</text>
+  <rect x="272" y="240" width="30" height="15" rx="5" fill="#FFF9C4"/>
+  <text x="287" y="252" text-anchor="middle" font-family="Arial" font-size="10" font-weight="bold" fill="#F57F17">$</text>
+  <text x="256" y="400" text-anchor="middle" font-family="Arial" font-size="28" font-weight="bold" fill="#4A148C">收到转账</text>
+</svg>

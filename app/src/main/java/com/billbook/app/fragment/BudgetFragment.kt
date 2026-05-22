@@ -17,6 +17,7 @@ import com.billbook.app.util.AutoContrast
 import com.billbook.app.util.BackgroundApplier
 import com.billbook.app.util.BudgetManager
 import com.billbook.app.util.BudgetThemeApplier
+import com.billbook.app.util.CategoryIconMapper
 import com.billbook.app.util.ThemeManager
 
 class BudgetFragment : Fragment() {
@@ -374,7 +375,19 @@ class BudgetFragment : Fragment() {
             val itemView = LayoutInflater.from(context).inflate(R.layout.item_budget_category, binding.layoutCategoryList, false)
             val itemBinding = ItemBudgetCategoryBinding.bind(itemView)
 
-            itemBinding.tvCategoryIcon.text = info.category.icon
+            // 使用 CategoryIconMapper 获取图标资源 ID
+            val iconResId = CategoryIconMapper.getIconResId(info.category.name, 0) // 预算默认为支出类型
+            if (iconResId != 0) {
+                itemBinding.ivCategoryIcon.setImageResource(iconResId)
+                itemBinding.ivCategoryIcon.visibility = View.VISIBLE
+                itemBinding.tvCategoryIcon.visibility = View.GONE
+            } else {
+                // 兼容旧的 emoji 图标
+                itemBinding.tvCategoryIcon.text = info.category.icon
+                itemBinding.tvCategoryIcon.visibility = View.VISIBLE
+                itemBinding.ivCategoryIcon.visibility = View.GONE
+            }
+
             itemBinding.tvCategoryName.text = info.category.name
             itemBinding.tvCategoryBudget.text = "¥%.2f".format(info.category.budgetAmount)
             itemBinding.tvCategorySpent.text = "已消费：¥%.2f".format(info.spent)

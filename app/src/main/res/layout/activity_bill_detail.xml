@@ -70,11 +70,26 @@
                 android:orientation="vertical">
 
                 <!-- 分类图标 -->
-                <TextView
-                    android:id="@+id/tvDetailIcon"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="48sp" />
+                <FrameLayout
+                    android:layout_width="64dp"
+                    android:layout_height="64dp">
+
+                    <ImageView
+                        android:id="@+id/ivDetailIcon"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:padding="8dp"
+                        android:scaleType="centerInside"
+                        android:visibility="gone" />
+
+                    <TextView
+                        android:id="@+id/tvDetailIcon"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:textSize="48sp"
+                        android:visibility="visible" />
+                </FrameLayout>
 
                 <!-- 分类名称 -->
                 <TextView

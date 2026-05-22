@@ -6,6 +6,7 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
+import android.view.View
 import android.view.animation.DecelerateInterpolator
 import android.view.animation.OvershootInterpolator
 import android.widget.Toast
@@ -19,6 +20,7 @@ import androidx.core.view.updatePadding
 import com.billbook.app.databinding.ActivityBillDetailBinding
 import com.billbook.app.db.BillDao
 import com.billbook.app.model.Bill
+import com.billbook.app.util.CategoryIconMapper
 import com.billbook.app.util.ThemeManager
 import java.text.SimpleDateFormat
 import java.util.*
@@ -86,7 +88,24 @@ class BillDetailActivity : AppCompatActivity() {
         }
 
         binding.apply {
-            tvDetailIcon.text = bill.categoryIcon.ifEmpty { "📦" }
+            // 使用 CategoryIconMapper 获取图标资源 ID
+            val iconResId = if (bill.categoryIconResId != 0) {
+                bill.categoryIconResId
+            } else {
+                CategoryIconMapper.getIconResId(bill.categoryName, bill.type)
+            }
+
+            if (iconResId != 0) {
+                ivDetailIcon.setImageResource(iconResId)
+                ivDetailIcon.visibility = View.VISIBLE
+                tvDetailIcon.visibility = View.GONE
+            } else {
+                // 兼容旧的 emoji 图标
+                tvDetailIcon.text = bill.categoryIcon.ifEmpty { "📦" }
+                tvDetailIcon.visibility = View.VISIBLE
+                ivDetailIcon.visibility = View.GONE
+            }
+
             tvDetailCategory.text = bill.categoryName
 
             val prefix = if (bill.type == Bill.TYPE_EXPENSE) "-" else "+"

@@ -1,12 +1,14 @@
 package com.billbook.app.adapter
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.billbook.app.R
 import com.billbook.app.databinding.ItemBillBinding
 import com.billbook.app.model.Bill
+import com.billbook.app.util.CategoryIconMapper
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -48,7 +50,24 @@ class DayBillAdapter(
     inner class BillViewHolder(private val binding: ItemBillBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(bill: Bill) {
             binding.apply {
-                tvCategoryIcon.text = bill.categoryIcon.ifEmpty { "📦" }
+                // 使用 CategoryIconMapper 获取图标资源 ID
+                val iconResId = if (bill.categoryIconResId != 0) {
+                    bill.categoryIconResId
+                } else {
+                    CategoryIconMapper.getIconResId(bill.categoryName, bill.type)
+                }
+
+                if (iconResId != 0) {
+                    ivCategoryIcon.setImageResource(iconResId)
+                    ivCategoryIcon.visibility = View.VISIBLE
+                    tvCategoryIcon.visibility = View.GONE
+                } else {
+                    // 兼容旧的 emoji 图标
+                    tvCategoryIcon.text = bill.categoryIcon.ifEmpty { "📦" }
+                    tvCategoryIcon.visibility = View.VISIBLE
+                    ivCategoryIcon.visibility = View.GONE
+                }
+
                 tvCategoryName.text = bill.categoryName
                 tvCategoryName.setTextColor(textColor)
                 tvCategoryName.setShadowLayer(4f, 0f, 1f, shadowColor)

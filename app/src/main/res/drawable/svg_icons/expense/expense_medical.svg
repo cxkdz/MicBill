@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <rect x="100" y="100" width="312" height="312" rx="30" fill="#E8F5E9"/>
+  <rect x="100" y="100" width="312" height="60" rx="30" fill="#66BB6A"/>
+  <rect x="100" y="140" width="312" height="20" fill="#66BB6A"/>
+  <rect x="230" y="150" width="52" height="160" rx="10" fill="#EF5350"/>
+  <rect x="170" y="210" width="172" height="40" rx="10" fill="#EF5350"/>
+  <circle cx="256" cy="230" r="15" fill="#FFCDD2"/>
+  <rect x="140" y="320" width="232" height="20" rx="5" fill="#C8E6C9"/>
+  <rect x="160" y="350" width="192" height="15" rx="5" fill="#C8E6C9"/>
+  <rect x="180" y="375" width="152" height="15" rx="5" fill="#C8E6C9"/>
+  <circle cx="160" cy="430" r="20" fill="#81C784"/>
+  <circle cx="256" cy="430" r="20" fill="#81C784"/>
+  <circle cx="352" cy="430" r="20" fill="#81C784"/>
+  <text x="256" y="130" text-anchor="middle" font-family="Arial" font-size="24" font-weight="bold" fill="white">医疗</text>
+</svg>

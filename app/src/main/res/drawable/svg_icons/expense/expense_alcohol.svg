@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <rect x="200" y="120" width="112" height="60" rx="10" fill="#8D6E63"/>
+  <rect x="220" y="100" width="72" height="30" rx="5" fill="#A1887F"/>
+  <rect x="230" y="80" width="52" height="25" rx="5" fill="#BCAAA4"/>
+  <rect x="240" y="60" width="32" height="25" rx="5" fill="#D7CCC8"/>
+  <rect x="220" y="180" width="72" height="200" rx="15" fill="#FFECB3"/>
+  <rect x="220" y="180" width="72" height="40" rx="15" fill="#FFE082"/>
+  <rect x="220" y="200" width="72" height="20" fill="#FFE082"/>
+  <rect x="230" y="220" width="52" height="150" rx="5" fill="#FFF8E1"/>
+  <rect x="240" y="240" width="32" height="20" rx="3" fill="#FFCC80"/>
+  <rect x="240" y="270" width="32" height="20" rx="3" fill="#FFCC80"/>
+  <rect x="240" y="300" width="32" height="20" rx="3" fill="#FFCC80"/>
+  <circle cx="340" cy="350" r="40" fill="#FFB74D"/>
+  <circle cx="340" cy="350" r="30" fill="#FFA726"/>
+  <rect x="330" y="310" width="20" height="50" rx="5" fill="#8D6E63"/>
+  <circle cx="340" cy="300" r="15" fill="#FFCC80"/>
+  <text x="256" y="450" text-anchor="middle" font-family="Arial" font-size="28" font-weight="bold" fill="#4E342E">烟酒</text>
+</svg>

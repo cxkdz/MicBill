@@ -6,7 +6,8 @@ data class Bill(
     var type: Int = TYPE_EXPENSE,        // 0支出 1收入
     var categoryId: Long = 0,
     var categoryName: String = "",
-    var categoryIcon: String = "",
+    var categoryIcon: String = "",       // 保留字段兼容数据库
+    var categoryIconResId: Int = 0,      // 新增：drawable 资源 ID
     var payType: String = PAY_WECHAT,    // 支付渠道
     var billTime: Long = System.currentTimeMillis(),
     var remark: String = "",

@@ -1,7 +1,7 @@
 package com.billbook.app.util
 
 /**
- * 分类图标库 - 提供丰富的图标选择
+ * 分类图标库 - 提供丰富的图标选择（emoji 格式，用于图标选择对话框）
  */
 object CategoryIcons {
 

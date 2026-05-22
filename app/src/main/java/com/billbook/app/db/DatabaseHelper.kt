@@ -8,7 +8,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DB_NAME, null
 
     companion object {
         const val DB_NAME = "billbook.db"
-        const val DB_VERSION = 3
+        const val DB_VERSION = 5
 
         // 账单表
         const val TABLE_BILL = "tb_bill"
@@ -30,6 +30,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DB_NAME, null
         const val COL_CAT_ID = "id"
         const val COL_CAT_NAME = "name"
         const val COL_CAT_ICON = "icon"
+        const val COL_CAT_ICON_RES_ID = "icon_res_id"
         const val COL_CAT_TYPE = "type"
         const val COL_CAT_SORT = "sort_order"
         const val COL_CAT_DEFAULT = "is_default"
@@ -82,6 +83,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DB_NAME, null
                 $COL_CAT_ID INTEGER PRIMARY KEY AUTOINCREMENT,
                 $COL_CAT_NAME TEXT NOT NULL,
                 $COL_CAT_ICON TEXT DEFAULT '',
+                $COL_CAT_ICON_RES_ID INTEGER DEFAULT 0,
                 $COL_CAT_TYPE INTEGER NOT NULL DEFAULT 0,
                 $COL_CAT_SORT INTEGER DEFAULT 0,
                 $COL_CAT_DEFAULT INTEGER DEFAULT 0
@@ -137,6 +139,37 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DB_NAME, null
             // 回填已有账单的分类图标
             db.execSQL("UPDATE $TABLE_BILL SET $COL_CATEGORY_ICON = (SELECT $COL_CAT_ICON FROM $TABLE_CATEGORY WHERE $TABLE_CATEGORY.$COL_CAT_NAME = $TABLE_BILL.$COL_CATEGORY_NAME AND $TABLE_CATEGORY.$COL_CAT_TYPE = $TABLE_BILL.$COL_TYPE) WHERE $COL_CATEGORY_ICON = '' OR $COL_CATEGORY_ICON IS NULL")
         }
+        if (oldVersion < 4) {
+            // 添加新的支出分类
+            val newExpenseCategories = listOf(
+                Triple("日用", "🧴", 12), Triple("蔬菜", "🥬", 13), Triple("水果", "🍎", 14),
+                Triple("酒水", "🍺", 15), Triple("汽车", "🚗", 16), Triple("书籍", "📖", 17),
+                Triple("美容", "💄", 18), Triple("孩子", "👶", 19), Triple("宠物", "🐱", 20),
+                Triple("健身", "💪", 21), Triple("游戏", "🎮", 22), Triple("住房", "🏠", 23),
+                Triple("运动", "⚽", 24), Triple("旅行", "✈️", 25), Triple("零食", "🍪", 26),
+                Triple("咖啡", "☕", 27)
+            )
+            newExpenseCategories.forEach { (name, icon, sort) ->
+                db.execSQL(
+                    "INSERT OR IGNORE INTO $TABLE_CATEGORY ($COL_CAT_NAME, $COL_CAT_ICON, $COL_CAT_TYPE, $COL_CAT_SORT, $COL_CAT_DEFAULT) VALUES (?, ?, 0, ?, 1)",
+                    arrayOf(name, icon, sort)
+                )
+            }
+            // 添加新的收入分类
+            val newIncomeCategories = listOf(
+                Triple("礼金", "🎁", 6), Triple("兼职", "💼", 7), Triple("分红", "💎", 8)
+            )
+            newIncomeCategories.forEach { (name, icon, sort) ->
+                db.execSQL(
+                    "INSERT OR IGNORE INTO $TABLE_CATEGORY ($COL_CAT_NAME, $COL_CAT_ICON, $COL_CAT_TYPE, $COL_CAT_SORT, $COL_CAT_DEFAULT) VALUES (?, ?, 1, ?, 1)",
+                    arrayOf(name, icon, sort)
+                )
+            }
+        }
+        if (oldVersion < 5) {
+            // 添加图标资源ID字段
+            db.execSQL("ALTER TABLE $TABLE_CATEGORY ADD COLUMN $COL_CAT_ICON_RES_ID INTEGER DEFAULT 0")
+        }
     }
 
     private fun insertDefaultCategories(db: SQLiteDatabase) {
@@ -144,12 +177,19 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DB_NAME, null
             Triple("餐饮", "🍜", 0), Triple("交通", "🚗", 1), Triple("购物", "🛒", 2),
             Triple("娱乐", "🎮", 3), Triple("居住", "🏠", 4), Triple("医疗", "💊", 5),
             Triple("教育", "📚", 6), Triple("通讯", "📱", 7), Triple("服饰", "👔", 8),
-            Triple("红包", "🧧", 9), Triple("转账", "💸", 10), Triple("其他", "📦", 11)
+            Triple("红包", "🧧", 9), Triple("转账", "💸", 10), Triple("其他", "📦", 11),
+            Triple("日用", "🧴", 12), Triple("蔬菜", "🥬", 13), Triple("水果", "🍎", 14),
+            Triple("酒水", "🍺", 15), Triple("汽车", "🚗", 16), Triple("书籍", "📖", 17),
+            Triple("美容", "💄", 18), Triple("孩子", "👶", 19), Triple("宠物", "🐱", 20),
+            Triple("健身", "💪", 21), Triple("游戏", "🎮", 22), Triple("住房", "🏠", 23),
+            Triple("运动", "⚽", 24), Triple("旅行", "✈️", 25), Triple("零食", "🍪", 26),
+            Triple("咖啡", "☕", 27)
         )
 
         val defaultIncomeCategories = listOf(
             Triple("工资", "💰", 0), Triple("奖金", "🎁", 1), Triple("红包", "🧧", 2),
-            Triple("转账", "💸", 3), Triple("理财", "📈", 4), Triple("其他", "📦", 5)
+            Triple("转账", "💸", 3), Triple("理财", "📈", 4), Triple("其他", "📦", 5),
+            Triple("礼金", "🎁", 6), Triple("兼职", "💼", 7), Triple("分红", "💎", 8)
         )
 
         defaultExpenseCategories.forEach { (name, icon, sort) ->

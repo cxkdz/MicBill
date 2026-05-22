@@ -147,6 +147,12 @@ class AddBillActivity : AppCompatActivity() {
 
     // ==================== 分类选择 ====================
 
+    override fun onResume() {
+        super.onResume()
+        // 从设置页面返回时重新加载分类
+        loadCategories()
+    }
+
     private fun setupCategoryGrid() {
         loadCategories()
     }

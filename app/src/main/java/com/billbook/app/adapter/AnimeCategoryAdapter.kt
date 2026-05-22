@@ -4,10 +4,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.billbook.app.R
 import com.billbook.app.model.Category
+import com.billbook.app.util.CategoryIconMapper
 import androidx.dynamicanimation.animation.DynamicAnimation
 import androidx.dynamicanimation.animation.SpringAnimation
 import androidx.dynamicanimation.animation.SpringForce
@@ -37,6 +39,7 @@ class AnimeCategoryAdapter(
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val iconContainer: FrameLayout = view.findViewById(R.id.iconContainer)
+        val ivIcon: ImageView = view.findViewById(R.id.ivIcon)
         val tvIcon: TextView = view.findViewById(R.id.tvIcon)
         val tvName: TextView = view.findViewById(R.id.tvName)
     }
@@ -49,7 +52,25 @@ class AnimeCategoryAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val category = categories[position]
-        holder.tvIcon.text = category.icon
+
+        // 优先使用自定义的 iconResId，否则使用 CategoryIconMapper 获取
+        val iconResId = if (category.iconResId != 0) {
+            category.iconResId
+        } else {
+            CategoryIconMapper.getIconResId(category.name, category.type)
+        }
+
+        if (iconResId != 0) {
+            holder.ivIcon.setImageResource(iconResId)
+            holder.ivIcon.visibility = View.VISIBLE
+            holder.tvIcon.visibility = View.GONE
+        } else {
+            // 兼容旧的 emoji 图标
+            holder.tvIcon.text = category.icon
+            holder.tvIcon.visibility = View.VISIBLE
+            holder.ivIcon.visibility = View.GONE
+        }
+
         holder.tvName.text = category.name
 
         val isSelected = position == selectedPosition

@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <rect x="100" y="180" width="312" height="180" rx="40" fill="#7E57C2"/>
+  <rect x="100" y="180" width="312" height="40" rx="40" fill="#5E35B1"/>
+  <rect x="100" y="200" width="312" height="20" fill="#5E35B1"/>
+  <circle cx="180" cy="270" r="30" fill="#B39DDB"/>
+  <circle cx="180" cy="270" r="20" fill="#9575CD"/>
+  <line x1="180" y1="250" x2="180" y2="290" stroke="#E1BEE7" stroke-width="6" stroke-linecap="round"/>
+  <line x1="160" y1="270" x2="200" y2="270" stroke="#E1BEE7" stroke-width="6" stroke-linecap="round"/>
+  <circle cx="240" cy="260" r="12" fill="#EF5350"/>
+  <circle cx="270" cy="280" r="12" fill="#42A5F5"/>
+  <circle cx="300" cy="260" r="12" fill="#66BB6A"/>
+  <circle cx="330" cy="280" r="12" fill="#FFB74D"/>
+  <rect x="150" y="210" width="40" height="15" rx="5" fill="#E1BEE7"/>
+  <rect x="200" y="210" width="40" height="15" rx="5" fill="#E1BEE7"/>
+  <circle cx="150" cy="150" r="15" fill="#FFD54F"/>
+  <circle cx="362" cy="150" r="15" fill="#FFD54F"/>
+  <circle cx="150" cy="150" r="8" fill="#FFEE58"/>
+  <circle cx="362" cy="150" r="8" fill="#FFEE58"/>
+  <text x="256" y="420" text-anchor="middle" font-family="Arial" font-size="28" font-weight="bold" fill="#311B92">游戏</text>
+</svg>

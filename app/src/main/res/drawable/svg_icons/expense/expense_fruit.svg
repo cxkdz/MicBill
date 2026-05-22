@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <circle cx="256" cy="280" r="100" fill="#EF5350"/>
+  <circle cx="256" cy="280" r="80" fill="#E53935"/>
+  <path d="M256 180 Q240 140 230 160 Q220 140 210 160 L256 180Z" fill="#4CAF50"/>
+  <path d="M256 180 Q272 140 282 160 Q292 140 302 160 L256 180Z" fill="#388E3C"/>
+  <rect x="250" y="160" width="12" height="30" rx="3" fill="#795548"/>
+  <circle cx="220" cy="260" r="15" fill="rgba(255,255,255,0.3)"/>
+  <circle cx="180" cy="380" r="45" fill="#FFB74D"/>
+  <circle cx="180" cy="380" r="35" fill="#FFA726"/>
+  <circle cx="170" cy="370" r="8" fill="rgba(255,255,255,0.3)"/>
+  <path d="M180 335 L175 320 L185 320Z" fill="#4CAF50"/>
+  <rect x="177" y="320" width="6" height="15" fill="#795548"/>
+  <circle cx="340" cy="370" r="40" fill="#FFEB3B"/>
+  <circle cx="340" cy="370" r="30" fill="#FDD835"/>
+  <circle cx="330" cy="360" r="7" fill="rgba(255,255,255,0.3)"/>
+  <ellipse cx="340" cy="335" rx="8" ry="12" fill="#4CAF50"/>
+  <text x="256" y="460" text-anchor="middle" font-family="Arial" font-size="28" font-weight="bold" fill="#B71C1C">水果</text>
+</svg>
