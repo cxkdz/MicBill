@@ -72,7 +72,7 @@ class SettingsFragment : Fragment() {
         setupDarkModeSwitch()
         setupTiltAngle()
         setupCustomImageBg()
-        setupTextColorToggle()
+
         setupCategoryManage()
         setupBudgetAndQuery()
         setupImportBills()
@@ -245,10 +245,11 @@ class SettingsFragment : Fragment() {
     private fun setupDarkModeSwitch() {
         val isDark = themeManager.isDarkMode()
         binding.switchDarkMode.isChecked = isDark
-        binding.tvDarkModeStatus.text = if (isDark) "开启" else "关闭"
+        binding.tvDarkModeStatus.text = if (isDark) "浅色" else "深色"
 
         binding.switchDarkMode.setOnCheckedChangeListener { _, isChecked ->
             themeManager.setDarkMode(isChecked)
+            themeManager.setTextColorMode(if (isChecked) 2 else 0)
             if (isChecked) {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
             } else {
@@ -493,27 +494,6 @@ class SettingsFragment : Fragment() {
 
     private fun updateOpacityDisplay() {
         binding.tvOpacityValue.text = "${themeManager.getBgOpacity()}%"
-    }
-
-    private fun setupTextColorToggle() {
-        val mode = themeManager.getTextColorMode()
-        binding.tvTextColorStatus.text = when (mode) {
-            1 -> "深色文字"
-            2 -> "浅色文字"
-            else -> "自动"
-        }
-
-        binding.btnTextColorToggle.setOnClickListener {
-            val current = themeManager.getTextColorMode()
-            val next = (current + 1) % 3
-            themeManager.setTextColorMode(next)
-            binding.tvTextColorStatus.text = when (next) {
-                1 -> "深色文字"
-                2 -> "浅色文字"
-                else -> "自动"
-            }
-            requireActivity().recreate()
-        }
     }
 
     private fun setupCategoryManage() {

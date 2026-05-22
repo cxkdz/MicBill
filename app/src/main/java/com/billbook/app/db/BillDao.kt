@@ -259,7 +259,7 @@ class BillDao(context: Context) {
                 totalExpense = expense,
                 totalIncome = income
             )
-        }.sortedByDescending { it.dayStart }
+        }.sortedBy { it.dayStart }
     }
 
     data class DayBills(

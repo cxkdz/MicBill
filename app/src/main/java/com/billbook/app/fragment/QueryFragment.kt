@@ -15,11 +15,13 @@ import com.billbook.app.adapter.BillAdapter
 import com.billbook.app.databinding.FragmentQueryBinding
 import com.billbook.app.db.BillDao
 import com.billbook.app.model.Bill
-import com.github.mikephil.charting.data.PieData
-import com.github.mikephil.charting.data.PieDataSet
-import com.github.mikephil.charting.data.PieEntry
-import com.github.mikephil.charting.formatter.PercentFormatter
-import com.github.mikephil.charting.utils.ColorTemplate
+import android.graphics.Typeface
+import com.billbook.app.util.AutoContrast
+import com.github.mikephil.charting.components.Legend
+import com.github.mikephil.charting.data.*
+import com.github.mikephil.charting.formatter.ValueFormatter
+import com.github.mikephil.charting.highlight.Highlight
+import com.github.mikephil.charting.listener.OnChartValueSelectedListener
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -28,6 +30,23 @@ class QueryFragment : Fragment() {
     private var _binding: FragmentQueryBinding? = null
     private val binding get() = _binding!!
     private lateinit var billDao: BillDao
+    private var textColorMode = 0
+
+    // 二次元可爱风配色（高饱和度、区分度高）
+    private val animeColors = intArrayOf(
+        Color.parseColor("#FF6B8A"), // 粉红
+        Color.parseColor("#7ED4FF"), // 天蓝
+        Color.parseColor("#FFD166"), // 暖黄
+        Color.parseColor("#95E1A3"), // 薄荷绿
+        Color.parseColor("#C4A8FF"), // 薰衣草紫
+        Color.parseColor("#FFA07A"), // 橘粉
+        Color.parseColor("#87CEEB"), // 浅蓝
+        Color.parseColor("#FFB6C1"), // 浅粉
+        Color.parseColor("#98D8C8"), // 青绿
+        Color.parseColor("#F0E68C"), // 卡其黄
+        Color.parseColor("#DDA0DD"), // 梅红
+        Color.parseColor("#B0E0E6")  // 粉蓝
+    )
 
     private val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.CHINA)
     private val calStart = Calendar.getInstance()
@@ -41,9 +60,9 @@ class QueryFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val tm = ThemeManager(requireContext())
-        val mode = tm.getTextColorMode()
-        BackgroundApplier.applyToFragment(view, tm, mode)
-        FrostGlassApplier.applyToFragment(requireActivity(), view, mode)
+        textColorMode = tm.getTextColorMode()
+        BackgroundApplier.applyToFragment(view, tm, textColorMode)
+        FrostGlassApplier.applyToFragment(requireActivity(), view, textColorMode)
         billDao = BillDao(requireContext())
 
         // 默认查询本月
@@ -144,25 +163,101 @@ class QueryFragment : Fragment() {
     }
 
     private fun loadQueryPieChart(categoryMap: Map<String, Double>) {
+        if (categoryMap.isEmpty()) {
+            binding.pieChartQuery.apply {
+                setNoDataText("暂无消费数据")
+                setNoDataTextColor(Color.parseColor("#B0FFFFFF"))
+                invalidate()
+            }
+            return
+        }
+
         val total = categoryMap.values.sum()
         val entries = categoryMap.map { PieEntry((it.value / total * 100).toFloat(), it.key) }
-        val textColor = requireContext().getColor(com.billbook.app.R.color.text_primary)
+
+        val pageBg = com.billbook.app.util.BudgetThemeApplier.getPageComposite(requireActivity())
+        val isDark = AutoContrast.isDark(pageBg)
+        val valueTextColor = when (textColorMode) {
+            1 -> Color.parseColor("#E03D4A5C")
+            2 -> Color.parseColor("#E0FFFFFF")
+            else -> if (isDark) Color.parseColor("#E0FFFFFF") else Color.parseColor("#E03D4A5C")
+        }
+        val labelColor = when (textColorMode) {
+            1 -> Color.parseColor("#C03D4A5C")
+            2 -> Color.parseColor("#C0FFFFFF")
+            else -> if (isDark) Color.parseColor("#C0FFFFFF") else Color.parseColor("#C03D4A5C")
+        }
+
         val dataSet = PieDataSet(entries, "").apply {
-            colors = ColorTemplate.MATERIAL_COLORS.toList()
+            colors = animeColors.take(entries.size)
             valueTextSize = 11f
-            valueTextColor = textColor
+            setValueTextColor(Color.WHITE)
+            setValueLinePart1Length(0.4f)
+            setValueLinePart2Length(0.6f)
+            setValueLineColor(Color.parseColor("#50FFFFFF"))
+            setValueLineWidth(1.2f)
+            sliceSpace = 2f
+            selectionShift = 10f
+            valueFormatter = object : ValueFormatter() {
+                override fun getFormattedValue(value: Float): String = "%.1f%%".format(value)
+            }
+            yValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
         }
-        val pieData = PieData(dataSet).apply {
-            setValueFormatter(PercentFormatter())
-        }
+
+        val pieData = PieData(dataSet)
 
         binding.pieChartQuery.apply {
             data = pieData
-            description.text = "分类支出占比"
-            description.textSize = 12f
+            description.isEnabled = false
             isRotationEnabled = true
+            rotationAngle = -90f
+            isHighlightPerTapEnabled = true
+
+            // 扇形块内部文字
+            setDrawEntryLabels(true)
+            setEntryLabelColor(Color.WHITE)
             setEntryLabelTextSize(10f)
-            animateY(800)
+            setEntryLabelTypeface(Typeface.DEFAULT_BOLD)
+
+            // 中心圆（甜甜圈效果）
+            isDrawHoleEnabled = true
+            holeRadius = 45f
+            transparentCircleRadius = 50f
+            setHoleColor(Color.TRANSPARENT)
+            setTransparentCircleColor(Color.parseColor("#15FFFFFF"))
+            setTransparentCircleAlpha(50)
+
+            // 中心文字
+            setDrawCenterText(true)
+            centerText = "消费\n占比"
+            setCenterTextSize(13f)
+            setCenterTextColor(labelColor)
+            setCenterTextTypeface(Typeface.DEFAULT_BOLD)
+
+            // 图例
+            legend.apply {
+                isEnabled = true
+                textColor = labelColor
+                textSize = 11f
+                form = Legend.LegendForm.CIRCLE
+                formSize = 10f
+                xEntrySpace = 12f
+                yEntrySpace = 6f
+                verticalAlignment = Legend.LegendVerticalAlignment.BOTTOM
+                horizontalAlignment = Legend.LegendHorizontalAlignment.CENTER
+                orientation = Legend.LegendOrientation.HORIZONTAL
+                setDrawInside(false)
+            }
+
+            // 动画
+            animateXY(1000, 1000)
+
+            // 点击高亮回调
+            setOnChartValueSelectedListener(object : OnChartValueSelectedListener {
+                override fun onValueSelected(e: Entry?, h: Highlight?) {}
+                override fun onNothingSelected() {}
+            })
+
             invalidate()
         }
     }

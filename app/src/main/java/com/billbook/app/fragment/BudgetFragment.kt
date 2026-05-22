@@ -1,6 +1,7 @@
 package com.billbook.app.fragment
 
 import com.billbook.app.util.AnimeDialogHelper
+import android.graphics.Color
 import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -308,7 +309,7 @@ class BudgetFragment : Fragment() {
         val percentText = "已使用 %.1f%%".format(info.percentUsed)
         binding.tvPercent.text = percentText
 
-        val isDarkCard = AutoContrast.isDark(pageBg) // 卡片与页面背景同亮度级
+        val isDarkCard = AutoContrast.isDark(pageBg)
         val statusColorRed = if (isDarkCard) 0xFFFF6B6B.toInt() else resources.getColor(android.R.color.holo_red_dark, null)
         val statusColorOrange = if (isDarkCard) 0xFFFFB84D.toInt() else resources.getColor(android.R.color.holo_orange_dark, null)
         val statusColorGreen = if (isDarkCard) 0xFF6BCB77.toInt() else resources.getColor(android.R.color.holo_green_dark, null)
@@ -330,6 +331,9 @@ class BudgetFragment : Fragment() {
                 binding.progressBudget.progressTintList = ColorStateList.valueOf(statusColorGreen)
             }
         }
+        binding.progressBudget.progressBackgroundTintList = ColorStateList.valueOf(
+            if (textColorMode == 2) Color.WHITE else 0xFF16162A.toInt()
+        )
 
         if (info.dailyBudget > 0) {
             binding.tvDailyBudget.text = "建议每日消费：¥%.2f（剩余%d天）".format(info.dailyBudget, info.daysRemaining)
@@ -401,6 +405,9 @@ class BudgetFragment : Fragment() {
                     itemBinding.progressCategory.progressTintList = ColorStateList.valueOf(itemStatusGreen)
                 }
             }
+            itemBinding.progressCategory.progressBackgroundTintList = ColorStateList.valueOf(
+                if (textColorMode == 2) Color.WHITE else 0xFF16162A.toInt()
+            )
 
             itemBinding.btnEdit.setOnClickListener {
                 showEditCategoryDialog(info)
