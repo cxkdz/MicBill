@@ -543,7 +543,7 @@ class SettingsFragment : Fragment() {
         }
 
         // 添加分组标题和分类项的函数
-        fun addCategoryGroup(title: String, categories: List<com.billbook.app.model.Category>, startIndex: Int) {
+        fun addCategoryGroup(title: String, categories: List<com.billbook.app.model.Category>) {
             // 分组标题
             listLayout.addView(android.widget.TextView(requireContext()).apply {
                 text = title
@@ -615,7 +615,7 @@ class SettingsFragment : Fragment() {
         }
 
         // 支出分类
-        addCategoryGroup("支出分类", expenseCategories, 0)
+        addCategoryGroup("支出分类", expenseCategories)
 
         // 分组间距
         listLayout.addView(View(requireContext()).apply {
@@ -626,7 +626,7 @@ class SettingsFragment : Fragment() {
         })
 
         // 收入分类
-        addCategoryGroup("收入分类", incomeCategories, expenseCategories.size)
+        addCategoryGroup("收入分类", incomeCategories)
 
         scrollView.addView(listLayout)
         container.addView(scrollView, android.widget.LinearLayout.LayoutParams(
@@ -933,7 +933,8 @@ class SettingsFragment : Fragment() {
         }
 
         // 删除按钮（仅编辑模式显示）
-        if (isEdit) {
+        if (isEdit && category != null) {
+            val cat = category
             val deleteButton = android.widget.TextView(requireContext()).apply {
                 text = "删除"
                 setTextColor(0xFFFF5252.toInt())
@@ -947,11 +948,11 @@ class SettingsFragment : Fragment() {
                     com.billbook.app.util.AnimeDialogHelper.show(
                         context = requireContext(),
                         title = "确认删除",
-                        message = "确定要删除分类「${category!!.name}」吗？",
+                        message = "确定要删除分类「${cat.name}」吗？",
                         positiveText = "删除",
                         negativeText = "取消",
                         onPositive = {
-                            val result = categoryDao.delete(category!!.id)
+                            val result = categoryDao.delete(cat.id)
                             if (result > 0) {
                                 Toast.makeText(requireContext(), "分类已删除", Toast.LENGTH_SHORT).show()
                                 dialog?.dismiss()
@@ -1002,11 +1003,12 @@ class SettingsFragment : Fragment() {
                     return@setOnClickListener
                 }
 
-                if (isEdit) {
+                if (isEdit && category != null) {
                     // 更新分类
-                    category!!.name = name
-                    category!!.iconResId = selectedIconResId
-                    categoryDao.update(category!!)
+                    val cat = category
+                    cat.name = name
+                    cat.iconResId = selectedIconResId
+                    categoryDao.update(cat)
                     Toast.makeText(requireContext(), "分类已更新", Toast.LENGTH_SHORT).show()
                 } else {
                     // 添加新分类

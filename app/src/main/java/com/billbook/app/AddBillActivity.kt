@@ -121,11 +121,17 @@ class AddBillActivity : AppCompatActivity() {
     private fun setupTypeSwitch() {
         binding.chipExpense.setOnClickListener {
             billType = Bill.TYPE_EXPENSE
+            selectedCategoryId = 0L
+            selectedCategoryName = ""
+            selectedCategoryIcon = ""
             updateTypeSelection()
             loadCategories()
         }
         binding.chipIncome.setOnClickListener {
             billType = Bill.TYPE_INCOME
+            selectedCategoryId = 0L
+            selectedCategoryName = ""
+            selectedCategoryIcon = ""
             updateTypeSelection()
             loadCategories()
         }
