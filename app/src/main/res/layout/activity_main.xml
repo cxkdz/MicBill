@@ -76,13 +76,23 @@
                     android:textSize="@dimen/text_xs" />
             </LinearLayout>
 
-            <!-- 账单翻页区 -->
+            <!-- 账单翻页区（横向模式：一天一页） -->
             <androidx.viewpager2.widget.ViewPager2
                 android:id="@+id/vpDayBills"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
                 android:clipToPadding="false" />
+
+            <!-- 竖向模式：按日期分组的连续账单流 -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvVerticalBills"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:clipToPadding="false"
+                android:paddingBottom="@dimen/spacing_lg"
+                android:visibility="gone" />
 
             <!-- Fragment 容器（其他 Tab） -->
             <FrameLayout
@@ -154,7 +164,7 @@
                     android:layout_gravity="center"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
-                    android:paddingHorizontal="4dp">
+                    android:paddingHorizontal="@dimen/spacing_xs">
 
                     <TextView
                         android:id="@+id/btnFilterAll"

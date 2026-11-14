@@ -59,6 +59,7 @@ class AnimeDatePickerDialog(
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.dialog_anime_date_picker)
+        window?.decorView?.let { com.billbook.app.util.ThemeSurfaces.apply(it) }
 
         cal.timeInMillis = initialTimeMillis
         selectedYear = cal.get(Calendar.YEAR)

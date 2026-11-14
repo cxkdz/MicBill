@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="8dp"
+    android:layout_marginTop="@dimen/spacing_sm"
     app:cardCornerRadius="@dimen/radius_lg"
     app:cardElevation="@dimen/card_elevation">
 
@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="@dimen/spacing_md">
 
         <!-- 分类名称和金额 -->
         <LinearLayout
@@ -28,7 +28,7 @@
                     android:id="@+id/ivCategoryIcon"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:padding="4dp"
+                    android:padding="@dimen/spacing_xs"
                     android:scaleType="centerInside"
                     android:visibility="gone" />
 
@@ -37,8 +37,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:gravity="center"
-                    android:text="🍜"
-                    android:textSize="24sp"
+                    android:text=""
+                    android:textSize="@dimen/text_xl"
                     android:visibility="visible" />
             </FrameLayout>
 
@@ -46,7 +46,7 @@
                 android:id="@+id/tvCategoryName"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
+                android:layout_marginStart="@dimen/spacing_sm"
                 android:layout_weight="1"
                 android:text="餐饮"
                 android:textColor="@color/text_primary"
@@ -76,7 +76,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="@dimen/spacing_sm"
             android:orientation="horizontal">
 
             <TextView
@@ -101,7 +101,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="@dimen/spacing_sm"
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
@@ -117,7 +117,7 @@
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnEdit"
                 android:layout_width="wrap_content"
-                android:layout_height="36dp"
+                android:layout_height="48dp"
                 android:minWidth="0dp"
                 android:paddingHorizontal="12dp"
                 android:text="修改"
@@ -128,7 +128,7 @@
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnDelete"
                 android:layout_width="wrap_content"
-                android:layout_height="36dp"
+                android:layout_height="48dp"
                 android:minWidth="0dp"
                 android:paddingHorizontal="12dp"
                 android:text="删除"

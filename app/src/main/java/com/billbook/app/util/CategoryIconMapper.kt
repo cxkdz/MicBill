@@ -1,5 +1,6 @@
 package com.billbook.app.util
 
+import android.content.Context
 import com.billbook.app.R
 
 /**
@@ -147,4 +148,29 @@ object CategoryIconMapper {
     fun getAllIncomeIconResIds(): List<Int> {
         return allIncomeIconResIds
     }
+
+    /**
+     * 统一图标解析入口：新数据存的是 drawable 资源名，存量数据存的是 emoji 字符串。
+     * 资源名解析失败（emoji 或脏数据）时按分类名称映射，因此不需要 DB schema 迁移。
+     */
+    fun resolveIcon(context: Context, categoryName: String, storedIcon: String, type: Int = 0): Int {
+        if (storedIcon.isNotBlank() && storedIcon.all { it.isLetterOrDigit() || it == '_' }) {
+            val id = context.resources.getIdentifier(storedIcon, "drawable", context.packageName)
+            if (id != 0) return id
+        }
+        return getIconResId(categoryName, type)
+    }
+
+    /** 存库用稳定资源名，不存 resId（aapt 资源 ID 会随构建变化） */
+    fun iconName(context: Context, resId: Int): String = try {
+        context.resources.getResourceEntryName(resId)
+    } catch (_: Exception) {
+        ""
+    }
+
+    /** 带中文标签的全部候选图标，用于自定义分类的图标选择器 */
+    fun labeledIcons(): List<Pair<Int, String>> =
+        (expenseIconMap.entries + incomeIconMap.entries)
+            .distinctBy { it.value }
+            .map { it.value to it.key }
 }

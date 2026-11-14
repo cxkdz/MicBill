@@ -18,7 +18,7 @@ import com.billbook.app.util.ThemeManager
 
 class ThemeEditorDialog : DialogFragment() {
 
-    private var onApply: ((String) -> Unit)? = null
+    private var onApply: (() -> Unit)? = null
     private var selectedImageUri: Uri? = null
     private lateinit var themeManager: ThemeManager
 
@@ -37,7 +37,7 @@ class ThemeEditorDialog : DialogFragment() {
         }
     }
 
-    fun setOnApplyListener(listener: (String) -> Unit) {
+    fun setOnApplyListener(listener: () -> Unit) {
         onApply = listener
     }
 
@@ -51,18 +51,15 @@ class ThemeEditorDialog : DialogFragment() {
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.WRAP_CONTENT
         )
-        // 应用二次元风格背景
+        // 窗口底色跟随当前预设主题
         dialog?.window?.setBackgroundDrawable(
-            android.graphics.drawable.GradientDrawable().apply {
-                setColor(0xE61A1A2E.toInt())
-                cornerRadius = 20 * resources.displayMetrics.density
-                setStroke((1 * resources.displayMetrics.density).toInt(), 0x20FFFFFF)
-            }
+            com.billbook.app.util.ThemeSurfaces.surface(requireContext(), 20f)
         )
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        com.billbook.app.util.ThemeSurfaces.apply(view)
 
         themeManager = ThemeManager(requireContext())
         selectedImageUri = themeManager.getCustomDioramaImageUri()
@@ -95,7 +92,7 @@ class ThemeEditorDialog : DialogFragment() {
             } else {
                 themeManager.clearCustomDioramaImage()
             }
-            onApply?.invoke(themeManager.getCurrentPaletteKey())
+            onApply?.invoke()
             dismiss()
         }
     }
@@ -110,16 +107,13 @@ class ThemeEditorDialog : DialogFragment() {
     }
 
     private fun showImagePreview(uri: Uri) {
-        try {
-            val inputStream = requireContext().contentResolver.openInputStream(uri)
-            val bitmap = android.graphics.BitmapFactory.decodeStream(inputStream)
-            inputStream?.close()
-            if (bitmap != null) {
-                ivPreview.setImageBitmap(bitmap)
-                layoutImagePreview.visibility = View.VISIBLE
-                btnClearImage.visibility = View.VISIBLE
-            }
-        } catch (e: Exception) {
+        // 预览只需要缩略图，按 512 采样即可，不再全尺寸解码
+        val bitmap = com.billbook.app.util.BitmapUtils.decodeSampledUri(requireContext(), uri, 512, 512)
+        if (bitmap != null) {
+            ivPreview.setImageBitmap(bitmap)
+            layoutImagePreview.visibility = View.VISIBLE
+            btnClearImage.visibility = View.VISIBLE
+        } else {
             Toast.makeText(requireContext(), "图片加载失败", Toast.LENGTH_SHORT).show()
         }
     }

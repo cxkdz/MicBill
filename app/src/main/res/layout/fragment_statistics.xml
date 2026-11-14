@@ -142,11 +142,11 @@
             <TextView
                 android:id="@+id/btnPieToggle"
                 android:layout_width="wrap_content"
-                android:layout_height="36dp"
+                android:layout_height="48dp"
                 android:background="@drawable/bg_segment_control"
                 android:gravity="center"
                 android:minWidth="64dp"
-                android:paddingHorizontal="16dp"
+                android:paddingHorizontal="@dimen/spacing_md"
                 android:text="百分比"
                 android:textColor="@color/text_primary"
                 android:textSize="@dimen/text_sm" />

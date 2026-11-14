@@ -4,7 +4,7 @@
     android:layout_height="wrap_content"
     android:gravity="center"
     android:orientation="vertical"
-    android:paddingVertical="8dp">
+    android:paddingVertical="@dimen/spacing_sm">
 
     <FrameLayout
         android:id="@+id/iconContainer"
@@ -25,7 +25,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:textSize="26sp"
+            android:textSize="@dimen/text_xl"
             android:visibility="visible" />
     </FrameLayout>
 
@@ -33,9 +33,9 @@
         android:id="@+id/tvName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="@dimen/spacing_xs"
         android:ellipsize="end"
         android:maxLines="1"
         android:textColor="@color/anime_text_secondary"
-        android:textSize="11sp" />
+        android:textSize="@dimen/text_xs" />
 </LinearLayout>

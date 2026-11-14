@@ -1,235 +1,140 @@
 package com.billbook.app.util
 
 import android.graphics.Color
-import com.billbook.app.model.DioramaType
+import com.billbook.app.R
 import com.billbook.app.model.ThemePalette
 
+/**
+ * 6 套预设主题：每套 = 一张「前景」角色图 + 一层「背景」纯色渐变 + 配套 UI 配色。
+ *
+ * 渐变两端色取自对应角色图的明暗主色；dioramaGround 取渐变中间色，供 AutoContrast
+ * 估算文字对比度。旧的 10 套程序化场景预设（forest/snow/...）及场景绘制链已删除。
+ * 以后加一套预设只需在 PRESETS 里加一行。
+ *
+ * 所有「派生色」（文字、强调、segment、收支）统一由 derive() 计算：
+ * 预设与自定义配色共用同一套算法，自定义时不会出现「底色变了但文字色没跟上」。
+ */
 object ThemePalettes {
 
-    val PRESETS = listOf(
-        // 1. Forest
-        ThemePalette(
-            key = "forest", name = "渐变灰", dioramaType = DioramaType.FOREST,
-            dioramaSkyTop = Color.parseColor("#87CEEB"),
-            dioramaSkyBottom = Color.parseColor("#98D8C8"),
-            dioramaGround = Color.parseColor("#2D5016"),
-            dioramaAccent = Color.parseColor("#3A7D44"),
-            dioramaHighlight = Color.parseColor("#D4A574"),
-            planePrimary = Color.parseColor("#E8F5E9"),
-            planeAccent = Color.parseColor("#4CAF50"),
-            planeShadowTint = Color.parseColor("#1B5E20"),
-            planeAmbientLight = Color.parseColor("#C8E6C9"),
-            planeGlassAlpha = 30, planeBorderAlpha = 20,
-            headerTextPrimary = Color.parseColor("#1A1A2E"),
-            headerTextSecondary = Color.parseColor("#801A1A2E"),
-            segmentBg = Color.parseColor("#15000000"),
-            segmentActiveBg = Color.parseColor("#25000000"),
-            segmentActiveText = Color.parseColor("#2E7D32"),
-            segmentInactiveText = Color.parseColor("#801A1A2E"),
-            expenseColor = Color.parseColor("#E87C7C"),
-            incomeColor = Color.parseColor("#7CD4A8")
-        ),
-        // 2. Snow Mountain
-        ThemePalette(
-            key = "snow", name = "雪山", dioramaType = DioramaType.SNOW_MOUNTAIN,
-            dioramaSkyTop = Color.parseColor("#B3E5FC"),
-            dioramaSkyBottom = Color.parseColor("#E1F5FE"),
-            dioramaGround = Color.parseColor("#E8EAF6"),
-            dioramaAccent = Color.parseColor("#90CAF9"),
-            dioramaHighlight = Color.parseColor("#FFFFFF"),
-            planePrimary = Color.parseColor("#E3F2FD"),
-            planeAccent = Color.parseColor("#42A5F5"),
-            planeShadowTint = Color.parseColor("#1565C0"),
-            planeAmbientLight = Color.parseColor("#BBDEFB"),
-            planeGlassAlpha = 25, planeBorderAlpha = 18,
-            headerTextPrimary = Color.parseColor("#1A1A2E"),
-            headerTextSecondary = Color.parseColor("#801A1A2E"),
-            segmentBg = Color.parseColor("#12000000"),
-            segmentActiveBg = Color.parseColor("#20000000"),
-            segmentActiveText = Color.parseColor("#1565C0"),
-            segmentInactiveText = Color.parseColor("#801A1A2E"),
-            expenseColor = Color.parseColor("#E87C7C"),
-            incomeColor = Color.parseColor("#7CD4A8")
-        ),
-        // 3. Desert
-        ThemePalette(
-            key = "desert", name = "沙漠", dioramaType = DioramaType.DESERT,
-            dioramaSkyTop = Color.parseColor("#FFB74D"),
-            dioramaSkyBottom = Color.parseColor("#FFE0B2"),
-            dioramaGround = Color.parseColor("#D7CCC8"),
-            dioramaAccent = Color.parseColor("#BCAAA4"),
-            dioramaHighlight = Color.parseColor("#FFF8E1"),
-            planePrimary = Color.parseColor("#FFF3E0"),
-            planeAccent = Color.parseColor("#FF9800"),
-            planeShadowTint = Color.parseColor("#E65100"),
-            planeAmbientLight = Color.parseColor("#FFE0B2"),
-            planeGlassAlpha = 28, planeBorderAlpha = 18,
-            headerTextPrimary = Color.parseColor("#1A1A2E"),
-            headerTextSecondary = Color.parseColor("#801A1A2E"),
-            segmentBg = Color.parseColor("#15000000"),
-            segmentActiveBg = Color.parseColor("#25000000"),
-            segmentActiveText = Color.parseColor("#E65100"),
-            segmentInactiveText = Color.parseColor("#801A1A2E"),
-            expenseColor = Color.parseColor("#E87C7C"),
-            incomeColor = Color.parseColor("#7CD4A8")
-        ),
-        // 4. Ocean
-        ThemePalette(
-            key = "ocean", name = "海洋", dioramaType = DioramaType.OCEAN,
-            dioramaSkyTop = Color.parseColor("#0288D1"),
-            dioramaSkyBottom = Color.parseColor("#4FC3F7"),
-            dioramaGround = Color.parseColor("#01579B"),
-            dioramaAccent = Color.parseColor("#0277BD"),
-            dioramaHighlight = Color.parseColor("#B3E5FC"),
-            planePrimary = Color.parseColor("#E0F7FA"),
-            planeAccent = Color.parseColor("#00BCD4"),
-            planeShadowTint = Color.parseColor("#006064"),
-            planeAmbientLight = Color.parseColor("#B2EBF2"),
-            planeGlassAlpha = 30, planeBorderAlpha = 20,
-            headerTextPrimary = Color.parseColor("#FFFFFF"),
-            headerTextSecondary = Color.parseColor("#B0FFFFFF"),
-            segmentBg = Color.parseColor("#20FFFFFF"),
-            segmentActiveBg = Color.parseColor("#30FFFFFF"),
-            segmentActiveText = Color.parseColor("#FFFFFF"),
-            segmentInactiveText = Color.parseColor("#B0FFFFFF"),
-            expenseColor = Color.parseColor("#FF8A80"),
-            incomeColor = Color.parseColor("#69F0AE")
-        ),
-        // 5. Starry Sky
-        ThemePalette(
-            key = "starry", name = "星空", dioramaType = DioramaType.STARRY_SKY,
-            dioramaSkyTop = Color.parseColor("#0D0221"),
-            dioramaSkyBottom = Color.parseColor("#1A0533"),
-            dioramaGround = Color.parseColor("#0A0118"),
-            dioramaAccent = Color.parseColor("#3F1E78"),
-            dioramaHighlight = Color.parseColor("#FFD54F"),
-            planePrimary = Color.parseColor("#1A1A2E"),
-            planeAccent = Color.parseColor("#7C4DFF"),
-            planeShadowTint = Color.parseColor("#311B92"),
-            planeAmbientLight = Color.parseColor("#311B92"),
-            planeGlassAlpha = 35, planeBorderAlpha = 25,
-            headerTextPrimary = Color.parseColor("#FFFFFF"),
-            headerTextSecondary = Color.parseColor("#B0FFFFFF"),
-            segmentBg = Color.parseColor("#20FFFFFF"),
-            segmentActiveBg = Color.parseColor("#30FFFFFF"),
-            segmentActiveText = Color.parseColor("#B388FF"),
-            segmentInactiveText = Color.parseColor("#B0FFFFFF"),
-            expenseColor = Color.parseColor("#FF8A80"),
-            incomeColor = Color.parseColor("#69F0AE")
-        ),
-        // 6. City
-        ThemePalette(
-            key = "city", name = "城市", dioramaType = DioramaType.CITY,
-            dioramaSkyTop = Color.parseColor("#263238"),
-            dioramaSkyBottom = Color.parseColor("#37474F"),
-            dioramaGround = Color.parseColor("#1C1C1E"),
-            dioramaAccent = Color.parseColor("#546E7A"),
-            dioramaHighlight = Color.parseColor("#FFD54F"),
-            planePrimary = Color.parseColor("#ECEFF1"),
-            planeAccent = Color.parseColor("#607D8B"),
-            planeShadowTint = Color.parseColor("#263238"),
-            planeAmbientLight = Color.parseColor("#CFD8DC"),
-            planeGlassAlpha = 32, planeBorderAlpha = 22,
-            headerTextPrimary = Color.parseColor("#1A1A2E"),
-            headerTextSecondary = Color.parseColor("#801A1A2E"),
-            segmentBg = Color.parseColor("#15000000"),
-            segmentActiveBg = Color.parseColor("#25000000"),
-            segmentActiveText = Color.parseColor("#37474F"),
-            segmentInactiveText = Color.parseColor("#801A1A2E"),
-            expenseColor = Color.parseColor("#E87C7C"),
-            incomeColor = Color.parseColor("#7CD4A8")
-        ),
-        // 7. Cyberpunk
-        ThemePalette(
-            key = "cyberpunk", name = "赛博朋克", dioramaType = DioramaType.CYBERPUNK,
-            dioramaSkyTop = Color.parseColor("#0A0014"),
-            dioramaSkyBottom = Color.parseColor("#1A0033"),
-            dioramaGround = Color.parseColor("#0D001A"),
-            dioramaAccent = Color.parseColor("#FF00FF"),
-            dioramaHighlight = Color.parseColor("#00FFFF"),
-            planePrimary = Color.parseColor("#1A0033"),
-            planeAccent = Color.parseColor("#E040FB"),
-            planeShadowTint = Color.parseColor("#4A148C"),
-            planeAmbientLight = Color.parseColor("#7B1FA2"),
-            planeGlassAlpha = 40, planeBorderAlpha = 30,
-            headerTextPrimary = Color.parseColor("#FFFFFF"),
-            headerTextSecondary = Color.parseColor("#B0FFFFFF"),
-            segmentBg = Color.parseColor("#25FFFFFF"),
-            segmentActiveBg = Color.parseColor("#35FFFFFF"),
-            segmentActiveText = Color.parseColor("#EA80FC"),
-            segmentInactiveText = Color.parseColor("#B0FFFFFF"),
-            expenseColor = Color.parseColor("#FF5252"),
-            incomeColor = Color.parseColor("#69F0AE")
-        ),
-        // 8. Minimal Geometry
-        ThemePalette(
-            key = "minimal", name = "极简几何", dioramaType = DioramaType.MINIMAL_GEOMETRY,
-            dioramaSkyTop = Color.parseColor("#F5F5F5"),
-            dioramaSkyBottom = Color.parseColor("#EEEEEE"),
-            dioramaGround = Color.parseColor("#E0E0E0"),
-            dioramaAccent = Color.parseColor("#BDBDBD"),
-            dioramaHighlight = Color.parseColor("#FFFFFF"),
-            planePrimary = Color.parseColor("#FAFAFA"),
-            planeAccent = Color.parseColor("#9E9E9E"),
-            planeShadowTint = Color.parseColor("#616161"),
-            planeAmbientLight = Color.parseColor("#F5F5F5"),
-            planeGlassAlpha = 20, planeBorderAlpha = 15,
-            headerTextPrimary = Color.parseColor("#1A1A2E"),
-            headerTextSecondary = Color.parseColor("#801A1A2E"),
-            segmentBg = Color.parseColor("#10000000"),
-            segmentActiveBg = Color.parseColor("#20000000"),
-            segmentActiveText = Color.parseColor("#424242"),
-            segmentInactiveText = Color.parseColor("#801A1A2E"),
-            expenseColor = Color.parseColor("#E87C7C"),
-            incomeColor = Color.parseColor("#7CD4A8")
-        ),
-        // 9. Anime
-        ThemePalette(
-            key = "anime", name = "动漫", dioramaType = DioramaType.ANIME,
-            dioramaSkyTop = Color.parseColor("#F8BBD0"),
-            dioramaSkyBottom = Color.parseColor("#FCE4EC"),
-            dioramaGround = Color.parseColor("#C8E6C9"),
-            dioramaAccent = Color.parseColor("#F48FB1"),
-            dioramaHighlight = Color.parseColor("#FFF9C4"),
-            planePrimary = Color.parseColor("#FCE4EC"),
-            planeAccent = Color.parseColor("#EC407A"),
-            planeShadowTint = Color.parseColor("#AD1457"),
-            planeAmbientLight = Color.parseColor("#F8BBD0"),
-            planeGlassAlpha = 25, planeBorderAlpha = 18,
-            headerTextPrimary = Color.parseColor("#1A1A2E"),
-            headerTextSecondary = Color.parseColor("#801A1A2E"),
-            segmentBg = Color.parseColor("#15000000"),
-            segmentActiveBg = Color.parseColor("#25000000"),
-            segmentActiveText = Color.parseColor("#C2185B"),
-            segmentInactiveText = Color.parseColor("#801A1A2E"),
-            expenseColor = Color.parseColor("#E87C7C"),
-            incomeColor = Color.parseColor("#7CD4A8")
-        ),
-        // 10. Illustration
-        ThemePalette(
-            key = "illustration", name = "插画", dioramaType = DioramaType.ILLUSTRATION,
-            dioramaSkyTop = Color.parseColor("#A5D6A7"),
-            dioramaSkyBottom = Color.parseColor("#C8E6C9"),
-            dioramaGround = Color.parseColor("#81C784"),
-            dioramaAccent = Color.parseColor("#66BB6A"),
-            dioramaHighlight = Color.parseColor("#FFFDE7"),
-            planePrimary = Color.parseColor("#F1F8E9"),
-            planeAccent = Color.parseColor("#66BB6A"),
-            planeShadowTint = Color.parseColor("#2E7D32"),
-            planeAmbientLight = Color.parseColor("#DCEDC8"),
-            planeGlassAlpha = 28, planeBorderAlpha = 18,
-            headerTextPrimary = Color.parseColor("#1A1A2E"),
-            headerTextSecondary = Color.parseColor("#801A1A2E"),
-            segmentBg = Color.parseColor("#15000000"),
-            segmentActiveBg = Color.parseColor("#25000000"),
-            segmentActiveText = Color.parseColor("#388E3C"),
-            segmentInactiveText = Color.parseColor("#801A1A2E"),
-            expenseColor = Color.parseColor("#E87C7C"),
-            incomeColor = Color.parseColor("#7CD4A8")
+    private fun color(hex: String) = Color.parseColor(hex)
+
+    /**
+     * 用一组基础色（ground / accent）重算 palette 的全部派生字段。
+     *
+     * @param base 基础 palette（提供图片、玻璃参数、预设渐变等静态字段）
+     * @param groundColor 容器/页面底色，AutoContrast 以它判定明暗
+     * @param accentColor 主题强调色，用于按钮、选中态与语义色染色
+     * @param overrideGradient 是否用 ground/accent 重新生成 Layer1 渐变。
+     *        预设路径为 false（保留逐套精确调过的渐变）；自定义配色为 true。
+     */
+    fun derive(
+        base: ThemePalette,
+        groundColor: Int = base.dioramaGround,
+        accentColor: Int = base.dioramaAccent,
+        overrideGradient: Boolean = false
+    ): ThemePalette {
+        val onDark = AutoContrast.isDark(groundColor)
+
+        // 主题强调色：保留色相，但在当前底色上拉到可读（深底提亮 / 浅底压暗）
+        val readableAccent = if (onDark) {
+            AutoContrast.blendColor(accentColor, Color.WHITE, 0.32f)
+        } else {
+            AutoContrast.blendColor(accentColor, color("#171722"), 0.30f)
+        }
+
+        // 文字一律由 AutoContrast 按底色自动取，保证任何自定义色下都清晰
+        val textPrimary = AutoContrast.textColorFor(groundColor)
+        val textSecondary = AutoContrast.secondaryTextColorFor(groundColor)
+
+        // 收支语义色保持稳定（红/绿 = 辨识度），只染 18% 主题色达到协调
+        val expense = AutoContrast.blendColor(color("#E8615F"), accentColor, 0.18f)
+        val income = AutoContrast.blendColor(color("#5FC89B"), accentColor, 0.18f)
+
+        val skyTop = if (overrideGradient) {
+            AutoContrast.blendColor(groundColor, Color.BLACK, 0.45f)
+        } else base.dioramaSkyTop
+        val skyBottom = if (overrideGradient) {
+            AutoContrast.blendColor(
+                AutoContrast.blendColor(groundColor, accentColor, 0.45f),
+                Color.WHITE, 0.18f
+            )
+        } else base.dioramaSkyBottom
+
+        return base.copy(
+            dioramaSkyTop = skyTop,
+            dioramaSkyBottom = skyBottom,
+            dioramaGround = groundColor,
+            dioramaAccent = accentColor,
+            planeAccent = readableAccent,
+            headerTextPrimary = textPrimary,
+            headerTextSecondary = textSecondary,
+            segmentBg = if (onDark) color("#18FFFFFF") else color("#12000000"),
+            segmentActiveBg = if (onDark) color("#30FFFFFF") else color("#20000000"),
+            segmentActiveText = readableAccent,
+            segmentInactiveText = textSecondary,
+            expenseColor = expense,
+            incomeColor = income
         )
+    }
+
+    private fun preset(
+        key: String,
+        name: String,
+        foregroundResId: Int,
+        skyTop: String,
+        skyBottom: String,
+        ground: String,
+        accent: String,
+        planePrimary: String,
+        glassAlpha: Int,
+        borderAlpha: Int
+    ): ThemePalette {
+        // 只填「基础色」；派生字段全部交给 derive()，避免两套算法
+        val base = ThemePalette(
+            key = key,
+            name = name,
+            foregroundResId = foregroundResId,
+            dioramaSkyTop = color(skyTop),
+            dioramaSkyBottom = color(skyBottom),
+            dioramaGround = color(ground),
+            dioramaAccent = color(accent),
+            dioramaHighlight = Color.WHITE,
+            planePrimary = color(planePrimary),
+            planeAccent = 0,
+            planeShadowTint = color("#33000000"),
+            planeAmbientLight = color("#20FFFFFF"),
+            planeGlassAlpha = glassAlpha,
+            planeBorderAlpha = borderAlpha,
+            headerTextPrimary = 0,
+            headerTextSecondary = 0,
+            segmentBg = 0,
+            segmentActiveBg = 0,
+            segmentActiveText = 0,
+            segmentInactiveText = 0,
+            expenseColor = 0,
+            incomeColor = 0
+        )
+        return derive(base)
+    }
+
+    val PRESETS = listOf(
+        preset("moying", "墨影", R.drawable.fg_moying,
+            "#0A0A0C", "#6E7070", "#3A3B3B", "#9A9B99", "#E8E8E8", 42, 40),
+        preset("ziyan", "紫烟", R.drawable.fg_ziyan,
+            "#8E6E8E", "#F2E9EF", "#C4AFC0", "#A97FA9", "#F7F0F6", 30, 20),
+        preset("shenhai", "深海", R.drawable.fg_shenhai,
+            "#101F38", "#5A6C82", "#35455C", "#6C9BD2", "#E3EDF7", 38, 34),
+        preset("yingzhi", "樱织", R.drawable.fg_yingzhi,
+            "#6E4E5B", "#E8CBD2", "#A98A96", "#D98AA4", "#FBEFF2", 32, 22),
+        preset("nuanzhou", "暖昼", R.drawable.fg_nuanzhou,
+            "#6E6872", "#D8CFC2", "#A29B99", "#C9A96B", "#F5F0E8", 32, 22),
+        preset("xingye", "星夜", R.drawable.fg_xingye,
+            "#1C2540", "#7A7890", "#4A4A66", "#8FA8E0", "#E6EAF6", 40, 36)
     )
 
-    fun findByKey(key: String): ThemePalette? = PRESETS.find { it.key == key }
+    val DEFAULT_KEY = "moying"
 
-    val DEFAULT_KEY = "forest"
+    val DEFAULT: ThemePalette get() = PRESETS.first()
+
+    fun findByKey(key: String): ThemePalette? = PRESETS.find { it.key == key }
 }

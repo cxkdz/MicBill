@@ -2,6 +2,7 @@ package com.billbook.app.fragment
 
 import android.graphics.Color
 import android.graphics.Typeface
+import com.billbook.app.util.AppExecutors
 import com.billbook.app.util.AutoContrast
 import com.billbook.app.util.ThemeManager
 import android.os.Bundle
@@ -69,9 +70,11 @@ class StatisticsFragment : Fragment() {
             binding.btnPieToggle.text = if (showPercentage) "百分比" else "金额"
             updatePieChart()
         }
-
-        refreshData()
+        // 首次刷新交给 onResume，避免 onViewCreated + onResume 连发两次查库
     }
+
+    /** 每次刷新取一个序号，只让最后一次结果落到 UI，防止快速切页时旧数据覆盖新数据 */
+    private var refreshSeq = 0
 
     override fun onResume() {
         super.onResume()
@@ -79,22 +82,44 @@ class StatisticsFragment : Fragment() {
     }
 
     fun refreshData() {
+        val seq = ++refreshSeq
         val cal = Calendar.getInstance()
         val year = cal.get(Calendar.YEAR)
         val month = cal.get(Calendar.MONTH) + 1
 
         binding.tvMonth.text = dateFormat.format(cal.time)
 
-        val (expense, income) = billDao.getMonthSummary(year, month)
-        binding.tvTotalExpense.text = String.format("¥%.2f", expense)
-        binding.tvTotalIncome.text = String.format("¥%.2f", income)
-        binding.tvBalance.text = String.format("¥%.2f", income - expense)
+        // 在主线程捕获 DAO 引用，避免后台线程直接读 lateinit 字段
+        val dao = billDao
+        AppExecutors.io(onError = {
+            if (_binding != null && isAdded) {
+                android.widget.Toast.makeText(
+                    requireContext(), "统计加载失败，请重试", android.widget.Toast.LENGTH_SHORT
+                ).show()
+            }
+        }) {
+            // 原本 8 次同步查库（1 次汇总 + 1 次排行 + 6 次趋势）全部挤在主线程
+            val summary = dao.getMonthSummary(year, month)
+            val rankings = dao.getCategoryRanking(year, month, Bill.TYPE_EXPENSE)
+            val trend = (5 downTo 0).map { offset ->
+                val c = Calendar.getInstance()
+                c.add(Calendar.MONTH, -offset)
+                val (e, i) = dao.getMonthSummary(c.get(Calendar.YEAR), c.get(Calendar.MONTH) + 1)
+                Triple(c.get(Calendar.MONTH) + 1, e, i)
+            }
+            AppExecutors.main {
+                if (_binding == null || !isAdded || seq != refreshSeq) return@main
+                binding.tvTotalExpense.text = String.format("¥%.2f", summary.first)
+                binding.tvTotalIncome.text = String.format("¥%.2f", summary.second)
+                binding.tvBalance.text = String.format("¥%.2f", summary.second - summary.first)
 
-        cachedYear = year
-        cachedMonth = month
-        cachedRankings = billDao.getCategoryRanking(year, month, Bill.TYPE_EXPENSE)
-        updatePieChart()
-        loadMonthlyTrendChart()
+                cachedYear = year
+                cachedMonth = month
+                cachedRankings = rankings
+                updatePieChart()
+                loadMonthlyTrendChart(trend)
+            }
+        }
     }
 
     private fun updatePieChart() {
@@ -212,20 +237,15 @@ class StatisticsFragment : Fragment() {
         }
     }
 
-    private fun loadMonthlyTrendChart() {
+    private fun loadMonthlyTrendChart(trend: List<Triple<Int, Double, Double>>) {
         val entriesExpense = mutableListOf<Entry>()
         val entriesIncome = mutableListOf<Entry>()
         val labels = mutableListOf<String>()
 
-        for (i in 5 downTo 0) {
-            val tempCal = Calendar.getInstance()
-            tempCal.add(Calendar.MONTH, -i)
-            val y = tempCal.get(Calendar.YEAR)
-            val m = tempCal.get(Calendar.MONTH) + 1
-
-            val (expense, income) = billDao.getMonthSummary(y, m)
-            entriesExpense.add(Entry((5 - i).toFloat(), expense.toFloat()))
-            entriesIncome.add(Entry((5 - i).toFloat(), income.toFloat()))
+        // 数据已在后台查好，这里只负责组装图表，保证 UI 操作都在主线程
+        trend.forEachIndexed { index, (m, expense, income) ->
+            entriesExpense.add(Entry(index.toFloat(), expense.toFloat()))
+            entriesIncome.add(Entry(index.toFloat(), income.toFloat()))
             labels.add("${m}月")
         }
 
@@ -242,8 +262,10 @@ class StatisticsFragment : Fragment() {
             else -> if (isDark) Color.parseColor("#C0FFFFFF") else Color.parseColor("#C03D4A5C")
         }
 
-        val expenseColor = Color.parseColor("#FF6B8A") // 粉红
-        val incomeColor = Color.parseColor("#95E1A3")  // 薄荷绿
+        // 收支折线随主题配色（语义红/绿 + 主题色轻微染色），不再写死
+        val palette = com.billbook.app.util.ThemeManager(requireContext()).getEffectivePalette()
+        val expenseColor = palette.expenseColor
+        val incomeColor = palette.incomeColor
 
         val expenseDataSet = LineDataSet(entriesExpense, "支出").apply {
             setColor(expenseColor)

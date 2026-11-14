@@ -96,7 +96,7 @@ class DateDayAdapter(
 
             when {
                 isSelected -> {
-                    tvDay.setBackgroundResource(R.drawable.bg_anime_date_selected)
+                    tvDay.background = com.billbook.app.util.ThemeSurfaces.selectedDay(tvDay.context)
                     tvDay.setTextColor(Color.WHITE)
                     // Selection pop animation
                     tvDay.animate()

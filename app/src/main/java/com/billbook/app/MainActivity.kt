@@ -23,7 +23,10 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
+import com.billbook.app.adapter.BillAdapter
 import com.billbook.app.adapter.DayPagerAdapter
 import com.billbook.app.animation.ExpandAnimationController
 import com.billbook.app.db.BillDao
@@ -50,6 +53,18 @@ class MainActivity : AppCompatActivity() {
     private var currentYear: Int = 0
     private var currentMonth: Int = 0
 
+    /**
+     * 用户当前正在看的那一天。
+     * 刷新定位按「日期」而不是「页码」——账单增删会让页数变化，
+     * 用页码做锚点必然漂到前一天；用日期做锚点才能稳定停在同一天。
+     */
+    private var currentDayStart: Long? = null
+    private val dayHeaderFormat = SimpleDateFormat("MM月dd日 EEEE", Locale.CHINA)
+
+    /** App 上次在前台的公历日，用来识别「跨天回前台」 */
+    private var lastActiveDay: String = ""
+    private val dayKeyFormat = SimpleDateFormat("yyyyMMdd", Locale.CHINA)
+
     // Layer 1
     private lateinit var dioramaLayer: DioramaView
 
@@ -65,6 +80,8 @@ class MainActivity : AppCompatActivity() {
 
     // Plane content
     private lateinit var vpDayBills: ViewPager2
+    private lateinit var rvVerticalBills: RecyclerView
+    private lateinit var verticalBillAdapter: BillAdapter
     private lateinit var tvEmpty: TextView
     private lateinit var daySummary: LinearLayout
     private lateinit var tvDayDate: TextView
@@ -97,7 +114,7 @@ class MainActivity : AppCompatActivity() {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         }
 
-        setTheme(themeManager.getCurrentTheme().styleRes)
+        setTheme(R.style.Theme_BillBook)  // 主题样式已收敛为一套，配色由 ThemePalettes 负责
         super.onCreate(savedInstanceState)
 
         // Edge-to-Edge: 内容延伸到状态栏和导航栏区域
@@ -120,10 +137,19 @@ class MainActivity : AppCompatActivity() {
         setupWindowInsets()
         setupGradientOverlay()
         setupViewPager()
+        setupVerticalBillList()
         setupBottomNav()
         setupFilter()
         applyThemeBackground()
         setupExpandOverlay()
+
+        // 首帧兜底：部分机型在 measure 之前设置的 BitmapDrawable 会被后续 background 覆盖，
+        // 表现就是「首次启动人物没了，切一次主题才出现」。只在确实没拿到图时补一次。
+        backgroundPlane.post {
+            if (backgroundPlane.background !is android.graphics.drawable.BitmapDrawable) {
+                applyForegroundLayer(themeManager.getEffectivePalette())
+            }
+        }
 
         if (savedInstanceState == null) {
             selectNavItem(0)
@@ -142,6 +168,7 @@ class MainActivity : AppCompatActivity() {
         btnFilterExpense = findViewById(R.id.btnFilterExpense)
         btnFilterIncome = findViewById(R.id.btnFilterIncome)
         vpDayBills = findViewById(R.id.vpDayBills)
+        rvVerticalBills = findViewById(R.id.rvVerticalBills)
         tvEmpty = findViewById(R.id.tvEmpty)
         daySummary = findViewById(R.id.daySummary)
         tvDayDate = findViewById(R.id.tvDayDate)
@@ -210,29 +237,49 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         themeManager = ThemeManager(this)
+
+        // App 常驻后台没被杀时，第二天回前台不该还停在昨天的锚点上。
+        val todayKey = dayKeyFormat.format(java.util.Date())
+        val crossedDay = lastActiveDay.isNotEmpty() && lastActiveDay != todayKey
+        lastActiveDay = todayKey
+
         applyThemeBackground()
         selectNavItem(currentNavIndex)
-        if (currentNavIndex == 0) refreshBillData()
+        if (currentNavIndex == 0) {
+            if (crossedDay) {
+                val now = Calendar.getInstance()
+                currentYear = now.get(Calendar.YEAR)
+                currentMonth = now.get(Calendar.MONTH) + 1
+                refreshBillData(preferDayStart = startOfToday())
+            } else {
+                refreshBillData()
+            }
+        }
+    }
+
+    // 横向 / 竖向两套列表共用同一套点击行为，避免改一处漏一处
+    private fun openBillDetail(bill: Bill) {
+        startActivity(
+            Intent(this, BillDetailActivity::class.java).putExtra("bill_id", bill.id)
+        )
+    }
+
+    private fun confirmDeleteBill(bill: Bill) {
+        AlertDialog.Builder(this)
+            .setTitle("删除账单")
+            .setMessage("确定要删除这条 ${bill.categoryName} ¥${bill.money} 的记录吗？")
+            .setPositiveButton("删除") { _, _ ->
+                billDao.delete(bill.id)
+                refreshBillData()
+            }
+            .setNegativeButton("取消", null)
+            .show()
     }
 
     private fun setupViewPager() {
         dayPagerAdapter = DayPagerAdapter(
-            onBillClick = { bill ->
-                val intent = Intent(this, BillDetailActivity::class.java)
-                intent.putExtra("bill_id", bill.id)
-                startActivity(intent)
-            },
-            onBillLongClick = { bill ->
-                AlertDialog.Builder(this)
-                    .setTitle("删除账单")
-                    .setMessage("确定要删除这条 ${bill.categoryName} ¥${bill.money} 的记录吗？")
-                    .setPositiveButton("删除") { _, _ ->
-                        billDao.delete(bill.id)
-                        refreshBillData()
-                    }
-                    .setNegativeButton("取消", null)
-                    .show()
-            }
+            onBillClick = ::openBillDetail,
+            onBillLongClick = ::confirmDeleteBill
         )
         vpDayBills.adapter = dayPagerAdapter
 
@@ -244,9 +291,27 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onPageSelected(position: Int) {
+                val days = dayPagerAdapter.getCurrentDays()
+                if (position in days.indices) currentDayStart = days[position].dayStart
                 updateDaySummary(position)
             }
         })
+    }
+
+    /** 竖向模式：复用带日期表头的 BillAdapter，一天一组、连续下滑 */
+    private fun setupVerticalBillList() {
+        verticalBillAdapter = BillAdapter(
+            onItemClick = ::openBillDetail,
+            onItemLongClick = ::confirmDeleteBill
+        ).apply {
+            // 竖向是普通账单流，不套用「卡片堆叠」的渐隐缩放
+            setStackedEffectEnabled(false)
+        }
+        rvVerticalBills.apply {
+            layoutManager = LinearLayoutManager(this@MainActivity)
+            adapter = verticalBillAdapter
+            addItemDecoration(BillAdapter.DayDividerDecoration())
+        }
     }
 
     private fun updateDaySummary(position: Int) {
@@ -302,22 +367,95 @@ class MainActivity : AppCompatActivity() {
         }.show()
     }
 
-    private fun refreshBillData() {
+    /**
+     * @param preferDayStart 强制定位到这一天（刚记完账时传那笔账的时间）；
+     *                       null 表示保持用户当前浏览的那天，首次进入则回落到今天。
+     */
+    private fun refreshBillData(preferDayStart: Long? = null) {
         tvYearMonth.text = "${currentYear}年${currentMonth}月"
 
-        val days = billDao.getDaysInMonth(currentYear, currentMonth)
-        dayPagerAdapter.submitDays(days)
+        val days = billDao.getDaysInMonth(currentYear, currentMonth).toMutableList()
 
+        // 当前月永远补一页「今天」：今天还没记账，也应该能停在今天，
+        // 而不是被留在最后一条账单所在的昨天。
+        if (isCurrentMonth()) {
+            val today = startOfToday()
+            if (days.none { isSameDay(it.dayStart, today) }) {
+                days.add(
+                    BillDao.DayBills(
+                        dateText = dayHeaderFormat.format(java.util.Date(today)),
+                        dayStart = today,
+                        bills = emptyList(),
+                        totalExpense = 0.0,
+                        totalIncome = 0.0
+                    )
+                )
+                days.sortBy { it.dayStart }
+            }
+        }
+
+        applyDays(days, preferDayStart)
+    }
+
+    /** 统一收口：按浏览方式切换容器 → 按日期定位 → 立刻回填汇总 → 决定空态。 */
+    private fun applyDays(days: List<BillDao.DayBills>, preferDayStart: Long?) {
+        dayPagerAdapter.submitDays(days)
+        val vertical = themeManager.isVerticalBillMode()
+        val allBills = days.flatMap { it.bills }
+
+        // 两种模式共用同一个日期锚点，切换浏览方式时不会丢掉「正在看哪天」
+        val wanted = preferDayStart ?: currentDayStart ?: startOfToday()
+        val anchor = days.indexOfFirst { isSameDay(it.dayStart, wanted) }
+
+        if (vertical) {
+            vpDayBills.visibility = View.GONE
+            rvVerticalBills.visibility = View.VISIBLE
+            // 竖向模式的每日收支放在日期表头里，顶部日汇总栏不再重复
+            daySummary.visibility = View.GONE
+            verticalBillAdapter.submitList(allBills)
+            tvEmpty.visibility = if (allBills.isEmpty()) View.VISIBLE else View.GONE
+            currentDayStart = if (anchor >= 0) days[anchor].dayStart else null
+            return
+        }
+
+        rvVerticalBills.visibility = View.GONE
         if (days.isEmpty()) {
             tvEmpty.visibility = View.VISIBLE
             vpDayBills.visibility = View.GONE
             daySummary.visibility = View.GONE
-        } else {
-            tvEmpty.visibility = View.GONE
-            vpDayBills.visibility = View.VISIBLE
-            daySummary.visibility = View.VISIBLE
-            updateDaySummary(0)
+            currentDayStart = null
+            return
         }
+
+        val target = if (anchor >= 0) anchor else days.lastIndex
+        // 先定位，再同步汇总。不能只靠 onPageSelected：页码没变化时它不会回调，
+        // 而 submitDays 之后汇总数据已经是新的，手动回填才不会「慢一拍」。
+        vpDayBills.setCurrentItem(target, false)
+        updateDaySummary(target)
+        currentDayStart = days[target].dayStart
+
+        tvEmpty.visibility = if (days[target].bills.isEmpty()) View.VISIBLE else View.GONE
+        vpDayBills.visibility = View.VISIBLE
+        daySummary.visibility = View.VISIBLE
+    }
+
+    private fun startOfToday(): Long = Calendar.getInstance().apply {
+        set(Calendar.HOUR_OF_DAY, 0)
+        set(Calendar.MINUTE, 0)
+        set(Calendar.SECOND, 0)
+        set(Calendar.MILLISECOND, 0)
+    }.timeInMillis
+
+    private fun isSameDay(a: Long, b: Long): Boolean {
+        val ca = Calendar.getInstance().apply { timeInMillis = a }
+        val cb = Calendar.getInstance().apply { timeInMillis = b }
+        return ca.get(Calendar.YEAR) == cb.get(Calendar.YEAR) &&
+            ca.get(Calendar.DAY_OF_YEAR) == cb.get(Calendar.DAY_OF_YEAR)
+    }
+
+    private fun isCurrentMonth(): Boolean {
+        val now = Calendar.getInstance()
+        return currentYear == now.get(Calendar.YEAR) && currentMonth == now.get(Calendar.MONTH) + 1
     }
 
     private fun filterByType(type: Int) {
@@ -338,12 +476,20 @@ class MainActivity : AppCompatActivity() {
             tvEmpty.visibility = View.VISIBLE
             vpDayBills.visibility = View.GONE
             daySummary.visibility = View.GONE
-        } else {
-            tvEmpty.visibility = View.GONE
-            vpDayBills.visibility = View.VISIBLE
-            daySummary.visibility = View.VISIBLE
-            updateDaySummary(0)
+            currentDayStart = null
+            return
         }
+
+        val wanted = currentDayStart ?: startOfToday()
+        var target = filteredDays.indexOfFirst { isSameDay(it.dayStart, wanted) }
+        if (target < 0) target = filteredDays.lastIndex
+        vpDayBills.setCurrentItem(target, false)
+        updateDaySummary(target)
+        currentDayStart = filteredDays[target].dayStart
+
+        tvEmpty.visibility = View.GONE
+        vpDayBills.visibility = View.VISIBLE
+        daySummary.visibility = View.VISIBLE
     }
 
     // ==================== Navigation ====================
@@ -375,8 +521,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun showBillPage() {
         findViewById<View>(R.id.fragmentContainer).visibility = View.GONE
-        vpDayBills.visibility = View.VISIBLE
-        daySummary.visibility = View.VISIBLE
+        val vertical = themeManager.isVerticalBillMode()
+        vpDayBills.visibility = if (vertical) View.GONE else View.VISIBLE
+        rvVerticalBills.visibility = if (vertical) View.VISIBLE else View.GONE
+        daySummary.visibility = if (vertical) View.GONE else View.VISIBLE
         snowfallView.visibility = View.VISIBLE
         tvEmpty.visibility = View.GONE
         headerLayer.visibility = View.VISIBLE
@@ -388,6 +536,7 @@ class MainActivity : AppCompatActivity() {
     private fun setupExpandOverlay() {
         val fabAdd = findViewById<FrameLayout>(R.id.fabAdd)
         val overlayView = LayoutInflater.from(this).inflate(R.layout.layout_expand_overlay, null)
+        com.billbook.app.util.ThemeSurfaces.apply(overlayView)
 
         // 添加 overlay 到根布局
         val rootView = findViewById<FrameLayout>(android.R.id.content)
@@ -459,10 +608,10 @@ class MainActivity : AppCompatActivity() {
         fun updatePayChipSelection(selected: TextView) {
             payChips.forEach { chip ->
                 if (chip == selected) {
-                    chip.setBackgroundResource(R.drawable.bg_anime_pay_chip_selected)
+                    chip.background = com.billbook.app.util.ThemeSurfaces.chip(chip.context, true)
                     chip.setTextColor(0xE0FFFFFF.toInt())
                 } else {
-                    chip.setBackgroundResource(R.drawable.bg_anime_pay_chip)
+                    chip.background = com.billbook.app.util.ThemeSurfaces.chip(chip.context, false)
                     chip.setTextColor(0x80FFFFFF.toInt())
                 }
             }
@@ -476,12 +625,12 @@ class MainActivity : AppCompatActivity() {
         // 收支切换
         fun updateTypeSelection() {
             if (billType == Bill.TYPE_EXPENSE) {
-                chipExpense.setBackgroundResource(R.drawable.bg_anime_pay_chip_selected)
+                chipExpense.background = com.billbook.app.util.ThemeSurfaces.chip(chipExpense.context, true)
                 chipExpense.setTextColor(0xE0FFFFFF.toInt())
                 chipIncome.setBackgroundColor(Color.TRANSPARENT)
                 chipIncome.setTextColor(getColor(R.color.anime_text_hint))
             } else {
-                chipIncome.setBackgroundResource(R.drawable.bg_anime_pay_chip_selected)
+                chipIncome.background = com.billbook.app.util.ThemeSurfaces.chip(chipIncome.context, true)
                 chipIncome.setTextColor(0xE0FFFFFF.toInt())
                 chipExpense.setBackgroundColor(Color.TRANSPARENT)
                 chipExpense.setTextColor(getColor(R.color.anime_text_hint))
@@ -643,8 +792,14 @@ class MainActivity : AppCompatActivity() {
                 selectedCategoryId = 0L
                 expandController?.collapse()
 
-                // 刷新账单数据
-                if (currentNavIndex == 0) refreshBillData()
+                // 记完直接跳到这笔账所在的那天（通常是今天），并立刻重算当日汇总。
+                // 若用户把日期改到了别的月份，顺带把首页月份切过去，否则看不到刚记的账。
+                if (currentNavIndex == 0) {
+                    val cal = Calendar.getInstance().apply { timeInMillis = bill.billTime }
+                    currentYear = cal.get(Calendar.YEAR)
+                    currentMonth = cal.get(Calendar.MONTH) + 1
+                    refreshBillData(preferDayStart = bill.billTime)
+                }
             }
         }
 
@@ -667,6 +822,7 @@ class MainActivity : AppCompatActivity() {
     private fun loadFragment(fragment: Fragment) {
         findViewById<View>(R.id.fragmentContainer).visibility = View.VISIBLE
         vpDayBills.visibility = View.GONE
+        rvVerticalBills.visibility = View.GONE
         snowfallView.visibility = View.GONE
         daySummary.visibility = View.GONE
         tvEmpty.visibility = View.GONE
@@ -719,20 +875,21 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun applyPaletteImmediate(palette: ThemePalette) {
-        // Layer 1: Diorama (custom image or procedural scene)
+        // Layer 1「背景」：用户自定义图优先，否则用预设的纯色渐变
         val dioramaUri = themeManager.getCustomDioramaImageUri()
         if (dioramaUri != null) {
             dioramaLayer.applyCustomImage(dioramaUri)
         } else {
-            dioramaLayer.applyDefaultImage(R.drawable.theme_default_bg)
+            dioramaLayer.applyGradient(palette.dioramaSkyTop, palette.dioramaSkyBottom)
         }
 
-        // Layer 2: Background Plane glass morphism (or custom image)
-        if (themeManager.isCustomBackgroundEnabled()) {
-            applyPlaneImageBackground()
-        } else {
-            applyPlaneTheme(palette)
-        }
+        // Layer 2「前景」：自定义图 > 预设角色图 > 玻璃平面
+        applyForegroundLayer(palette)
+        // 个别机型首帧会把 alpha 留在 0（跟随页面切换的呼吸动效残值），这里强制归位
+        backgroundPlane.alpha = 1f
+
+        // 记账浮层（FAB 展开）容器跟随当前主题的深色变体
+        expandController?.applyPalette(palette)
 
         // Compute auto-contrast colors
         val planeComposite = computePlaneCompositeColor(palette)
@@ -758,8 +915,9 @@ class MainActivity : AppCompatActivity() {
         // Bottom nav
         selectNavItem(currentNavIndex)
 
-        // Bill item text colors + shadow
+        // Bill item text colors + shadow（横向 / 竖向两套列表共用）
         dayPagerAdapter.setTextColors(currentTextColor, currentSecondaryColor, shadowColor)
+        verticalBillAdapter.setTextColors(currentTextColor, currentSecondaryColor, shadowColor)
 
         // Status bar icon color + gradient overlay
         updateStatusBarIconColor(palette)
@@ -800,13 +958,74 @@ class MainActivity : AppCompatActivity() {
 
     private fun applyPlaneImageBackground() {
         val uri = themeManager.getCustomBackgroundUri() ?: return
+        val metrics = resources.displayMetrics
+        val bitmap = com.billbook.app.util.BitmapUtils.decodeSampledUri(
+            this, uri, metrics.widthPixels, metrics.heightPixels
+        )
+        if (bitmap == null) {
+            applyPlaneTheme(themeManager.getEffectivePalette())
+            return
+        }
+        applyPlaneBitmap(bitmap)
+    }
+
+    /** Layer 2 前景层：自定义图 > 预设角色图 > 玻璃平面 */
+    private fun applyForegroundLayer(palette: ThemePalette) {
+        if (themeManager.isCustomBackgroundEnabled()) {
+            appliedFgResId = 0
+            applyPlaneImageBackground()
+        } else if (palette.foregroundResId != 0) {
+            if (appliedFgResId != palette.foregroundResId) {
+                appliedFgResId = palette.foregroundResId
+                // 冷启动时立刻解码会跟布局、图片资源抢内存，失败就退化成空玻璃板
+                // （用户看到的现象：首次安装没有人物，切一次主题才出现）。
+                // 放到首帧之后再解码，顺带避开 measure 之前设置背景被覆盖的问题。
+                backgroundPlane.post { applyPlanePresetImage(palette.foregroundResId) }
+            }
+        } else {
+            appliedFgResId = 0
+            applyPlaneTheme(palette)
+        }
+    }
+
+    /** 当前已经应用到平面上的预设前景图，避免动画每帧重复解码 */
+    private var appliedFgResId = 0
+
+    /** 预设自带的角色图作为「前景」 */
+    private fun applyPlanePresetImage(resId: Int) {
+        val metrics = resources.displayMetrics
+        // 冷启动时堆内存最紧张，解码失败会退化成空玻璃板（看起来就是「人物没了」）。
+        // 失败就降一级采样重试，实在不行才回落到玻璃平面。
+        var bitmap = com.billbook.app.util.BitmapUtils.decodeSampledResource(
+            resources, resId, metrics.widthPixels, metrics.heightPixels
+        )
+        if (bitmap == null) {
+            bitmap = com.billbook.app.util.BitmapUtils.decodeSampledResource(
+                resources, resId, metrics.widthPixels / 2, metrics.heightPixels / 2, extraSample = 2
+            )
+        }
+        if (bitmap == null) {
+            // 解码失败：清掉标记，下次 onResume 还会再试一次
+            appliedFgResId = 0
+            applyPlaneTheme(themeManager.getEffectivePalette())
+            return
+        }
+        applyPlaneBitmap(bitmap)
+    }
+
+    /**
+     * 前景图统一处理：圆角裁剪 → 半透明蒙版（保证账单文字可读）→ 沿用「前景透明度」滑杆。
+     * 蒙版用 SRC_ATOP，只在已绘制的圆角区域内叠加，不会越界。
+     */
+    private fun applyPlaneBitmap(bitmap: android.graphics.Bitmap) {
         try {
-            val bitmap = android.provider.MediaStore.Images.Media.getBitmap(contentResolver, uri)
             val opacity = themeManager.getBgOpacity()
             val alpha = (255 * opacity / 100).coerceIn(0, 255)
             val cornerRadius = resources.getDimension(R.dimen.plane_corner_radius)
 
-            val output = android.graphics.Bitmap.createBitmap(bitmap.width, bitmap.height, android.graphics.Bitmap.Config.ARGB_8888)
+            val output = android.graphics.Bitmap.createBitmap(
+                bitmap.width, bitmap.height, android.graphics.Bitmap.Config.ARGB_8888
+            )
             val canvas = android.graphics.Canvas(output)
             val paint = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG)
             val rect = android.graphics.RectF(0f, 0f, bitmap.width.toFloat(), bitmap.height.toFloat())
@@ -814,11 +1033,26 @@ class MainActivity : AppCompatActivity() {
             paint.xfermode = android.graphics.PorterDuffXfermode(android.graphics.PorterDuff.Mode.SRC_IN)
             canvas.drawBitmap(bitmap, 0f, 0f, paint)
 
+            val overlay = android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG).apply {
+                color = Color.argb(64, 18, 20, 34)
+                xfermode = android.graphics.PorterDuffXfermode(android.graphics.PorterDuff.Mode.SRC_ATOP)
+            }
+            canvas.drawRoundRect(rect, cornerRadius, cornerRadius, overlay)
+
             backgroundPlane.background = android.graphics.drawable.BitmapDrawable(resources, output).apply {
                 this.alpha = alpha
             }
-        } catch (_: Exception) {
-            applyPlaneTheme(themeManager.getEffectivePalette())
+        } catch (_: Throwable) {
+            // 内存吃紧时圆角蒙版可能创建失败（OOM 是 Error 不是 Exception）。
+            // 宁可显示未裁圆角的人物，也不要退成一块空玻璃板。
+            try {
+                val alpha = (255 * themeManager.getBgOpacity() / 100).coerceIn(0, 255)
+                backgroundPlane.background =
+                    android.graphics.drawable.BitmapDrawable(resources, bitmap).apply { this.alpha = alpha }
+            } catch (_: Throwable) {
+                appliedFgResId = 0
+                applyPlaneTheme(themeManager.getEffectivePalette())
+            }
         }
     }
 

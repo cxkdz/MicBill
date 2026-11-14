@@ -65,8 +65,8 @@ class AnimeCategoryAdapter(
             holder.ivIcon.visibility = View.VISIBLE
             holder.tvIcon.visibility = View.GONE
         } else {
-            // 兼容旧的 emoji 图标
-            holder.tvIcon.text = category.icon
+            // 兜底分支：不再显示系统 emoji，图标位留空
+            holder.tvIcon.text = ""
             holder.tvIcon.visibility = View.VISIBLE
             holder.ivIcon.visibility = View.GONE
         }

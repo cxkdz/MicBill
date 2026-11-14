@@ -88,33 +88,180 @@
                 app:cornerRadius="@dimen/radius_md" />
         </LinearLayout>
 
-        <!-- 查询结果 -->
+        <!-- 查询结果：范围 + 三个汇总指标 -->
         <LinearLayout
+            android:id="@+id/cardSummary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/spacing_md"
             android:background="@drawable/bg_glass_card"
             android:orientation="vertical"
-            android:padding="@dimen/spacing_md">
+            android:padding="@dimen/spacing_md"
+            android:visibility="gone">
 
             <TextView
-                android:id="@+id/tvQueryResult"
+                android:id="@+id/tvQueryRange"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:fontFamily="monospace"
-                android:lineSpacingExtra="6dp"
-                android:textColor="@color/text_primary"
+                android:textColor="@color/text_secondary"
                 android:textSize="@dimen/text_sm" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_sm"
+                android:baselineAligned="false"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="总支出"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="@dimen/text_xs" />
+
+                    <TextView
+                        android:id="@+id/tvQueryExpense"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:textColor="@color/expense_red"
+                        android:textSize="@dimen/text_lg"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="总收入"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="@dimen/text_xs" />
+
+                    <TextView
+                        android:id="@+id/tvQueryIncome"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:textColor="@color/income_green"
+                        android:textSize="@dimen/text_lg"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="净收支"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="@dimen/text_xs" />
+
+                    <TextView
+                        android:id="@+id/tvQueryNet"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:textColor="@color/text_primary"
+                        android:textSize="@dimen/text_lg"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- 分类支出明细：名称 + 金额 + 占比条 -->
+        <LinearLayout
+            android:id="@+id/cardCategories"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_md"
+            android:background="@drawable/bg_glass_card"
+            android:orientation="vertical"
+            android:padding="@dimen/spacing_md"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="分类支出"
+                android:textColor="@color/text_primary"
+                android:textSize="@dimen/text_md"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:id="@+id/listCategories"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_sm"
+                android:orientation="vertical" />
+        </LinearLayout>
+
+        <!-- 账单明细：可点击进入详情 -->
+        <LinearLayout
+            android:id="@+id/cardBills"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_md"
+            android:background="@drawable/bg_glass_card"
+            android:orientation="vertical"
+            android:padding="@dimen/spacing_md"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/tvBillsTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="账单明细"
+                android:textColor="@color/text_primary"
+                android:textSize="@dimen/text_md"
+                android:textStyle="bold" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvQueryBills"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_sm"
+                android:nestedScrollingEnabled="false"
+                android:overScrollMode="never" />
+
+            <TextView
+                android:id="@+id/tvQueryEmpty"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_md"
+                android:gravity="center"
+                android:paddingBottom="@dimen/spacing_md"
+                android:text="该时间段内没有账单"
+                android:textColor="@color/text_secondary"
+                android:textSize="@dimen/text_sm"
+                android:visibility="gone" />
         </LinearLayout>
 
         <!-- 饼图 -->
         <LinearLayout
+            android:id="@+id/cardPie"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/spacing_md"
             android:background="@drawable/bg_glass_card"
             android:orientation="vertical"
-            android:padding="@dimen/spacing_sm">
+            android:padding="@dimen/spacing_sm"
+            android:visibility="gone">
 
             <com.github.mikephil.charting.charts.PieChart
                 android:id="@+id/pieChartQuery"

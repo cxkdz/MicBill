@@ -11,7 +11,7 @@
         android:background="@drawable/bg_anime_date_cell"
         android:gravity="center"
         android:textColor="#99FFFFFF"
-        android:textSize="14sp"
+        android:textSize="@dimen/text_sm"
         android:clickable="true"
         android:focusable="true" />
 </FrameLayout>

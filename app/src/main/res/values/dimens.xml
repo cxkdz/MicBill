@@ -27,6 +27,7 @@
     <dimen name="text_xl">22sp</dimen>
     <dimen name="text_xxl">28sp</dimen>
     <dimen name="text_display">36sp</dimen>
+    <dimen name="text_hero">48sp</dimen>
 
     <!-- 卡片 -->
     <dimen name="card_elevation">2dp</dimen>

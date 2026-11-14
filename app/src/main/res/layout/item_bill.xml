@@ -17,7 +17,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@drawable/bg_glass_icon_circle"
-            android:padding="8dp"
+            android:padding="@dimen/spacing_sm"
             android:scaleType="centerInside"
             android:visibility="gone" />
 
@@ -27,12 +27,12 @@
             android:layout_height="match_parent"
             android:gravity="center"
             android:background="@drawable/bg_glass_icon_circle"
-            android:text="📦"
-            android:textSize="20sp"
+            android:text=""
+            android:textSize="@dimen/text_xl"
             android:visibility="visible" />
     </FrameLayout>
 
-    <!-- 分类名和备注 -->
+    <!-- 主行：用户标题；副行：支付方式 -->
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"

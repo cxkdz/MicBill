@@ -46,8 +46,20 @@ class BillAdapter(
     }
 
     sealed class DisplayItem {
-        class Header(val dateText: String) : DisplayItem()
+        class Header(val dateText: String, val expense: Double, val income: Double) : DisplayItem()
         class BillItem(val bill: Bill, val isLastInDay: Boolean) : DisplayItem()
+    }
+
+    /**
+     * 竖向连续列表要像普通账单流一样，不能把靠后的日期整段压暗/缩放。
+     * 查询页等原有调用方保留默认的堆叠效果。
+     */
+    private var stackedEffectEnabled = true
+
+    fun setStackedEffectEnabled(enabled: Boolean) {
+        if (stackedEffectEnabled == enabled) return
+        stackedEffectEnabled = enabled
+        notifyDataSetChanged()
     }
 
     fun submitList(bills: List<Bill>) {
@@ -59,7 +71,9 @@ class BillAdapter(
             dayBills.forEachIndexed { index, bill ->
                 if (index == 0) {
                     val cal = Calendar.getInstance().apply { timeInMillis = bill.billTime }
-                    items.add(DisplayItem.Header(headerFormat.format(cal.time)))
+                    val expense = dayBills.filter { it.type == Bill.TYPE_EXPENSE }.sumOf { it.money }
+                    val income = dayBills.filter { it.type == Bill.TYPE_INCOME }.sumOf { it.money }
+                    items.add(DisplayItem.Header(headerFormat.format(cal.time), expense, income))
                     dayGroupIndices[items.size - 1] = groupIdx
                 }
                 items.add(DisplayItem.BillItem(bill, index == dayBills.lastIndex))
@@ -170,15 +184,18 @@ class BillAdapter(
             is DisplayItem.BillItem -> (holder as BillViewHolder).bind(item)
         }
 
-        // 应用叠加效果
-        val alpha = getAlphaForPosition(position)
-        val translationY = getTranslationYForPosition(position)
-        val scale = getScaleForPosition(position)
-
-        holder.itemView.alpha = alpha
-        holder.itemView.translationY = translationY
-        holder.itemView.scaleX = scale
-        holder.itemView.scaleY = scale
+        // 应用叠加效果（竖向连续列表关闭）
+        if (stackedEffectEnabled) {
+            holder.itemView.alpha = getAlphaForPosition(position)
+            holder.itemView.translationY = getTranslationYForPosition(position)
+            holder.itemView.scaleX = getScaleForPosition(position)
+            holder.itemView.scaleY = getScaleForPosition(position)
+        } else {
+            holder.itemView.alpha = 1f
+            holder.itemView.translationY = 0f
+            holder.itemView.scaleX = 1f
+            holder.itemView.scaleY = 1f
+        }
     }
 
     inner class HeaderViewHolder(private val binding: ItemBillHeaderBinding) : RecyclerView.ViewHolder(binding.root) {
@@ -186,6 +203,8 @@ class BillAdapter(
             binding.tvDate.text = item.dateText
             binding.tvDate.setTextColor(secondaryColor)
             binding.tvDate.setShadowLayer(3f, 0f, 1f, shadowColor)
+            binding.tvHeaderExpense.text = "-¥%.2f".format(item.expense)
+            binding.tvHeaderIncome.text = "+¥%.2f".format(item.income)
         }
     }
 
@@ -205,15 +224,17 @@ class BillAdapter(
                     ivCategoryIcon.visibility = View.VISIBLE
                     tvCategoryIcon.visibility = View.GONE
                 } else {
-                    // 兼容旧的 emoji 图标
-                    tvCategoryIcon.text = bill.categoryIcon.ifEmpty { "📦" }
+                    // 兜底分支：不再显示系统 emoji，图标位留空
+                    tvCategoryIcon.text = ""
                     tvCategoryIcon.visibility = View.VISIBLE
                     ivCategoryIcon.visibility = View.GONE
                 }
-                tvCategoryName.text = bill.categoryName
+                // 主行 = 用户写的「标题」（DB 字段仍是 remark）；没写时回退分类名
+                tvCategoryName.text = bill.remark.ifBlank { bill.categoryName }
                 tvCategoryName.setTextColor(textColor)
                 tvCategoryName.setShadowLayer(4f, 0f, 1f, shadowColor)
-                tvRemark.text = bill.remark.ifEmpty { bill.payType }
+                // 副行 = 支付方式
+                tvRemark.text = bill.payType.ifBlank { bill.categoryName }
                 tvRemark.setTextColor(secondaryColor)
                 tvRemark.setShadowLayer(3f, 0f, 1f, shadowColor)
                 tvTime.text = dateFormat.format(Date(bill.billTime))

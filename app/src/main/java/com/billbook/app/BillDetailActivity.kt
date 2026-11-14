@@ -36,7 +36,7 @@ class BillDetailActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         themeManager = ThemeManager(this)
-        setTheme(themeManager.getCurrentTheme().styleRes)
+        setTheme(R.style.Theme_BillBook)  // 主题样式已收敛为一套，配色由 ThemePalettes 负责
         super.onCreate(savedInstanceState)
 
         WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -50,6 +50,7 @@ class BillDetailActivity : AppCompatActivity() {
 
         binding = ActivityBillDetailBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        com.billbook.app.util.ThemeSurfaces.apply(binding.root)
 
         // 顶部栏适配状态栏 insets（标题下移避开刘海）
         ViewCompat.setOnApplyWindowInsetsListener(binding.topBar) { view, windowInsets ->
@@ -100,8 +101,8 @@ class BillDetailActivity : AppCompatActivity() {
                 ivDetailIcon.visibility = View.VISIBLE
                 tvDetailIcon.visibility = View.GONE
             } else {
-                // 兼容旧的 emoji 图标
-                tvDetailIcon.text = bill.categoryIcon.ifEmpty { "📦" }
+                // 兜底分支：不再显示系统 emoji，图标位留空
+                tvDetailIcon.text = ""
                 tvDetailIcon.visibility = View.VISIBLE
                 ivDetailIcon.visibility = View.GONE
             }

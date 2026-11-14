@@ -38,7 +38,7 @@
                 android:id="@+id/topBar"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
-                android:paddingHorizontal="8dp">
+                android:paddingHorizontal="@dimen/spacing_sm">
 
                 <!-- 返回按钮 -->
                 <ImageView
@@ -56,13 +56,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:paddingTop="4dp"
-                android:paddingBottom="8dp">
+                android:paddingTop="@dimen/spacing_xs"
+                android:paddingBottom="@dimen/spacing_sm">
 
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="32dp"
-                    android:layout_marginTop="4dp"
+                    android:layout_marginTop="@dimen/spacing_xs"
                     android:background="@drawable/bg_anime_pay_chip"
                     android:orientation="horizontal"
                     android:padding="2dp">
@@ -96,7 +96,7 @@
                 android:layout_height="0dp"
                 android:layout_weight="1"
                 android:clipToPadding="false"
-                android:paddingBottom="16dp">
+                android:paddingBottom="@dimen/spacing_md">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -108,7 +108,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
+                        android:layout_marginTop="@dimen/spacing_xs"
                         android:text="选择分类"
                         android:textColor="@color/anime_text_secondary"
                         android:textSize="@dimen/text_sm" />
@@ -117,7 +117,7 @@
                         android:id="@+id/vpCategories"
                         android:layout_width="match_parent"
                         android:layout_height="270dp"
-                        android:layout_marginTop="8dp"
+                        android:layout_marginTop="@dimen/spacing_sm"
                         android:nestedScrollingEnabled="false" />
 
                     <LinearLayout
@@ -132,7 +132,7 @@
                     <FrameLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="24dp">
+                        android:layout_marginTop="@dimen/spacing_lg">
 
                         <LinearLayout
                             android:layout_width="wrap_content"
@@ -153,11 +153,11 @@
                                 android:id="@+id/tvAmountDisplay"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginStart="4dp"
+                                android:layout_marginStart="@dimen/spacing_xs"
                                 android:hint="0.00"
                                 android:textColor="@color/anime_text_primary"
                                 android:textColorHint="@color/anime_text_hint"
-                                android:textSize="36sp"
+                                android:textSize="@dimen/text_display"
                                 android:textStyle="bold" />
                         </LinearLayout>
 
@@ -186,13 +186,13 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:layout_marginTop="16dp" />
+                        android:layout_marginTop="@dimen/spacing_md" />
 
                     <!-- 支付渠道 -->
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="24dp"
+                        android:layout_marginTop="@dimen/spacing_lg"
                         android:text="支付渠道"
                         android:textColor="@color/anime_text_secondary"
                         android:textSize="@dimen/text_sm" />
@@ -200,7 +200,7 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
+                        android:layout_marginTop="@dimen/spacing_sm"
                         android:orientation="horizontal">
 
                         <TextView
@@ -265,20 +265,20 @@
                         android:id="@+id/tvTime"
                         android:layout_width="match_parent"
                         android:layout_height="44dp"
-                        android:layout_marginTop="8dp"
+                        android:layout_marginTop="@dimen/spacing_sm"
                         android:background="@drawable/bg_anime_input"
                         android:gravity="center_vertical"
-                        android:paddingHorizontal="16dp"
+                        android:paddingHorizontal="@dimen/spacing_md"
                         android:text="点击选择时间"
                         android:textColor="@color/anime_text_primary"
                         android:textSize="@dimen/text_sm" />
 
-                    <!-- 备注 -->
+                    <!-- 标题 -->
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="20dp"
-                        android:text="备注"
+                        android:text="标题"
                         android:textColor="@color/anime_text_secondary"
                         android:textSize="@dimen/text_sm" />
 
@@ -286,11 +286,11 @@
                         android:id="@+id/etRemark"
                         android:layout_width="match_parent"
                         android:layout_height="44dp"
-                        android:layout_marginTop="8dp"
+                        android:layout_marginTop="@dimen/spacing_sm"
                         android:background="@drawable/bg_anime_input"
-                        android:hint="选填"
+                        android:hint="给这笔账起个标题（选填）"
                         android:inputType="text"
-                        android:paddingHorizontal="16dp"
+                        android:paddingHorizontal="@dimen/spacing_md"
                         android:textColor="@color/anime_text_primary"
                         android:textColorHint="@color/anime_text_hint"
                         android:textSize="@dimen/text_sm" />
@@ -307,9 +307,9 @@
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal"
                 android:orientation="vertical"
-                android:paddingHorizontal="24dp"
+                android:paddingHorizontal="@dimen/spacing_lg"
                 android:paddingBottom="20dp"
-                android:paddingTop="8dp">
+                android:paddingTop="@dimen/spacing_sm">
 
                 <com.billbook.app.animation.GlowButton
                     android:id="@+id/btnSave"

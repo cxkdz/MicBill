@@ -13,7 +13,7 @@
         android:background="@drawable/bg_nav_gradient"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:paddingHorizontal="8dp"
+        android:paddingHorizontal="@dimen/spacing_sm"
         android:paddingTop="6dp"
         android:paddingBottom="6dp">
 
@@ -39,7 +39,7 @@
                 android:layout_marginTop="2dp"
                 android:text="账单"
                 android:textColor="@color/text_hint"
-                android:textSize="10sp" />
+                android:textSize="@dimen/text_xs" />
         </LinearLayout>
 
         <!-- 统计 -->
@@ -64,7 +64,7 @@
                 android:layout_marginTop="2dp"
                 android:text="统计"
                 android:textColor="@color/text_hint"
-                android:textSize="10sp" />
+                android:textSize="@dimen/text_xs" />
         </LinearLayout>
 
         <!-- 占位：中间 FAB -->
@@ -95,7 +95,7 @@
                 android:layout_marginTop="2dp"
                 android:text="预算"
                 android:textColor="@color/text_hint"
-                android:textSize="10sp" />
+                android:textSize="@dimen/text_xs" />
         </LinearLayout>
 
         <!-- 设置 -->
@@ -120,7 +120,7 @@
                 android:layout_marginTop="2dp"
                 android:text="设置"
                 android:textColor="@color/text_hint"
-                android:textSize="10sp" />
+                android:textSize="@dimen/text_xs" />
         </LinearLayout>
     </LinearLayout>
 

@@ -11,6 +11,7 @@ import android.view.animation.DecelerateInterpolator
 import androidx.dynamicanimation.animation.DynamicAnimation
 import androidx.dynamicanimation.animation.SpringAnimation
 import androidx.dynamicanimation.animation.SpringForce
+import com.billbook.app.model.ThemePalette
 
 /**
  * FAB 展开到全屏的高级动画控制器
@@ -53,6 +54,11 @@ class ExpandAnimationController(
 
     init {
         expandContainer.background = glassMorphDrawable
+    }
+
+    /** 记账浮层容器跟随主题：每套主题用自己的深色变体，而不是固定深蓝紫 */
+    fun applyPalette(palette: ThemePalette) {
+        glassMorphDrawable.applyTheme(palette.dioramaGround, palette.planeAccent)
     }
 
     /**

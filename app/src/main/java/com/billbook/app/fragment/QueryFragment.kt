@@ -16,6 +16,7 @@ import com.billbook.app.databinding.FragmentQueryBinding
 import com.billbook.app.db.BillDao
 import com.billbook.app.model.Bill
 import android.graphics.Typeface
+import com.billbook.app.util.AppExecutors
 import com.billbook.app.util.AutoContrast
 import com.github.mikephil.charting.components.Legend
 import com.github.mikephil.charting.data.*
@@ -74,6 +75,32 @@ class QueryFragment : Fragment() {
         updateDateDisplay()
         setupDatePickers()
         setupQueryButton()
+        setupBillList()
+    }
+
+    // ==================== 账单明细列表 ====================
+
+    private var billAdapter: BillAdapter? = null
+
+    private fun setupBillList() {
+        val pageBg = com.billbook.app.util.BudgetThemeApplier.getPageComposite(requireActivity())
+        val primary = AutoContrast.textColorFor(pageBg)
+        val secondary = AutoContrast.hintTextColorFor(pageBg)
+        billAdapter = BillAdapter(
+            onItemClick = { bill ->
+                startActivity(
+                    android.content.Intent(requireContext(), com.billbook.app.BillDetailActivity::class.java)
+                        .putExtra("bill_id", bill.id)
+                )
+            },
+            onItemLongClick = { }
+        ).apply {
+            setTextColors(primary, secondary)
+        }
+        binding.rvQueryBills.apply {
+            layoutManager = LinearLayoutManager(requireContext())
+            adapter = billAdapter
+        }
     }
 
     private fun setupDatePickers() {
@@ -114,52 +141,111 @@ class QueryFragment : Fragment() {
             return
         }
 
-        // 查询该时间范围内的所有账单
-        val allBills = billDao.getByDateRange(startTime, endTime)
+        // SimpleDateFormat 非线程安全，日期文案在主线程预先算好再带进后台
+        val startLabel = dateFormat.format(calStart.time)
+        val endLabel = dateFormat.format(calEnd.time)
+        val dao = billDao
 
-        if (allBills.isEmpty()) {
-            binding.tvQueryResult.text = "该时间段内无账单数据"
-            binding.pieChartQuery.clear()
-            return
-        }
+        AppExecutors.io(onError = {
+            if (_binding != null && isAdded) {
+                android.widget.Toast.makeText(
+                    requireContext(), "查询失败，请重试", android.widget.Toast.LENGTH_SHORT
+                ).show()
+            }
+        }) {
+            val allBills = dao.getByDateRange(startTime, endTime)
+            if (allBills.isEmpty()) {
+                AppExecutors.main {
+                    if (_binding == null || !isAdded) return@main
+                    binding.cardSummary.visibility = View.GONE
+                    binding.cardCategories.visibility = View.GONE
+                    binding.cardPie.visibility = View.GONE
+                    binding.cardBills.visibility = View.VISIBLE
+                    binding.tvQueryEmpty.visibility = View.VISIBLE
+                    binding.tvBillsTitle.visibility = View.GONE
+                    billAdapter?.submitList(emptyList())
+                    binding.pieChartQuery.clear()
+                }
+                return@io
+            }
 
-        // 计算总支出和总收入
-        var totalExpense = 0.0
-        var totalIncome = 0.0
-        val categoryMap = mutableMapOf<String, Double>() // 分类→金额
+            var totalExpense = 0.0
+            var totalIncome = 0.0
+            val categoryMap = mutableMapOf<String, Double>() // 分类→金额
 
-        allBills.forEach { bill ->
-            if (bill.type == Bill.TYPE_EXPENSE) {
-                totalExpense += bill.money
-                categoryMap[bill.categoryName] = (categoryMap[bill.categoryName] ?: 0.0) + bill.money
-            } else {
-                totalIncome += bill.money
+            allBills.forEach { bill ->
+                if (bill.type == Bill.TYPE_EXPENSE) {
+                    totalExpense += bill.money
+                    categoryMap[bill.categoryName] = (categoryMap[bill.categoryName] ?: 0.0) + bill.money
+                } else {
+                    totalIncome += bill.money
+                }
+            }
+
+            val sortedCategories = categoryMap.entries.sortedByDescending { it.value }
+            val billCount = allBills.size
+            val net = totalIncome - totalExpense
+
+            AppExecutors.main {
+                if (_binding == null || !isAdded) return@main
+                renderSummary(startLabel, endLabel, billCount, totalExpense, totalIncome, net)
+                renderCategories(sortedCategories, totalExpense)
+                binding.cardBills.visibility = View.VISIBLE
+                binding.cardPie.visibility = View.VISIBLE
+                binding.tvBillsTitle.visibility = View.VISIBLE
+                binding.tvQueryEmpty.visibility = View.GONE
+                billAdapter?.submitList(allBills)
+                loadQueryPieChart(categoryMap)
             }
         }
+    }
 
-        // 显示汇总结果
-        val sb = StringBuilder()
-        sb.appendLine("📊 查询结果")
-        sb.appendLine("━━━━━━━━━━━━━━━━")
-        sb.appendLine("📅 ${dateFormat.format(calStart.time)} ~ ${dateFormat.format(calEnd.time)}")
-        sb.appendLine("📝 共 ${allBills.size} 笔账单")
-        sb.appendLine("")
-        sb.appendLine("💸 总支出：¥%.2f".format(totalExpense))
-        sb.appendLine("💰 总收入：¥%.2f".format(totalIncome))
-        sb.appendLine("📊 净收支：¥%.2f".format(totalIncome - totalExpense))
-        sb.appendLine("")
-        sb.appendLine("📂 分类支出明细：")
-        sb.appendLine("━━━━━━━━━━━━━━━━")
+    private fun renderSummary(
+        startLabel: String, endLabel: String, count: Int,
+        expense: Double, income: Double, net: Double
+    ) {
+        binding.cardSummary.visibility = View.VISIBLE
+        binding.tvQueryRange.text = "$startLabel ~ $endLabel · 共 $count 笔"
+        binding.tvQueryExpense.text = "¥%.2f".format(expense)
+        binding.tvQueryIncome.text = "¥%.2f".format(income)
+        binding.tvQueryNet.text = if (net < 0) "-¥%.2f".format(-net) else "¥%.2f".format(net)
+        binding.tvQueryNet.setTextColor(
+            when {
+                net > 0 -> androidx.core.content.ContextCompat.getColor(requireContext(), com.billbook.app.R.color.income_green)
+                net < 0 -> androidx.core.content.ContextCompat.getColor(requireContext(), com.billbook.app.R.color.expense_red)
+                else -> AutoContrast.textColorFor(
+                    com.billbook.app.util.BudgetThemeApplier.getPageComposite(requireActivity())
+                )
+            }
+        )
+    }
 
-        categoryMap.entries.sortedByDescending { it.value }.forEach { (name, amount) ->
-            val percent = if (totalExpense > 0) amount / totalExpense * 100 else 0.0
-            sb.appendLine("  $name：¥%.2f (%.1f%%)".format(amount, percent))
+    /** 分类明细：名称 + 占比 + 金额 + 占比条，颜色与饼图同一套色板 */
+    private fun renderCategories(sorted: List<Map.Entry<String, Double>>, totalExpense: Double) {
+        binding.listCategories.removeAllViews()
+        if (sorted.isEmpty()) {
+            binding.cardCategories.visibility = View.GONE
+            return
         }
-
-        binding.tvQueryResult.text = sb.toString()
-
-        // 绘制饼图
-        loadQueryPieChart(categoryMap)
+        binding.cardCategories.visibility = View.VISIBLE
+        val density = resources.displayMetrics.density
+        sorted.forEachIndexed { index, (name, amount) ->
+            val row = com.billbook.app.databinding.ItemQueryCategoryBinding.inflate(
+                layoutInflater, binding.listCategories, false
+            )
+            val percent = if (totalExpense > 0) amount / totalExpense * 100 else 0.0
+            row.tvCategoryName.text = name
+            row.tvCategoryPercent.text = "%.0f%%".format(percent)
+            row.tvCategoryAmount.text = "¥%.2f".format(amount)
+            val color = animeColors[index % animeColors.size]
+            row.pbCategory.apply {
+                progress = percent.toInt().coerceIn(0, 100)
+                progressTintList = android.content.res.ColorStateList.valueOf(color)
+            }
+            binding.listCategories.addView(row.root)
+        }
+        // 底部留白
+        binding.listCategories.setPadding(0, 0, 0, (4 * density).toInt())
     }
 
     private fun loadQueryPieChart(categoryMap: Map<String, Double>) {

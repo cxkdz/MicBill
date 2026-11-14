@@ -59,7 +59,9 @@ class BillDao(context: Context) {
                     put(COL_IMPORT_BATCH, bill.importBatchId)
                     put(COL_CREATED_AT, System.currentTimeMillis())
                 }
-                db.insert(TABLE_BILL, null, values)
+                // insertOrThrow：任一条失败即抛异常，跳过 setTransactionSuccessful，
+                // finally 中的 endTransaction 会整体回滚，保证「要么全导入、要么一条不留」
+                db.insertOrThrow(TABLE_BILL, null, values)
                 count++
             }
             db.setTransactionSuccessful()

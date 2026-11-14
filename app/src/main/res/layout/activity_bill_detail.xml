@@ -28,7 +28,7 @@
             android:id="@+id/topBar"
             android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:paddingHorizontal="8dp">
+            android:paddingHorizontal="@dimen/spacing_sm">
 
             <ImageView
                 android:id="@+id/btnBack"
@@ -48,7 +48,7 @@
                 android:layout_gravity="center"
                 android:text="账单详情"
                 android:textColor="@color/anime_text_primary"
-                android:textSize="17sp"
+                android:textSize="@dimen/text_lg"
                 android:textStyle="bold" />
         </FrameLayout>
 
@@ -60,8 +60,8 @@
             android:overScrollMode="never"
             android:clipToPadding="false"
             android:paddingHorizontal="20dp"
-            android:paddingTop="16dp"
-            android:paddingBottom="16dp">
+            android:paddingTop="@dimen/spacing_md"
+            android:paddingBottom="@dimen/spacing_md">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -78,7 +78,7 @@
                         android:id="@+id/ivDetailIcon"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:padding="8dp"
+                        android:padding="@dimen/spacing_sm"
                         android:scaleType="centerInside"
                         android:visibility="gone" />
 
@@ -87,7 +87,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:gravity="center"
-                        android:textSize="48sp"
+                        android:textSize="@dimen/text_hero"
                         android:visibility="visible" />
                 </FrameLayout>
 
@@ -96,9 +96,9 @@
                     android:id="@+id/tvDetailCategory"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="@dimen/spacing_sm"
                     android:textColor="@color/anime_text_secondary"
-                    android:textSize="15sp" />
+                    android:textSize="@dimen/text_md" />
 
                 <!-- 金额 -->
                 <TextView
@@ -106,17 +106,17 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
-                    android:textSize="36sp"
+                    android:textSize="@dimen/text_display"
                     android:textStyle="bold" />
 
                 <!-- 信息卡片 -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="24dp"
+                    android:layout_marginTop="@dimen/spacing_lg"
                     android:background="@drawable/bg_glass_card"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:padding="@dimen/spacing_md">
 
                     <!-- 时间 -->
                     <LinearLayout
@@ -129,14 +129,14 @@
                             android:layout_height="wrap_content"
                             android:text="时间"
                             android:textColor="@color/anime_text_hint"
-                            android:textSize="13sp" />
+                            android:textSize="@dimen/text_sm" />
                         <TextView
                             android:id="@+id/tvDetailTime"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:textColor="@color/anime_text_primary"
-                            android:textSize="14sp" />
+                            android:textSize="@dimen/text_sm" />
                     </LinearLayout>
 
                     <View
@@ -156,14 +156,14 @@
                             android:layout_height="wrap_content"
                             android:text="类型"
                             android:textColor="@color/anime_text_hint"
-                            android:textSize="13sp" />
+                            android:textSize="@dimen/text_sm" />
                         <TextView
                             android:id="@+id/tvDetailType"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:textColor="@color/anime_text_primary"
-                            android:textSize="14sp" />
+                            android:textSize="@dimen/text_sm" />
                     </LinearLayout>
 
                     <View
@@ -183,14 +183,14 @@
                             android:layout_height="wrap_content"
                             android:text="支付渠道"
                             android:textColor="@color/anime_text_hint"
-                            android:textSize="13sp" />
+                            android:textSize="@dimen/text_sm" />
                         <TextView
                             android:id="@+id/tvDetailPayType"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:textColor="@color/anime_text_primary"
-                            android:textSize="14sp" />
+                            android:textSize="@dimen/text_sm" />
                     </LinearLayout>
 
                     <View
@@ -199,7 +199,7 @@
                         android:background="@drawable/bg_glass_card"
                         android:alpha="0.3" />
 
-                    <!-- 备注 -->
+                    <!-- 标题 -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -208,16 +208,16 @@
                         <TextView
                             android:layout_width="72dp"
                             android:layout_height="wrap_content"
-                            android:text="备注"
+                            android:text="标题"
                             android:textColor="@color/anime_text_hint"
-                            android:textSize="13sp" />
+                            android:textSize="@dimen/text_sm" />
                         <TextView
                             android:id="@+id/tvDetailRemark"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:textColor="@color/anime_text_primary"
-                            android:textSize="14sp" />
+                            android:textSize="@dimen/text_sm" />
                     </LinearLayout>
 
                     <View
@@ -237,14 +237,14 @@
                             android:layout_height="wrap_content"
                             android:text="来源"
                             android:textColor="@color/anime_text_hint"
-                            android:textSize="13sp" />
+                            android:textSize="@dimen/text_sm" />
                         <TextView
                             android:id="@+id/tvDetailSource"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:textColor="@color/anime_text_primary"
-                            android:textSize="14sp" />
+                            android:textSize="@dimen/text_sm" />
                     </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
@@ -257,7 +257,7 @@
             android:orientation="horizontal"
             android:paddingHorizontal="20dp"
             android:paddingTop="12dp"
-            android:paddingBottom="24dp">
+            android:paddingBottom="@dimen/spacing_lg">
 
             <TextView
                 android:id="@+id/btnEdit"
@@ -268,7 +268,7 @@
                 android:gravity="center"
                 android:text="修改"
                 android:textColor="@color/anime_text_primary"
-                android:textSize="15sp"
+                android:textSize="@dimen/text_md"
                 android:textStyle="bold"
                 android:clickable="true"
                 android:focusable="true" />
@@ -283,7 +283,7 @@
                 android:gravity="center"
                 android:text="删除"
                 android:textColor="#E85555"
-                android:textSize="15sp"
+                android:textSize="@dimen/text_md"
                 android:clickable="true"
                 android:focusable="true" />
         </LinearLayout>

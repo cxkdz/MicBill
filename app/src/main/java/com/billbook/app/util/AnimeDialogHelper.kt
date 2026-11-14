@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.FrameLayout
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
@@ -19,12 +20,9 @@ import android.widget.TextView
  */
 object AnimeDialogHelper {
 
-    private const val BG_COLOR = 0xE61A1A2E.toInt()
-    private const val BORDER_COLOR = 0x20FFFFFF
     private const val TITLE_COLOR = 0xE0FFFFFF.toInt()
     private const val MSG_COLOR = 0xB0FFFFFF.toInt()
     private const val HINT_COLOR = 0x50FFFFFF.toInt()
-    private const val ACCENT_COLOR = 0xFF6B8DD6.toInt()
     private const val NEGATIVE_COLOR = 0x80FFFFFF.toInt()
     private const val DIVIDER_COLOR = 0x15FFFFFF
 
@@ -90,7 +88,7 @@ object AnimeDialogHelper {
                 positiveText?.let {
                     dialog.getButton(AlertDialog.BUTTON_POSITIVE)?.apply {
                         text = it
-                        setTextColor(ACCENT_COLOR)
+                        setTextColor(ThemeSurfaces.accentText(context))
                         textSize = 15f
                     }
                 }
@@ -132,19 +130,11 @@ object AnimeDialogHelper {
 
     /** 对已有的 AlertDialog 应用二次元风格 */
     fun applyAnimeStyle(dialog: AlertDialog) {
-        val dp = dialog.context.resources.displayMetrics.density
-
-        // 窗口背景：深色圆角
-        dialog.window?.setBackgroundDrawable(
-            GradientDrawable().apply {
-                setColor(BG_COLOR)
-                cornerRadius = 20 * dp
-                setStroke((1 * dp).toInt(), BORDER_COLOR)
-            }
-        )
+        // 窗口背景：当前预设主题的深色变体
+        dialog.window?.setBackgroundDrawable(ThemeSurfaces.surface(dialog.context, 20f))
 
         // 按钮颜色
-        dialog.getButton(AlertDialog.BUTTON_POSITIVE)?.setTextColor(ACCENT_COLOR)
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE)?.setTextColor(ThemeSurfaces.accentText(dialog.context))
         dialog.getButton(AlertDialog.BUTTON_NEGATIVE)?.setTextColor(NEGATIVE_COLOR)
         dialog.getButton(AlertDialog.BUTTON_NEUTRAL)?.setTextColor(HINT_COLOR)
     }
@@ -296,7 +286,7 @@ object AnimeDialogHelper {
     fun showIconListDialog(
         context: Context,
         title: String,
-        items: List<Pair<String, String>>,  // (icon, name)
+        items: List<Pair<Int, String>>,  // (iconResId, name)
         onItemSelected: (Int) -> Unit,
         neutralText: String? = null,
         onNeutral: (() -> Unit)? = null
@@ -323,16 +313,27 @@ object AnimeDialogHelper {
             orientation = LinearLayout.VERTICAL
         }
 
-        items.forEachIndexed { index, (icon, name) ->
-            listLayout.addView(TextView(context).apply {
-                text = "$icon  $name"
-                setTextColor(MSG_COLOR)
-                textSize = 15f
-                setPadding((12 * dp).toInt(), (12 * dp).toInt(), (12 * dp).toInt(), (12 * dp).toInt())
+        items.forEachIndexed { index, (iconResId, name) ->
+            val row = LinearLayout(context).apply {
+                orientation = LinearLayout.HORIZONTAL
+                gravity = Gravity.CENTER_VERTICAL
+                setPadding((12 * dp).toInt(), (9 * dp).toInt(), (12 * dp).toInt(), (9 * dp).toInt())
                 setOnClickListener { onItemSelected(index) }
                 isClickable = true
                 isFocusable = true
+            }
+            row.addView(ImageView(context).apply {
+                setImageResource(iconResId)
+                scaleType = ImageView.ScaleType.FIT_CENTER
+                layoutParams = LinearLayout.LayoutParams((30 * dp).toInt(), (30 * dp).toInt())
             })
+            row.addView(TextView(context).apply {
+                text = name
+                setTextColor(MSG_COLOR)
+                textSize = 15f
+                setPadding((14 * dp).toInt(), 0, 0, 0)
+            })
+            listLayout.addView(row)
 
             if (index < items.size - 1) {
                 listLayout.addView(View(context).apply {

@@ -12,17 +12,17 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="3D 空间主题"
+            android:text="背景"
             android:textSize="@dimen/text_xl"
             android:textStyle="bold"
             android:textColor="@color/anime_text_primary"
             android:layout_marginBottom="@dimen/spacing_md" />
 
-        <!-- 自定义图片背景 -->
+        <!-- 自定义背景图片 -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="自定义场景背景"
+            android:text="自定义背景图片"
             android:textSize="@dimen/text_md"
             android:textStyle="bold"
             android:textColor="@color/anime_text_primary"
@@ -31,7 +31,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="选择一张图片作为 3D 场景背景"
+            android:text="选择一张图片覆盖预设的渐变背景"
             android:textSize="@dimen/text_xs"
             android:textColor="@color/anime_text_hint"
             android:layout_marginBottom="@dimen/spacing_sm" />

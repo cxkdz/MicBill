@@ -59,4 +59,10 @@ class CategoryPagerAdapter(
         selectedCategoryId = id
         pageAdapters.forEach { it.setSelectedCategoryId(id) }
     }
+
+    /** 某个分类落在第几页；找不到返回 -1。避免调用方再写死 itemsPerPage。 */
+    fun pageIndexFor(categoryId: Long): Int {
+        val index = categories.indexOfFirst { it.id == categoryId }
+        return if (index < 0) -1 else index / itemsPerPage
+    }
 }

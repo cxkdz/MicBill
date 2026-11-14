@@ -32,12 +32,12 @@
             android:textSize="@dimen/text_xl"
             android:textStyle="bold" />
 
-        <!-- 3D 空间主题 -->
+        <!-- 预设主题：独立于背景/前景，决定整套渐变、角色前景图与 UI 配色 -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:text="空间主题"
+            android:layout_marginTop="@dimen/spacing_lg"
+            android:text="预设主题"
             android:textColor="@color/text_secondary"
             android:textSize="@dimen/text_sm"
             android:textStyle="bold" />
@@ -60,7 +60,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="3D 空间主题"
+                    android:text="当前主题"
                     android:textColor="@color/text_primary"
                     android:textSize="@dimen/text_md"
                     android:textStyle="bold" />
@@ -69,8 +69,8 @@
                     android:id="@+id/tvCurrentPalette"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:text="渐变灰"
+                    android:layout_marginTop="@dimen/spacing_xs"
+                    android:text="墨影"
                     android:textColor="@color/text_secondary"
                     android:textSize="@dimen/text_sm" />
             </LinearLayout>
@@ -79,7 +79,7 @@
                 android:id="@+id/btnThemeEditor"
                 android:layout_width="72dp"
                 android:layout_height="48dp"
-                android:background="@drawable/selector_neu_button">
+                android:background="@drawable/selector_glass_button">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -91,7 +91,16 @@
             </FrameLayout>
         </LinearLayout>
 
-        <!-- 特定字体颜色切换 -->
+        <!-- UI 配色：独立于预设主题，覆盖容器底色与强调色 -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_lg"
+            android:text="UI 配色"
+            android:textColor="@color/text_secondary"
+            android:textSize="@dimen/text_sm"
+            android:textStyle="bold" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -110,7 +119,117 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="特定字体颜色切换"
+                    android:text="当前配色"
+                    android:textColor="@color/text_primary"
+                    android:textSize="@dimen/text_md"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvUiColorStatus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/spacing_xs"
+                    android:text="跟随预设"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="@dimen/text_sm" />
+            </LinearLayout>
+
+            <FrameLayout
+                android:id="@+id/btnUiColor"
+                android:layout_width="72dp"
+                android:layout_height="48dp"
+                android:background="@drawable/selector_glass_button">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="调整"
+                    android:textColor="@color/text_primary"
+                    android:textSize="@dimen/text_sm" />
+            </FrameLayout>
+        </LinearLayout>
+
+        <!-- 背景：只管自定义背景图片，不设时使用预设的渐变 -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_lg"
+            android:text="背景"
+            android:textColor="@color/text_secondary"
+            android:textSize="@dimen/text_sm"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_sm"
+            android:background="@drawable/bg_glass_card"
+            android:orientation="vertical"
+            android:padding="@dimen/spacing_lg">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="自定义背景图片"
+                android:textColor="@color/text_primary"
+                android:textSize="@dimen/text_md"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvBackgroundStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_xs"
+                android:text="当前：预设渐变"
+                android:textColor="@color/text_hint"
+                android:textSize="@dimen/text_sm" />
+
+            <FrameLayout
+                android:id="@+id/btnCustomBackground"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/selector_glass_button">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="选择 / 清除图片"
+                    android:textColor="@color/text_primary"
+                    android:textSize="@dimen/text_sm" />
+            </FrameLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_sm"
+                android:text="不设图片时使用所选主题的渐变背景"
+                android:textColor="@color/text_hint"
+                android:textSize="@dimen/text_xs" />
+        </LinearLayout>
+
+        <!-- 深色模式 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_sm"
+            android:background="@drawable/bg_glass_card"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="@dimen/spacing_lg">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="深色模式"
                     android:textColor="@color/text_primary"
                     android:textSize="@dimen/text_md"
                     android:textStyle="bold" />
@@ -119,7 +238,7 @@
                     android:id="@+id/tvDarkModeStatus"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
+                    android:layout_marginTop="@dimen/spacing_xs"
                     android:text="深色"
                     android:textColor="@color/text_secondary"
                     android:textSize="@dimen/text_sm" />
@@ -161,7 +280,7 @@
                     android:id="@+id/tvSnowStatus"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
+                    android:layout_marginTop="@dimen/spacing_xs"
                     android:text="开启"
                     android:textColor="@color/text_secondary"
                     android:textSize="@dimen/text_sm" />
@@ -173,6 +292,81 @@
                 android:layout_height="wrap_content"
                 android:thumbTint="@color/colorPrimary"
                 android:trackTint="@color/divider" />
+        </LinearLayout>
+
+        <!-- 账单浏览方式：横向翻页 / 竖向连续列表 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_sm"
+            android:background="@drawable/bg_glass_card"
+            android:orientation="vertical"
+            android:padding="@dimen/spacing_lg">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="账单浏览方式"
+                android:textColor="@color/text_primary"
+                android:textSize="@dimen/text_md"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvBillModeStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_xs"
+                android:text="横向翻页 · 左右滑动切换日期"
+                android:textColor="@color/text_secondary"
+                android:textSize="@dimen/text_sm" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_sm"
+                android:orientation="horizontal">
+
+                <FrameLayout
+                    android:id="@+id/btnModeHorizontal"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_segment_active">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:text="横向翻页"
+                        android:textColor="@color/text_primary"
+                        android:textSize="@dimen/text_sm" />
+                </FrameLayout>
+
+                <FrameLayout
+                    android:id="@+id/btnModeVertical"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="@dimen/spacing_sm"
+                    android:background="@drawable/selector_glass_button">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:text="竖向列表"
+                        android:textColor="@color/text_primary"
+                        android:textSize="@dimen/text_sm" />
+                </FrameLayout>
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_sm"
+                android:text="竖向列表按日期分组连续下滑，每组显示当日收支"
+                android:textColor="@color/text_hint"
+                android:textSize="@dimen/text_xs" />
         </LinearLayout>
 
         <!-- 背景倾斜角度 -->
@@ -204,7 +398,7 @@
                     android:id="@+id/tvTiltValue"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
+                    android:layout_marginTop="@dimen/spacing_xs"
                     android:text="15°"
                     android:textColor="@color/text_secondary"
                     android:textSize="@dimen/text_sm" />
@@ -213,7 +407,7 @@
             <FrameLayout
                 android:layout_width="72dp"
                 android:layout_height="48dp"
-                android:background="@drawable/selector_neu_button">
+                android:background="@drawable/selector_glass_button">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -225,17 +419,17 @@
             </FrameLayout>
         </LinearLayout>
 
-        <!-- 背景设置 -->
+        <!-- 前景 -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:text="背景设置"
+            android:layout_marginTop="@dimen/spacing_lg"
+            android:text="前景"
             android:textColor="@color/text_secondary"
             android:textSize="@dimen/text_sm"
             android:textStyle="bold" />
 
-        <!-- 自定义图片背景 -->
+        <!-- 自定义前景图片 -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -247,7 +441,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="自定义图片背景"
+                android:text="自定义前景图片"
                 android:textColor="@color/text_primary"
                 android:textSize="@dimen/text_md"
                 android:textStyle="bold" />
@@ -256,8 +450,8 @@
                 android:id="@+id/tvCustomBgStatus"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="当前：纯色背景"
+                android:layout_marginTop="@dimen/spacing_xs"
+                android:text="当前：预设角色图"
                 android:textColor="@color/text_hint"
                 android:textSize="@dimen/text_sm" />
 
@@ -265,7 +459,7 @@
                 android:id="@+id/layoutBgPreview"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="@dimen/spacing_md"
                 android:background="@drawable/bg_glass_card"
                 android:visibility="gone">
 
@@ -280,15 +474,15 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="@dimen/spacing_md"
                 android:orientation="horizontal">
 
                 <FrameLayout
                     android:id="@+id/btnImportImage"
                     android:layout_width="0dp"
-                    android:layout_height="44dp"
+                    android:layout_height="48dp"
                     android:layout_weight="1"
-                    android:background="@drawable/selector_neu_button">
+                    android:background="@drawable/selector_glass_button">
 
                     <LinearLayout
                         android:layout_width="wrap_content"
@@ -320,9 +514,9 @@
                 <FrameLayout
                     android:id="@+id/btnClearImage"
                     android:layout_width="0dp"
-                    android:layout_height="44dp"
+                    android:layout_height="48dp"
                     android:layout_weight="1"
-                    android:background="@drawable/selector_neu_button"
+                    android:background="@drawable/selector_glass_button"
                     android:visibility="gone">
 
                     <TextView
@@ -339,7 +533,7 @@
                 android:id="@+id/layoutOpacity"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="@dimen/spacing_md"
                 android:background="@drawable/bg_glass_card"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
@@ -355,7 +549,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="背景透明度"
+                        android:text="前景透明度"
                         android:textColor="@color/text_primary"
                         android:textSize="@dimen/text_md"
                         android:textStyle="bold" />
@@ -364,7 +558,7 @@
                         android:id="@+id/tvOpacityValue"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
+                        android:layout_marginTop="@dimen/spacing_xs"
                         android:text="30%"
                         android:textColor="@color/text_secondary"
                         android:textSize="@dimen/text_sm" />
@@ -373,7 +567,7 @@
                 <FrameLayout
                     android:layout_width="72dp"
                     android:layout_height="48dp"
-                    android:background="@drawable/selector_neu_button">
+                    android:background="@drawable/selector_glass_button">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -388,8 +582,8 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="导入手机相册图片作为背景，可调节透明度"
+                android:layout_marginTop="@dimen/spacing_sm"
+                android:text="选择图片作为前景，可调节透明度"
                 android:textColor="@color/text_hint"
                 android:textSize="@dimen/text_xs" />
         </LinearLayout>
@@ -398,7 +592,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="@dimen/spacing_lg"
             android:text="功能"
             android:textColor="@color/text_secondary"
             android:textSize="@dimen/text_sm"
@@ -424,15 +618,15 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="@dimen/spacing_md"
                 android:orientation="horizontal">
 
                 <FrameLayout
                     android:id="@+id/btnManageCategory"
                     android:layout_width="0dp"
-                    android:layout_height="44dp"
+                    android:layout_height="48dp"
                     android:layout_weight="1"
-                    android:background="@drawable/selector_neu_button">
+                    android:background="@drawable/selector_glass_button">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -450,9 +644,9 @@
                 <FrameLayout
                     android:id="@+id/btnAddCategory"
                     android:layout_width="0dp"
-                    android:layout_height="44dp"
+                    android:layout_height="48dp"
                     android:layout_weight="1"
-                    android:background="@drawable/selector_neu_button">
+                    android:background="@drawable/selector_glass_button">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -492,7 +686,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
+                    android:layout_marginTop="@dimen/spacing_xs"
                     android:text="设置月度预算，控制消费"
                     android:textColor="@color/text_secondary"
                     android:textSize="@dimen/text_sm" />
@@ -502,7 +696,7 @@
                 android:id="@+id/btnBudget"
                 android:layout_width="72dp"
                 android:layout_height="48dp"
-                android:background="@drawable/selector_neu_button">
+                android:background="@drawable/selector_glass_button">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -541,7 +735,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
+                    android:layout_marginTop="@dimen/spacing_xs"
                     android:text="按日期范围查询收支明细"
                     android:textColor="@color/text_secondary"
                     android:textSize="@dimen/text_sm" />
@@ -551,7 +745,7 @@
                 android:id="@+id/btnQuery"
                 android:layout_width="72dp"
                 android:layout_height="48dp"
-                android:background="@drawable/selector_neu_button">
+                android:background="@drawable/selector_glass_button">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -567,7 +761,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="@dimen/spacing_lg"
             android:text="数据导入"
             android:textColor="@color/text_secondary"
             android:textSize="@dimen/text_sm"
@@ -593,7 +787,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
+                android:layout_marginTop="@dimen/spacing_xs"
                 android:text="支持 .xlsx 和 .csv 格式"
                 android:textColor="@color/text_hint"
                 android:textSize="@dimen/text_xs" />
@@ -601,9 +795,9 @@
             <FrameLayout
                 android:id="@+id/btnImportWechat"
                 android:layout_width="match_parent"
-                android:layout_height="44dp"
+                android:layout_height="48dp"
                 android:layout_marginTop="12dp"
-                android:background="@drawable/selector_neu_button">
+                android:background="@drawable/selector_glass_button">
 
                 <LinearLayout
                     android:layout_width="wrap_content"
@@ -621,7 +815,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
+                        android:layout_marginStart="@dimen/spacing_sm"
                         android:text="选择微信账单文件"
                         android:textColor="@color/text_primary"
                         android:textSize="@dimen/text_sm" />
@@ -649,7 +843,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
+                android:layout_marginTop="@dimen/spacing_xs"
                 android:text="支持 .xlsx 格式"
                 android:textColor="@color/text_hint"
                 android:textSize="@dimen/text_xs" />
@@ -657,9 +851,9 @@
             <FrameLayout
                 android:id="@+id/btnImportAlipay"
                 android:layout_width="match_parent"
-                android:layout_height="44dp"
+                android:layout_height="48dp"
                 android:layout_marginTop="12dp"
-                android:background="@drawable/selector_neu_button">
+                android:background="@drawable/selector_glass_button">
 
                 <LinearLayout
                     android:layout_width="wrap_content"
@@ -677,11 +871,119 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
+                        android:layout_marginStart="@dimen/spacing_sm"
                         android:text="选择支付宝账单文件"
                         android:textColor="@color/text_primary"
                         android:textSize="@dimen/text_sm" />
                 </LinearLayout>
+            </FrameLayout>
+        </LinearLayout>
+
+        <!-- 数据管理：导出备份 / 恢复备份 / 自动归类规则 -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_lg"
+            android:text="数据管理"
+            android:textColor="@color/text_secondary"
+            android:textSize="@dimen/text_sm"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_sm"
+            android:background="@drawable/bg_glass_card"
+            android:orientation="vertical"
+            android:padding="@dimen/spacing_lg">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="备份与恢复"
+                android:textColor="@color/text_primary"
+                android:textSize="@dimen/text_md"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_xs"
+                android:text="导出 JSON 快照，或恢复整个账本（含分类、预算、归类规则）"
+                android:textColor="@color/text_hint"
+                android:textSize="@dimen/text_xs" />
+
+            <FrameLayout
+                android:id="@+id/btnExportBackup"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/selector_glass_button">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="导出备份"
+                    android:textColor="@color/text_primary"
+                    android:textSize="@dimen/text_sm" />
+            </FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/btnRestoreBackup"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="@dimen/spacing_sm"
+                android:background="@drawable/selector_glass_button">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="从备份恢复"
+                    android:textColor="@color/text_primary"
+                    android:textSize="@dimen/text_sm" />
+            </FrameLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_sm"
+            android:background="@drawable/bg_glass_card"
+            android:orientation="vertical"
+            android:padding="@dimen/spacing_lg">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="自动归类规则"
+                android:textColor="@color/text_primary"
+                android:textSize="@dimen/text_md"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_xs"
+                android:text="导入账单时按商户关键词自动匹配分类"
+                android:textColor="@color/text_hint"
+                android:textSize="@dimen/text_xs" />
+
+            <FrameLayout
+                android:id="@+id/btnEditRules"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/selector_glass_button">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="管理规则"
+                    android:textColor="@color/text_primary"
+                    android:textSize="@dimen/text_sm" />
             </FrameLayout>
         </LinearLayout>
 

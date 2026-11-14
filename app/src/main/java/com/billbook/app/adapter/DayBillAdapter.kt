@@ -62,16 +62,18 @@ class DayBillAdapter(
                     ivCategoryIcon.visibility = View.VISIBLE
                     tvCategoryIcon.visibility = View.GONE
                 } else {
-                    // 兼容旧的 emoji 图标
-                    tvCategoryIcon.text = bill.categoryIcon.ifEmpty { "📦" }
+                    // 兜底分支：不再显示系统 emoji，图标位留空
+                    tvCategoryIcon.text = ""
                     tvCategoryIcon.visibility = View.VISIBLE
                     ivCategoryIcon.visibility = View.GONE
                 }
 
-                tvCategoryName.text = bill.categoryName
+                // 主行 = 用户写的「标题」（DB 字段仍是 remark）；没写时回退分类名
+                tvCategoryName.text = bill.remark.ifBlank { bill.categoryName }
                 tvCategoryName.setTextColor(textColor)
                 tvCategoryName.setShadowLayer(4f, 0f, 1f, shadowColor)
-                tvRemark.text = bill.remark.ifEmpty { bill.payType }
+                // 副行 = 支付方式
+                tvRemark.text = bill.payType.ifBlank { bill.categoryName }
                 tvRemark.setTextColor(secondaryColor)
                 tvRemark.setShadowLayer(3f, 0f, 1f, shadowColor)
                 tvTime.text = dateFormat.format(Date(bill.billTime))

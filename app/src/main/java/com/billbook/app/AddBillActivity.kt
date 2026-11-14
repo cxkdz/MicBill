@@ -49,7 +49,7 @@ class AddBillActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         themeManager = ThemeManager(this)
-        setTheme(themeManager.getCurrentTheme().styleRes)
+        setTheme(R.style.Theme_BillBook)  // 主题样式已收敛为一套，配色由 ThemePalettes 负责
         super.onCreate(savedInstanceState)
 
         WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -63,6 +63,7 @@ class AddBillActivity : AppCompatActivity() {
 
         binding = ActivityAddBillBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        com.billbook.app.util.ThemeSurfaces.apply(binding.root)
 
         // 顶部栏适配状态栏 insets
         ViewCompat.setOnApplyWindowInsetsListener(binding.topBar) { view, windowInsets ->
@@ -139,12 +140,12 @@ class AddBillActivity : AppCompatActivity() {
 
     private fun updateTypeSelection() {
         if (billType == Bill.TYPE_EXPENSE) {
-            binding.chipExpense.setBackgroundResource(R.drawable.bg_anime_pay_chip_selected)
+            binding.chipExpense.background = com.billbook.app.util.ThemeSurfaces.chip(binding.chipExpense.context, true)
             binding.chipExpense.setTextColor(0xE0FFFFFF.toInt())
             binding.chipIncome.setBackgroundColor(Color.TRANSPARENT)
             binding.chipIncome.setTextColor(0x50FFFFFF.toInt())
         } else {
-            binding.chipIncome.setBackgroundResource(R.drawable.bg_anime_pay_chip_selected)
+            binding.chipIncome.background = com.billbook.app.util.ThemeSurfaces.chip(binding.chipIncome.context, true)
             binding.chipIncome.setTextColor(0xE0FFFFFF.toInt())
             binding.chipExpense.setBackgroundColor(Color.TRANSPARENT)
             binding.chipExpense.setTextColor(0x50FFFFFF.toInt())
@@ -262,10 +263,10 @@ class AddBillActivity : AppCompatActivity() {
         selectedPayType = payType
         payChips.forEach { chip ->
             if (chip == selected) {
-                chip.setBackgroundResource(R.drawable.bg_anime_pay_chip_selected)
+                chip.background = com.billbook.app.util.ThemeSurfaces.chip(chip.context, true)
                 chip.setTextColor(0xE0FFFFFF.toInt())
             } else {
-                chip.setBackgroundResource(R.drawable.bg_anime_pay_chip)
+                chip.background = com.billbook.app.util.ThemeSurfaces.chip(chip.context, false)
                 chip.setTextColor(0x80FFFFFF.toInt())
             }
         }
@@ -288,20 +289,20 @@ class AddBillActivity : AppCompatActivity() {
         binding.tvTime.text = dateFormat.format(selectedTime)
     }
 
-    // ==================== 备注标签 ====================
+    // ==================== 标题标签 ====================
 
     private fun setupRemarkTags() {
         val tags = listOf(binding.tag1, binding.tag2, binding.tag3, binding.tag4)
         tags.forEach { tag ->
             tag.setOnClickListener {
-                // 点击标签填入备注
+                // 点击标签填入标题
                 binding.etRemark.setText(tag.text.toString())
                 // 选中态动画
-                tag.setBackgroundResource(R.drawable.bg_anime_pay_chip_selected)
+                tag.background = com.billbook.app.util.ThemeSurfaces.chip(tag.context, true)
                 tag.setTextColor(0xE0FFFFFF.toInt())
                 // 其他恢复
                 tags.filter { it != tag }.forEach {
-                    it.setBackgroundResource(R.drawable.bg_anime_pay_chip)
+                    it.background = com.billbook.app.util.ThemeSurfaces.chip(it.context, false)
                     it.setTextColor(getColor(R.color.anime_text_secondary))
                 }
             }
@@ -380,7 +381,7 @@ class AddBillActivity : AppCompatActivity() {
         binding.bubbleInputHint.visibility = View.GONE
         binding.bubbleTip.updateForAmount(bill.money)
 
-        // 备注
+        // 标题
         binding.etRemark.setText(bill.remark)
 
         // 类型
@@ -395,6 +396,15 @@ class AddBillActivity : AppCompatActivity() {
         updatePayChipDisplay()
         selectedTime = bill.billTime
         updateTimeDisplay()
+
+        // 回填分类选中态：先告诉分页适配器选中哪个，再翻到它所在的那一页。
+        // 顺序不能反 —— ViewPager2 只为已 bind 的页创建子 adapter，
+        // 先设 id 才能保证目标页首次 bind 时就是高亮态。
+        categoryPagerAdapter?.let { pager ->
+            pager.setSelectedCategoryId(bill.categoryId)
+            val page = pager.pageIndexFor(bill.categoryId)
+            if (page >= 0) binding.vpCategories.setCurrentItem(page, false)
+        }
     }
 
     private fun updatePayChipDisplay() {
@@ -407,10 +417,10 @@ class AddBillActivity : AppCompatActivity() {
         }
         payChips.forEach { chip ->
             if (chip == selected) {
-                chip.setBackgroundResource(R.drawable.bg_anime_pay_chip_selected)
+                chip.background = com.billbook.app.util.ThemeSurfaces.chip(chip.context, true)
                 chip.setTextColor(0xE0FFFFFF.toInt())
             } else {
-                chip.setBackgroundResource(R.drawable.bg_anime_pay_chip)
+                chip.background = com.billbook.app.util.ThemeSurfaces.chip(chip.context, false)
                 chip.setTextColor(0x80FFFFFF.toInt())
             }
         }

@@ -138,15 +138,17 @@ class BudgetFragment : Fragment() {
             return
         }
 
-        val categories = BudgetCategory.SUGGESTED_CATEGORIES.map { Pair(it.second, it.first) }
+        val categories = BudgetCategory.SUGGESTED_CATEGORIES.map { (name, resId) -> resId to name }
 
         AnimeDialogHelper.showIconListDialog(
             context = requireContext(),
             title = "选择预算分类",
             items = categories,
             onItemSelected = { index ->
-                val (name, icon) = BudgetCategory.SUGGESTED_CATEGORIES[index]
-                showSetCategoryAmountDialog(name, icon, null)
+                val (name, resId) = BudgetCategory.SUGGESTED_CATEGORIES[index]
+                showSetCategoryAmountDialog(
+                    name, CategoryIconMapper.iconName(requireContext(), resId), null
+                )
             },
             neutralText = "自定义",
             onNeutral = { showCustomCategoryDialog() }
@@ -184,14 +186,17 @@ class BudgetFragment : Fragment() {
     }
 
     private fun showIconSelectDialog(categoryName: String) {
-        val icons = listOf("🍜", "🚗", "🛒", "🎮", "🏠", "💊", "📚", "📱", "👔", "🎭", "💪", "🐱", "💄", "✈️", "🎵", "🎬", "⚽", "🎯", "💼", "🔧")
-
-        AnimeDialogHelper.showListDialog(
+        // 与记账分类共用同一套三渲二图标；标签直接取分类映射的中文名
+        val icons = CategoryIconMapper.labeledIcons()
+        AnimeDialogHelper.showIconListDialog(
             context = requireContext(),
             title = "选择图标",
             items = icons,
             onItemSelected = { which ->
-                showSetCategoryAmountDialog(categoryName, icons[which], null)
+                val (resId, _) = icons[which]
+                showSetCategoryAmountDialog(
+                    categoryName, CategoryIconMapper.iconName(requireContext(), resId), null
+                )
             }
         )
     }
@@ -223,7 +228,7 @@ class BudgetFragment : Fragment() {
         AnimeDialogHelper.show(
             context = requireContext(),
             title = title,
-            message = "分类：$icon $name\n可分配余额：¥%.2f".format(available),
+            message = "分类：$name\n可分配余额：¥%.2f".format(available),
             customView = container,
             positiveText = "确定",
             negativeText = "取消",
@@ -253,14 +258,21 @@ class BudgetFragment : Fragment() {
 
     private fun showEditCategoryDialog(info: BudgetManager.CategoryBudgetInfo) {
         val options = listOf("修改金额", "删除分类")
+        val resolvedIcon = CategoryIconMapper.resolveIcon(
+            requireContext(), info.category.name, info.category.icon, 0
+        )
 
         AnimeDialogHelper.showListDialog(
             context = requireContext(),
-            title = "${info.category.icon} ${info.category.name}",
+            title = info.category.name,
             items = options,
             onItemSelected = { which ->
                 when (which) {
-                    0 -> showSetCategoryAmountDialog(info.category.name, info.category.icon, info.category)
+                    0 -> showSetCategoryAmountDialog(
+                        info.category.name,
+                        CategoryIconMapper.iconName(requireContext(), resolvedIcon),
+                        info.category
+                    )
                     1 -> {
                         AnimeDialogHelper.show(
                             context = requireContext(),
@@ -317,17 +329,17 @@ class BudgetFragment : Fragment() {
 
         when {
             info.isOverBudget -> {
-                binding.tvStatus.text = "即使没钱，也要好好照顾自己"
+                binding.tvStatus.text = "这个月的预算，提前走到了句点。别急，慢慢来。"
                 binding.tvStatus.setTextColor(statusColorRed)
                 binding.progressBudget.progressTintList = ColorStateList.valueOf(statusColorRed)
             }
             info.percentUsed >= 80 -> {
-                binding.tvStatus.text = "要没钱了哦，我们一起节约呢"
+                binding.tvStatus.text = "余下的光不多了，我们把日子过轻一点。"
                 binding.tvStatus.setTextColor(statusColorOrange)
                 binding.progressBudget.progressTintList = ColorStateList.valueOf(statusColorOrange)
             }
             else -> {
-                binding.tvStatus.text = "资金满满，大牛一直陪着你"
+                binding.tvStatus.text = "余裕还在，像午后晒暖的窗台，糯账陪你慢慢记。"
                 binding.tvStatus.setTextColor(statusColorGreen)
                 binding.progressBudget.progressTintList = ColorStateList.valueOf(statusColorGreen)
             }
@@ -375,18 +387,13 @@ class BudgetFragment : Fragment() {
             val itemView = LayoutInflater.from(context).inflate(R.layout.item_budget_category, binding.layoutCategoryList, false)
             val itemBinding = ItemBudgetCategoryBinding.bind(itemView)
 
-            // 使用 CategoryIconMapper 获取图标资源 ID
-            val iconResId = CategoryIconMapper.getIconResId(info.category.name, 0) // 预算默认为支出类型
-            if (iconResId != 0) {
-                itemBinding.ivCategoryIcon.setImageResource(iconResId)
-                itemBinding.ivCategoryIcon.visibility = View.VISIBLE
-                itemBinding.tvCategoryIcon.visibility = View.GONE
-            } else {
-                // 兼容旧的 emoji 图标
-                itemBinding.tvCategoryIcon.text = info.category.icon
-                itemBinding.tvCategoryIcon.visibility = View.VISIBLE
-                itemBinding.ivCategoryIcon.visibility = View.GONE
-            }
+            // 存量 emoji 与新资源名统一解析成新图标
+            val iconResId = CategoryIconMapper.resolveIcon(
+                requireContext(), info.category.name, info.category.icon, 0
+            )
+            itemBinding.ivCategoryIcon.setImageResource(iconResId)
+            itemBinding.ivCategoryIcon.visibility = View.VISIBLE
+            itemBinding.tvCategoryIcon.visibility = View.GONE
 
             itemBinding.tvCategoryName.text = info.category.name
             itemBinding.tvCategoryBudget.text = "¥%.2f".format(info.category.budgetAmount)

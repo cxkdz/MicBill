@@ -142,12 +142,12 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DB_NAME, null
         if (oldVersion < 4) {
             // 添加新的支出分类
             val newExpenseCategories = listOf(
-                Triple("日用", "🧴", 12), Triple("蔬菜", "🥬", 13), Triple("水果", "🍎", 14),
-                Triple("酒水", "🍺", 15), Triple("汽车", "🚗", 16), Triple("书籍", "📖", 17),
-                Triple("美容", "💄", 18), Triple("孩子", "👶", 19), Triple("宠物", "🐱", 20),
-                Triple("健身", "💪", 21), Triple("游戏", "🎮", 22), Triple("住房", "🏠", 23),
-                Triple("运动", "⚽", 24), Triple("旅行", "✈️", 25), Triple("零食", "🍪", 26),
-                Triple("咖啡", "☕", 27)
+                Triple("日用", "", 12), Triple("蔬菜", "", 13), Triple("水果", "", 14),
+                Triple("酒水", "", 15), Triple("汽车", "", 16), Triple("书籍", "", 17),
+                Triple("美容", "", 18), Triple("孩子", "", 19), Triple("宠物", "", 20),
+                Triple("健身", "", 21), Triple("游戏", "", 22), Triple("住房", "", 23),
+                Triple("运动", "", 24), Triple("旅行", "", 25), Triple("零食", "", 26),
+                Triple("咖啡", "", 27)
             )
             newExpenseCategories.forEach { (name, icon, sort) ->
                 db.execSQL(
@@ -157,7 +157,7 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DB_NAME, null
             }
             // 添加新的收入分类
             val newIncomeCategories = listOf(
-                Triple("礼金", "🎁", 6), Triple("兼职", "💼", 7), Triple("分红", "💎", 8)
+                Triple("礼金", "", 6), Triple("兼职", "", 7), Triple("分红", "", 8)
             )
             newIncomeCategories.forEach { (name, icon, sort) ->
                 db.execSQL(
@@ -172,24 +172,26 @@ class DatabaseHelper(context: Context) : SQLiteOpenHelper(context, DB_NAME, null
         }
     }
 
+    // 分类图标统一由 CategoryIconMapper 按名称解析为新 drawable；
+    // 这里不再写入 emoji 字符串，存量数据的 emoji 由 resolveIcon 兼容回退。
     private fun insertDefaultCategories(db: SQLiteDatabase) {
         val defaultExpenseCategories = listOf(
-            Triple("餐饮", "🍜", 0), Triple("交通", "🚗", 1), Triple("购物", "🛒", 2),
-            Triple("娱乐", "🎮", 3), Triple("居住", "🏠", 4), Triple("医疗", "💊", 5),
-            Triple("教育", "📚", 6), Triple("通讯", "📱", 7), Triple("服饰", "👔", 8),
-            Triple("红包", "🧧", 9), Triple("转账", "💸", 10), Triple("其他", "📦", 11),
-            Triple("日用", "🧴", 12), Triple("蔬菜", "🥬", 13), Triple("水果", "🍎", 14),
-            Triple("酒水", "🍺", 15), Triple("汽车", "🚗", 16), Triple("书籍", "📖", 17),
-            Triple("美容", "💄", 18), Triple("孩子", "👶", 19), Triple("宠物", "🐱", 20),
-            Triple("健身", "💪", 21), Triple("游戏", "🎮", 22), Triple("住房", "🏠", 23),
-            Triple("运动", "⚽", 24), Triple("旅行", "✈️", 25), Triple("零食", "🍪", 26),
-            Triple("咖啡", "☕", 27)
+            Triple("餐饮", "", 0), Triple("交通", "", 1), Triple("购物", "", 2),
+            Triple("娱乐", "", 3), Triple("居住", "", 4), Triple("医疗", "", 5),
+            Triple("教育", "", 6), Triple("通讯", "", 7), Triple("服饰", "", 8),
+            Triple("红包", "", 9), Triple("转账", "", 10), Triple("其他", "", 11),
+            Triple("日用", "", 12), Triple("蔬菜", "", 13), Triple("水果", "", 14),
+            Triple("酒水", "", 15), Triple("汽车", "", 16), Triple("书籍", "", 17),
+            Triple("美容", "", 18), Triple("孩子", "", 19), Triple("宠物", "", 20),
+            Triple("健身", "", 21), Triple("游戏", "", 22), Triple("住房", "", 23),
+            Triple("运动", "", 24), Triple("旅行", "", 25), Triple("零食", "", 26),
+            Triple("咖啡", "", 27)
         )
 
         val defaultIncomeCategories = listOf(
-            Triple("工资", "💰", 0), Triple("奖金", "🎁", 1), Triple("红包", "🧧", 2),
-            Triple("转账", "💸", 3), Triple("理财", "📈", 4), Triple("其他", "📦", 5),
-            Triple("礼金", "🎁", 6), Triple("兼职", "💼", 7), Triple("分红", "💎", 8)
+            Triple("工资", "", 0), Triple("奖金", "", 1), Triple("红包", "", 2),
+            Triple("转账", "", 3), Triple("理财", "", 4), Triple("其他", "", 5),
+            Triple("礼金", "", 6), Triple("兼职", "", 7), Triple("分红", "", 8)
         )
 
         defaultExpenseCategories.forEach { (name, icon, sort) ->
