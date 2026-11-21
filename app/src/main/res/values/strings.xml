@@ -1,4 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">糯账</string>
+    <string name="app_name">MicBill</string>
+    <string name="autobill_accessibility_label">MicBill 支付结果页面识别</string>
+    <string name="autobill_accessibility_description">在微信或支付宝前台操作、没有系统通知时，读取转账及收款完成页面的金额和收支状态，生成待确认草稿。仅识别支付结果页面，不读取聊天列表，不代替你点击或转账。数据仅保存在本机，可随时在此关闭。</string>
+    <string name="screen_ocr_title">本机识图备用</string>
+    <string name="screen_ocr_description">仅在支付完成页无法读取文字时，识别当前支付窗口的图片。截图仅在本机临时处理，不保存、不上传；每笔均需手动确认。支持 Android 14 及以上，默认关闭。</string>
+    <string name="screen_ocr_consent_title">开启本机识图备用</string>
+    <string name="screen_ocr_consent_message">当你查看微信或支付宝的支付完成页、且页面文字无法读取时，应用会截取当前支付窗口，在本机识别金额、收支和完成状态。\n\n截图只在内存中临时处理，不保存、不上传；识别结果只生成待确认草稿，每笔须由你手动确认。\n\n需要系统无障碍截图授权。你可随时关闭此开关。</string>
+    <string name="screen_ocr_consent_enable">同意并开启</string>
+    <string name="screen_ocr_status_unsupported">未启用 · 仅支持 Android 14 及以上</string>
+    <string name="screen_ocr_status_off">已关闭</string>
+    <string name="screen_ocr_status_needs_permission">已开启 · 需开启或重新授权页面识别的截图能力</string>
+    <string name="screen_ocr_status_disconnected">已开启 · 等待支付页面识别连接</string>
+    <string name="screen_ocr_status_autobill_off">已开启 · 自动记账关闭时不运行</string>
+    <string name="screen_ocr_status_ready">已开启 · 页面文字不可读时备用，逐笔确认</string>
+    <string name="screen_ocr_permission_button">开启 / 重新授权页面识别</string>
+    <string name="screen_ocr_permission_title">授权支付窗口识图</string>
+    <string name="screen_ocr_permission_message">请在系统无障碍设置中开启「MicBill 支付结果页面识别」。若此前已开启，请关闭后重新开启，让系统更新截图授权。\n\n返回后可在这里查看连接状态，再打开已完成的转账详情。</string>
+    <string name="screen_ocr_permission_open">打开系统设置</string>
+    <string name="screen_ocr_permission_later">稍后设置</string>
+    <string name="screen_ocr_permission_failed">请在系统无障碍设置中开启或重新授权本应用的支付结果页面识别</string>
 </resources>

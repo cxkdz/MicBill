@@ -40,6 +40,32 @@ class SettingsFragment : Fragment() {
     private var _binding: FragmentSettingsBinding? = null
     private val binding get() = _binding!!
     private lateinit var themeManager: ThemeManager
+    private var openListenerAfterNotificationRequest = false
+    private var updatingScreenOcrSwitch = false
+    private var screenOcrConsentDialog: AlertDialog? = null
+    private var screenOcrPermissionDialog: AlertDialog? = null
+    private val autoBillStatusHandler = android.os.Handler(android.os.Looper.getMainLooper())
+    private val refreshAutoBillStatus = Runnable { updateAutoBillStatus() }
+
+    private val notificationPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) {
+        val openListener = openListenerAfterNotificationRequest
+        openListenerAfterNotificationRequest = false
+        updateAutoBillStatus()
+        if (openListener && isAdded) openNotificationListenerSettings()
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        openListenerAfterNotificationRequest =
+            savedInstanceState?.getBoolean("open_auto_bill_listener") ?: false
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putBoolean("open_auto_bill_listener", openListenerAfterNotificationRequest)
+        super.onSaveInstanceState(outState)
+    }
 
     /** 当前预设主题的强调色（已由 AutoContrast 保证可读），替代历史写死的 #6B8DD6 */
     private fun accentColor(): Int = themeManager.getEffectivePalette().planeAccent
@@ -100,6 +126,7 @@ class SettingsFragment : Fragment() {
         setupDarkModeSwitch()
         setupSnowSwitch()
         setupBillViewMode()
+        setupAutoBill()
         setupTiltAngle()
         setupCustomImageBg()
 
@@ -109,11 +136,394 @@ class SettingsFragment : Fragment() {
         setupBackupAndRules()
     }
 
-    /**
-     * 账单浏览方式。只写偏好，不在这里刷新账单页：
-     * 当前显示的是设置页（Fragment 容器），此时刷新会把账单列表误设为可见盖住设置页。
-     * 用户点底部「账单」时 showBillPage() 会重读偏好并切换容器。
-     */
+    /** 分开展示捕获、记账模式与提醒权限，授权不改变用户选择的开关。 */
+    private fun updateAutoBillStatus() {
+        if (_binding == null || !isAdded) return
+        val granted = com.billbook.app.autobill.AutoBillStore.isListenerGranted(requireContext())
+        val pending = com.billbook.app.autobill.AutoBillStore.pending(requireContext()).size
+        val captured = com.billbook.app.autobill.AutoBillStore.loadAll(requireContext()).size
+        val lastConnected = com.billbook.app.autobill.AutoBillStore.formatTime(
+            com.billbook.app.autobill.AutoBillStore.lastConnected(requireContext())
+        )
+        val listenerConnected = com.billbook.app.autobill.PayNotificationListenerService.isConnected
+        val pageCaptureEnabled = com.billbook.app.autobill.AutoBillListenerHealth
+            .isPageCaptureEnabled(requireContext())
+        val pageCaptureConnected = com.billbook.app.autobill.AutoBillAccessibilityService.isConnected
+        val enabled = com.billbook.app.autobill.AutoBillStore.isEnabled(requireContext())
+        val autoSave = com.billbook.app.autobill.AutoBillStore.isAutoSaveEnabled(requireContext())
+        // 状态面板使用深底；固定浅色状态字可避免主题图片上的暗字失去对比。
+        val okColor = 0xFFB8F3CC.toInt()
+        val badColor = 0xFFFFB3B3.toInt()
+        val sb = android.text.SpannableStringBuilder()
+        sb.append("通知使用权：")
+        var start = sb.length
+        sb.append(if (granted) "已授权" else "未开启")
+        sb.setSpan(
+            android.text.style.ForegroundColorSpan(if (granted) okColor else badColor),
+            start, sb.length, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+        sb.append(" · 捕获 $captured 条")
+        if (pending > 0) sb.append(" · 待确认 $pending 笔")
+        if (com.billbook.app.autobill.AutoBillStore.isProbeEnabled(requireContext())) sb.append(" · 诊断中")
+        sb.append("\n通知监听连接：")
+        start = sb.length
+        sb.append(when {
+            !granted -> "未授权"
+            listenerConnected -> "已连接"
+            else -> "未连接（可点恢复通知监听）"
+        })
+        sb.setSpan(
+            android.text.style.ForegroundColorSpan(if (granted && listenerConnected) okColor else badColor),
+            start, sb.length, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+        sb.append("\n最近通知连接时间：$lastConnected（历史）")
+        val lastWatched = com.billbook.app.autobill.AutoBillStore.lastWatched(requireContext())
+        sb.append("\n最近支付通知：")
+        sb.append(if (lastWatched == null) {
+            "尚未收到；前台微信可能不发通知"
+        } else {
+            "${com.billbook.app.autobill.AutoBillParser.channelLabel(lastWatched.first)} " +
+                com.billbook.app.autobill.AutoBillStore.formatTime(lastWatched.second)
+        })
+        sb.append("\n支付结果页面识别：")
+        start = sb.length
+        sb.append(when {
+            !pageCaptureEnabled -> "未开启（可选）"
+            pageCaptureConnected -> "已开启并连接"
+            else -> "已授权但未连接，请在系统设置重新开启"
+        })
+        sb.setSpan(
+            android.text.style.ForegroundColorSpan(if (pageCaptureEnabled && pageCaptureConnected) okColor else badColor),
+            start, sb.length, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+        val screenDiagnostic = com.billbook.app.autobill.AutoBillStore.lastScreenDiagnostic(requireContext())
+        sb.append("\n最近页面识别：")
+        sb.append(if (screenDiagnostic == null) {
+            "尚无记录；开启并连接后进入支付完成页查看"
+        } else {
+            val source = com.billbook.app.autobill.AutoBillParser.channelLabel(screenDiagnostic.packageName)
+            "${com.billbook.app.autobill.AutoBillStore.formatTime(screenDiagnostic.time)} $source · ${screenDiagnostic.reason}"
+        })
+        sb.append("\n微信零钱不会触发银行卡扣款通知。请确认页面识别已开启并连接，再进入付款完成页或已收款转账详情；生成草稿后需确认才入账。")
+        sb.append("\n自动记账：")
+        start = sb.length
+        sb.append(if (enabled) "已开启" else "已关闭")
+        sb.setSpan(
+            android.text.style.ForegroundColorSpan(if (enabled) okColor else badColor),
+            start, sb.length, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+        sb.append(when {
+            !enabled -> "（仅记录诊断信息）"
+            autoSave -> "（分类明确的支付通知自动入账；页面识别逐笔确认）"
+            else -> "（每笔确认后入账）"
+        })
+        val overlay = android.provider.Settings.canDrawOverlays(requireContext())
+        sb.append("\n后台弹窗：")
+        start = sb.length
+        sb.append(if (overlay) "已授权" else "未授权（使用通知提醒）")
+        sb.setSpan(
+            android.text.style.ForegroundColorSpan(if (overlay) okColor else badColor),
+            start, sb.length, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+        val manager = requireContext().getSystemService(android.content.Context.NOTIFICATION_SERVICE)
+            as? android.app.NotificationManager
+        val appNotifications = androidx.core.app.NotificationManagerCompat
+            .from(requireContext()).areNotificationsEnabled()
+        val channelEnabled = manager?.getNotificationChannel(
+            com.billbook.app.autobill.AutoBillNotifier.CHANNEL_ID
+        )?.importance != android.app.NotificationManager.IMPORTANCE_NONE
+        val remindersEnabled = appNotifications && channelEnabled
+        sb.append("\n通知提醒：")
+        start = sb.length
+        sb.append(when {
+            !appNotifications -> "应用通知已关闭"
+            !channelEnabled -> "待确认提醒频道已关闭"
+            else -> "已开启"
+        })
+        sb.setSpan(
+            android.text.style.ForegroundColorSpan(if (remindersEnabled) okColor else badColor),
+            start, sb.length, android.text.Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+        if (!remindersEnabled) sb.append("（仍可在记录中处理）")
+        binding.tvAutoBillStatus.apply {
+            background = com.billbook.app.util.ThemeSurfaces.surface(requireContext(), 12f)
+            setTextColor(0xF0FFFFFF.toInt())
+            val density = resources.displayMetrics.density
+            setPadding((14 * density).toInt(), (12 * density).toInt(),
+                (14 * density).toInt(), (12 * density).toInt())
+            text = sb
+        }
+        refreshScreenOcrControls()
+    }
+
+    private fun setupAutoBill() {
+        val store = com.billbook.app.autobill.AutoBillStore
+        binding.switchAutoBill.isChecked = store.isEnabled(requireContext())
+        binding.switchAutoBill.setOnCheckedChangeListener { _, checked ->
+            store.setEnabled(requireContext(), checked)
+            updateAutoBillStatus()
+        }
+        binding.switchAutoSave.isChecked = store.isAutoSaveEnabled(requireContext())
+        binding.switchAutoSave.setOnCheckedChangeListener { _, checked ->
+            store.setAutoSaveEnabled(requireContext(), checked)
+            updateAutoBillStatus()
+        }
+        binding.switchAutoBillProbe.isChecked = store.isProbeEnabled(requireContext())
+        binding.switchAutoBillProbe.setOnCheckedChangeListener { _, checked ->
+            store.setProbeEnabled(requireContext(), checked)
+            updateAutoBillStatus()
+        }
+        binding.btnAutoBillPermission.setOnClickListener {
+            requestNotificationPermission(openListenerAfter = true)
+        }
+        binding.btnAutoBillRestoreListener.setOnClickListener {
+            val result = com.billbook.app.autobill.AutoBillListenerHealth
+                .requestNotificationRebind(requireContext())
+            val message = when (result) {
+                com.billbook.app.autobill.AutoBillListenerHealth.RebindResult.REQUESTED ->
+                    "已请求系统恢复，请查看连接状态；仍未连接可在通知使用权中关闭后重开"
+                com.billbook.app.autobill.AutoBillListenerHealth.RebindResult.CONNECTED ->
+                    "通知监听已连接；前台微信可能不发通知，可选开启支付结果页面识别"
+                com.billbook.app.autobill.AutoBillListenerHealth.RebindResult.NOT_GRANTED ->
+                    "请先在通知使用权中授权本应用"
+                com.billbook.app.autobill.AutoBillListenerHealth.RebindResult.COOLDOWN ->
+                    "刚刚已请求恢复，请稍后查看连接状态"
+                com.billbook.app.autobill.AutoBillListenerHealth.RebindResult.FAILED ->
+                    "系统未接受恢复请求，请在通知使用权中关闭后重新开启"
+            }
+            Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
+            if (result == com.billbook.app.autobill.AutoBillListenerHealth.RebindResult.NOT_GRANTED) {
+                openNotificationListenerSettings()
+            }
+            refreshAutoBillConnectionStatus()
+        }
+        binding.btnAutoBillAccessibility.setOnClickListener {
+            try {
+                startActivity(Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS))
+            } catch (_: Exception) {
+                Toast.makeText(requireContext(), "请在系统无障碍设置中开启本应用的支付结果页面识别", Toast.LENGTH_LONG).show()
+            }
+        }
+        binding.btnAutoBillNotification.setOnClickListener {
+            if (needsNotificationPermission() &&
+                !requireContext().getSharedPreferences("autobill_settings", 0)
+                    .getBoolean("notification_permission_requested", false)) {
+                requestNotificationPermission(openListenerAfter = false)
+            } else {
+                openReminderNotificationSettings()
+            }
+        }
+        binding.btnAutoBillOverlay.setOnClickListener {
+            val ctx = requireContext()
+            if (android.provider.Settings.canDrawOverlays(ctx)) {
+                Toast.makeText(ctx, "已授权：付款后会从底部弹出确认面板", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            try {
+                startActivity(
+                    Intent(
+                        android.provider.Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                        Uri.parse("package:${ctx.packageName}")
+                    )
+                )
+            } catch (_: Exception) {
+                Toast.makeText(ctx, "请在系统设置里搜索「悬浮窗」或「显示在其他应用上层」", Toast.LENGTH_LONG).show()
+            }
+        }
+        binding.btnAutoBillRecords.setOnClickListener {
+            com.billbook.app.dialog.AutoBillRecordsDialog.show(requireContext()) {
+                updateAutoBillStatus()
+            }
+        }
+        setupScreenOcr()
+        updateAutoBillStatus()
+    }
+
+    private fun setupScreenOcr() {
+        refreshScreenOcrControls()
+        binding.switchScreenOcr.setOnCheckedChangeListener { _, checked ->
+            if (updatingScreenOcrSwitch) return@setOnCheckedChangeListener
+            val store = com.billbook.app.autobill.AutoBillStore
+            if (!checked) {
+                store.setScreenOcrEnabled(requireContext(), false)
+                updateAutoBillStatus()
+                return@setOnCheckedChangeListener
+            }
+            // Keep both the preference and switch off until the explicit consent button.
+            setScreenOcrSwitchChecked(false)
+            if (android.os.Build.VERSION.SDK_INT < 34 || screenOcrConsentDialog?.isShowing == true) {
+                return@setOnCheckedChangeListener
+            }
+            val dialog = com.billbook.app.util.AnimeDialogHelper.show(
+                context = requireContext(),
+                title = getString(R.string.screen_ocr_consent_title),
+                message = getString(R.string.screen_ocr_consent_message),
+                positiveText = getString(R.string.screen_ocr_consent_enable),
+                negativeText = getString(android.R.string.cancel),
+                onPositive = {
+                    if (isAdded && _binding != null) {
+                        store.setScreenOcrEnabled(requireContext(), true)
+                        updateAutoBillStatus()
+                        if (!hasScreenOcrScreenshotCapability() ||
+                            !com.billbook.app.autobill.AutoBillAccessibilityService.isConnected) {
+                            showScreenOcrPermissionOffer()
+                        }
+                    }
+                }
+            )
+            screenOcrConsentDialog = dialog
+            dialog.setOnDismissListener {
+                if (screenOcrConsentDialog === dialog) screenOcrConsentDialog = null
+            }
+        }
+        binding.btnScreenOcrPermission.setOnClickListener { showScreenOcrPermissionOffer() }
+    }
+
+    private fun setScreenOcrSwitchChecked(checked: Boolean) {
+        updatingScreenOcrSwitch = true
+        try {
+            binding.switchScreenOcr.isChecked = checked
+        } finally {
+            updatingScreenOcrSwitch = false
+        }
+    }
+
+    private fun refreshScreenOcrControls() {
+        if (_binding == null || !isAdded) return
+        val supported = android.os.Build.VERSION.SDK_INT >= 34
+        val store = com.billbook.app.autobill.AutoBillStore
+        val enabled = supported && store.isScreenOcrEnabled(requireContext())
+        val capable = supported && hasScreenOcrScreenshotCapability()
+        val connected = com.billbook.app.autobill.AutoBillAccessibilityService.isConnected
+        setScreenOcrSwitchChecked(enabled)
+        binding.switchScreenOcr.isEnabled = supported
+        binding.tvScreenOcrStatus.setText(when {
+            !supported -> R.string.screen_ocr_status_unsupported
+            !enabled -> R.string.screen_ocr_status_off
+            !capable -> R.string.screen_ocr_status_needs_permission
+            !connected -> R.string.screen_ocr_status_disconnected
+            !store.isEnabled(requireContext()) -> R.string.screen_ocr_status_autobill_off
+            else -> R.string.screen_ocr_status_ready
+        })
+        binding.btnScreenOcrPermission.visibility =
+            if (enabled && (!capable || !connected)) View.VISIBLE else View.GONE
+    }
+
+    private fun hasScreenOcrScreenshotCapability(): Boolean {
+        if (android.os.Build.VERSION.SDK_INT < 34) return false
+        val manager = requireContext().getSystemService(android.content.Context.ACCESSIBILITY_SERVICE)
+            as? android.view.accessibility.AccessibilityManager ?: return false
+        return runCatching {
+            manager.getEnabledAccessibilityServiceList(
+                android.accessibilityservice.AccessibilityServiceInfo.FEEDBACK_ALL_MASK
+            ).any { info ->
+                val service = info.resolveInfo.serviceInfo
+                service.packageName == requireContext().packageName &&
+                    service.name == com.billbook.app.autobill.AutoBillAccessibilityService::class.java.name &&
+                    info.capabilities and android.accessibilityservice.AccessibilityServiceInfo
+                        .CAPABILITY_CAN_TAKE_SCREENSHOT != 0
+            }
+        }.getOrDefault(false)
+    }
+
+    private fun showScreenOcrPermissionOffer() {
+        if (!isAdded || _binding == null || screenOcrPermissionDialog?.isShowing == true) return
+        val dialog = com.billbook.app.util.AnimeDialogHelper.show(
+            context = requireContext(),
+            title = getString(R.string.screen_ocr_permission_title),
+            message = getString(R.string.screen_ocr_permission_message),
+            positiveText = getString(R.string.screen_ocr_permission_open),
+            negativeText = getString(R.string.screen_ocr_permission_later),
+            onPositive = {
+                if (isAdded) {
+                    try {
+                        startActivity(Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS))
+                    } catch (_: Exception) {
+                        Toast.makeText(requireContext(), R.string.screen_ocr_permission_failed,
+                            Toast.LENGTH_LONG).show()
+                    }
+                }
+            }
+        )
+        screenOcrPermissionDialog = dialog
+        dialog.setOnDismissListener {
+            if (screenOcrPermissionDialog === dialog) screenOcrPermissionDialog = null
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // 从系统权限页返回后重读状态，保留用户选择的记账开关。
+        com.billbook.app.autobill.AutoBillListenerHealth.requestNotificationRebind(requireContext())
+        refreshAutoBillConnectionStatus()
+    }
+
+    override fun onPause() {
+        autoBillStatusHandler.removeCallbacks(refreshAutoBillStatus)
+        super.onPause()
+    }
+
+    /** A bounded refresh catches asynchronous service binding after returning from settings. */
+    private fun refreshAutoBillConnectionStatus() {
+        autoBillStatusHandler.removeCallbacks(refreshAutoBillStatus)
+        updateAutoBillStatus()
+        for (delay in longArrayOf(1_000L, 3_000L, 6_000L)) {
+            autoBillStatusHandler.postDelayed(refreshAutoBillStatus, delay)
+        }
+    }
+
+    private fun needsNotificationPermission(): Boolean =
+        android.os.Build.VERSION.SDK_INT >= 33 &&
+            requireContext().checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) !=
+            android.content.pm.PackageManager.PERMISSION_GRANTED
+
+    private fun requestNotificationPermission(openListenerAfter: Boolean) {
+        if (needsNotificationPermission()) {
+            openListenerAfterNotificationRequest = openListenerAfter
+            requireContext().getSharedPreferences("autobill_settings", 0).edit()
+                .putBoolean("notification_permission_requested", true).apply()
+            notificationPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+        } else if (openListenerAfter) {
+            openNotificationListenerSettings()
+        }
+    }
+
+    private fun openNotificationListenerSettings() {
+        try {
+            startActivity(Intent(android.provider.Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
+        } catch (_: Exception) {
+            Toast.makeText(
+                requireContext(), "请在系统设置里搜索「通知使用权」", Toast.LENGTH_LONG
+            ).show()
+        }
+    }
+
+    private fun openReminderNotificationSettings() {
+        val ctx = requireContext()
+        val manager = ctx.getSystemService(android.content.Context.NOTIFICATION_SERVICE)
+            as? android.app.NotificationManager
+        val channelId = com.billbook.app.autobill.AutoBillNotifier.CHANNEL_ID
+        val channelBlocked = manager?.getNotificationChannel(channelId)?.importance ==
+            android.app.NotificationManager.IMPORTANCE_NONE
+        val intent = if (channelBlocked &&
+            androidx.core.app.NotificationManagerCompat.from(ctx).areNotificationsEnabled()) {
+            Intent(android.provider.Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS)
+                .putExtra(android.provider.Settings.EXTRA_APP_PACKAGE, ctx.packageName)
+                .putExtra(android.provider.Settings.EXTRA_CHANNEL_ID, channelId)
+        } else {
+            Intent(android.provider.Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+                .putExtra(android.provider.Settings.EXTRA_APP_PACKAGE, ctx.packageName)
+        }
+        try {
+            startActivity(intent)
+        } catch (_: Exception) {
+            Toast.makeText(
+                ctx, "请在系统设置中开启本应用的通知与「待确认记账」提醒",
+                Toast.LENGTH_LONG
+            ).show()
+        }
+    }
+
     private fun setupBillViewMode() {
         fun render(vertical: Boolean) {
             binding.btnModeHorizontal.setBackgroundResource(
@@ -1301,6 +1711,10 @@ class SettingsFragment : Fragment() {
     }
 
     override fun onDestroyView() {
+        screenOcrConsentDialog?.dismiss()
+        screenOcrConsentDialog = null
+        screenOcrPermissionDialog?.dismiss()
+        screenOcrPermissionDialog = null
         super.onDestroyView()
         _binding = null
     }

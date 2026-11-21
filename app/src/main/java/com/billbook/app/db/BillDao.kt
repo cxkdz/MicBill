@@ -40,6 +40,46 @@ class BillDao(context: Context) {
         return db.insert(TABLE_BILL, null, values)
     }
 
+    /** The event marker makes retries safe after a process restart or a failed status save. */
+    fun insertAutoBillIfAbsent(bill: Bill): Bill {
+        require((bill.source == Bill.SOURCE_AUTO_NOTIFY && bill.importBatchId.startsWith("notify:")) ||
+            (bill.source == Bill.SOURCE_AUTO_SCREEN && bill.importBatchId.startsWith("screen:")))
+        val db = dbHelper.writableDatabase
+        db.beginTransaction()
+        try {
+            val existing = db.query(
+                TABLE_BILL, null, "$COL_SOURCE = ? AND $COL_IMPORT_BATCH = ?",
+                arrayOf(bill.source, bill.importBatchId), null, null, null, "1"
+            ).use { cursor -> if (cursor.moveToFirst()) cursorToBill(cursor) else null }
+            val saved = existing ?: bill.copy(id = insert(bill).also {
+                check(it > 0) { "自动记账保存失败" }
+            })
+            db.setTransactionSuccessful()
+            return saved
+        } finally {
+            db.endTransaction()
+        }
+    }
+
+    fun getAutoBillByMarker(source: String, marker: String): Bill? =
+        dbHelper.readableDatabase.query(
+            TABLE_BILL, null, "$COL_SOURCE = ? AND $COL_IMPORT_BATCH = ?",
+            arrayOf(source, marker), null, null, null, "1"
+        ).use { cursor -> if (cursor.moveToFirst()) cursorToBill(cursor) else null }
+
+    /** Only automatic entries can be candidates for cross-channel notification duplicates. */
+    fun getRecentAutoBills(money: Double, type: Int, fromTime: Long, toTime: Long): List<Bill> {
+        return dbHelper.readableDatabase.query(
+            TABLE_BILL, null,
+            "$COL_SOURCE IN (?, ?) AND ABS($COL_MONEY - ?) < 0.005 AND $COL_TYPE = ? " +
+                "AND $COL_BILL_TIME BETWEEN ? AND ?",
+            arrayOf(Bill.SOURCE_AUTO_NOTIFY, Bill.SOURCE_AUTO_SCREEN, money.toString(), type.toString(),
+                fromTime.toString(), toTime.toString()), null, null, "$COL_BILL_TIME DESC"
+        ).use { cursor ->
+            buildList { while (cursor.moveToNext()) add(cursorToBill(cursor)) }
+        }
+    }
+
     fun insertBatch(bills: List<Bill>): Int {
         val db = dbHelper.writableDatabase
         var count = 0

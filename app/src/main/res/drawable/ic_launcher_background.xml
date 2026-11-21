@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- 糯账 自适应图标背景：与插画底色同一支渐变（米白 → 浅湖蓝） -->
+<!-- MicBill 自适应图标背景：与插画底色同一支渐变（米白 → 浅湖蓝） -->
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle">
     <gradient

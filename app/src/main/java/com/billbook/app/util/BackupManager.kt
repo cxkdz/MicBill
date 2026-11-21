@@ -182,6 +182,6 @@ object BackupManager {
 
     fun defaultFileName(): String {
         val stamp = SimpleDateFormat("yyyyMMdd_HHmm", Locale.CHINA).format(Date())
-        return "billbook_backup_$stamp.json"
+        return "MicBill_backup_$stamp.json"
     }
 }

@@ -495,7 +495,7 @@
                             android:layout_width="16dp"
                             android:layout_height="16dp"
                             android:src="@android:drawable/ic_menu_gallery"
-                            android:tint="@color/text_secondary" />
+                            app:tint="@color/text_secondary" />
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -597,6 +597,233 @@
             android:textColor="@color/text_secondary"
             android:textSize="@dimen/text_sm"
             android:textStyle="bold" />
+
+        <!-- 自动记账（实验）：通知使用权 + 捕获记录 + 待确认草稿 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_sm"
+            android:background="@drawable/bg_glass_card"
+            android:orientation="vertical"
+            android:padding="@dimen/spacing_lg">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="自动记账（实验）"
+                android:textColor="@color/text_primary"
+                android:textSize="@dimen/text_md"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_xs"
+                android:text="识别支付通知，默认每笔确认后入账。可选开启分类明确的支付通知自动入账；页面识别始终逐笔确认。通知原文仅存本机"
+                android:textColor="@color/text_hint"
+                android:textSize="@dimen/text_xs" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_xs"
+                android:text="微信在前台聊天中转账、收款时，可能不发系统通知。可选开启「支付结果页面识别」：付款完成后查看结果页；收款先在微信确认领取，再打开转账详情。仅识别明确完成的支付、收款结果，聊天中的转账请求不会记账。需在无障碍设置中手动授权，可随时关闭；不会自动补齐历史交易，旧详情请核对后处理。"
+                android:textColor="@color/text_secondary"
+                android:textSize="@dimen/text_xs" />
+
+            <TextView
+                android:id="@+id/tvAutoBillStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_sm"
+                android:text="通知使用权：未开启"
+                android:textColor="@color/text_secondary"
+                android:textSize="@dimen/text_sm" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_sm"
+                android:orientation="horizontal">
+
+                <FrameLayout
+                    android:id="@+id/btnAutoBillPermission"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/selector_glass_button">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:text="通知使用权"
+                        android:textColor="@color/text_primary"
+                        android:textSize="@dimen/text_sm" />
+                </FrameLayout>
+
+                <FrameLayout
+                    android:id="@+id/btnAutoBillOverlay"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="@dimen/spacing_sm"
+                    android:background="@drawable/selector_glass_button">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:text="悬浮窗权限"
+                        android:textColor="@color/text_primary"
+                        android:textSize="@dimen/text_sm" />
+                </FrameLayout>
+            </LinearLayout>
+
+            <FrameLayout
+                android:id="@+id/btnAutoBillRestoreListener"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="@dimen/spacing_sm"
+                android:background="@drawable/selector_glass_button">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="恢复通知监听"
+                    android:textColor="@color/text_primary"
+                    android:textSize="@dimen/text_sm" />
+            </FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/btnAutoBillAccessibility"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="@dimen/spacing_sm"
+                android:background="@drawable/selector_glass_button">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="支付结果页面识别（可选）"
+                    android:textColor="@color/text_primary"
+                    android:textSize="@dimen/text_sm" />
+            </FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/btnAutoBillNotification"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="@dimen/spacing_sm"
+                android:background="@drawable/selector_glass_button">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="通知提醒权限"
+                    android:textColor="@color/text_primary"
+                    android:textSize="@dimen/text_sm" />
+            </FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/btnAutoBillRecords"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="@dimen/spacing_sm"
+                android:background="@drawable/selector_glass_button">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="记录 / 待确认"
+                    android:textColor="@color/text_primary"
+                    android:textSize="@dimen/text_sm" />
+            </FrameLayout>
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/switchAutoBill"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_sm"
+                android:text="自动记账（关闭时仅记录诊断信息）"
+                android:textColor="@color/text_primary"
+                android:textSize="@dimen/text_sm"
+                app:thumbTint="@color/colorPrimary"
+                app:trackTint="@color/divider" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/switchAutoSave"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_sm"
+                android:text="分类明确的支付通知自动入账（页面识别逐笔确认）"
+                android:textColor="@color/text_primary"
+                android:textSize="@dimen/text_sm"
+                app:thumbTint="@color/colorPrimary"
+                app:trackTint="@color/divider" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/switchScreenOcr"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_sm"
+                android:minHeight="48dp"
+                android:text="@string/screen_ocr_title"
+                android:textColor="@color/text_primary"
+                android:textSize="@dimen/text_sm"
+                android:checked="false"
+                app:thumbTint="@color/colorPrimary"
+                app:trackTint="@color/divider" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_xs"
+                android:text="@string/screen_ocr_description"
+                android:textColor="@color/text_secondary"
+                android:textSize="@dimen/text_xs" />
+
+            <TextView
+                android:id="@+id/tvScreenOcrStatus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_xs"
+                android:text="@string/screen_ocr_status_off"
+                android:textColor="@color/text_secondary"
+                android:textSize="@dimen/text_xs" />
+
+            <FrameLayout
+                android:id="@+id/btnScreenOcrPermission"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="@dimen/spacing_sm"
+                android:background="@drawable/selector_glass_button"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="@string/screen_ocr_permission_button"
+                    android:textColor="@color/text_primary"
+                    android:textSize="@dimen/text_sm" />
+            </FrameLayout>
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/switchAutoBillProbe"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_sm"
+                android:text="记录所有通知来源（诊断，只存包名+标题）"
+                android:textColor="@color/text_primary"
+                android:textSize="@dimen/text_sm"
+                app:thumbTint="@color/colorPrimary"
+                app:trackTint="@color/divider" />
+        </LinearLayout>
 
         <!-- 分类管理 -->
         <LinearLayout
@@ -810,7 +1037,7 @@
                         android:layout_width="16dp"
                         android:layout_height="16dp"
                         android:src="@android:drawable/ic_menu_upload"
-                        android:tint="@color/text_secondary" />
+                        app:tint="@color/text_secondary" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -866,7 +1093,7 @@
                         android:layout_width="16dp"
                         android:layout_height="16dp"
                         android:src="@android:drawable/ic_menu_upload"
-                        android:tint="@color/text_secondary" />
+                        app:tint="@color/text_secondary" />
 
                     <TextView
                         android:layout_width="wrap_content"

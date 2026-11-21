@@ -133,6 +133,21 @@ object AnimeDialogHelper {
         // 窗口背景：当前预设主题的深色变体
         dialog.window?.setBackgroundDrawable(ThemeSurfaces.surface(dialog.context, 20f))
 
+        // Builder.setMessage 使用系统 message 控件；窗口换成深底后必须同步改正文色。
+        dialog.findViewById<TextView>(android.R.id.message)?.setTextColor(MSG_COLOR)
+        dialog.findViewById<TextView>(androidx.appcompat.R.id.alertTitle)?.setTextColor(TITLE_COLOR)
+
+        // 标题是系统自带的 TextView，默认取的是页面态深色，压深底会看不见。
+        // AppCompat 把 alertTitle 定义在自己的包下（不是 android 包），两个都试一次。
+        val ctx = dialog.context
+        var titleId = ctx.resources.getIdentifier("alertTitle", "id", ctx.packageName)
+        if (titleId == 0) {
+            titleId = ctx.resources.getIdentifier("alertTitle", "id", "android")
+        }
+        if (titleId != 0) {
+            dialog.findViewById<TextView>(titleId)?.setTextColor(TITLE_COLOR)
+        }
+
         // 按钮颜色
         dialog.getButton(AlertDialog.BUTTON_POSITIVE)?.setTextColor(ThemeSurfaces.accentText(dialog.context))
         dialog.getButton(AlertDialog.BUTTON_NEGATIVE)?.setTextColor(NEGATIVE_COLOR)

@@ -414,15 +414,9 @@ class WeChatBillParser(private val context: Context) {
         billType: Int
     ): com.billbook.app.model.Category? {
         val searchText = "$counterparty $product"
-
-        for (rule in rules) {
-            if (searchText.contains(rule.mapToCategoryName) || searchText.contains(rule.merchantKeyword)) {
-                val category = categoryDao.getByName(rule.mapToCategoryName, billType)
-                if (category != null) return category
-            }
-        }
-
-        return categoryDao.getByName("其他", billType)
+        return com.billbook.app.autobill.CategoryMatcher.match(
+            searchText, rules, categoryDao, billType
+        )
     }
 
     fun preview(uri: Uri): ParseResult {

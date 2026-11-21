@@ -339,7 +339,7 @@ class BudgetFragment : Fragment() {
                 binding.progressBudget.progressTintList = ColorStateList.valueOf(statusColorOrange)
             }
             else -> {
-                binding.tvStatus.text = "余裕还在，像午后晒暖的窗台，糯账陪你慢慢记。"
+                binding.tvStatus.text = "余裕还在，像午后晒暖的窗台，MicBill 陪你慢慢记。"
                 binding.tvStatus.setTextColor(statusColorGreen)
                 binding.progressBudget.progressTintList = ColorStateList.valueOf(statusColorGreen)
             }

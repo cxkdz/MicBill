@@ -1,58 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <style name="BillBookLightBase" parent="Theme.MaterialComponents.Light.NoActionBar" />
+
     <!-- 默认蓝 -->
-    <style name="Theme.BillBook" parent="Theme.MaterialComponents.Light.NoActionBar">
+    <style name="Theme.BillBook" parent="BillBookLightBase">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:windowBackground">@color/bg_page</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
-        <item name="android:windowLightNavigationBar">true</item>
     </style>
 
     <!-- 清新绿 -->
-    <style name="Theme.BillBook.Green" parent="Theme.MaterialComponents.Light.NoActionBar">
+    <style name="Theme.BillBook.Green" parent="BillBookLightBase">
         <item name="colorPrimary">@color/green_primary</item>
         <item name="colorPrimaryDark">@color/green_primary_dark</item>
         <item name="colorAccent">@color/green_primary</item>
         <item name="android:windowBackground">@color/bg_page</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
-        <item name="android:windowLightNavigationBar">true</item>
     </style>
 
     <!-- 活力橙 -->
-    <style name="Theme.BillBook.Orange" parent="Theme.MaterialComponents.Light.NoActionBar">
+    <style name="Theme.BillBook.Orange" parent="BillBookLightBase">
         <item name="colorPrimary">@color/orange_primary</item>
         <item name="colorPrimaryDark">@color/orange_primary_dark</item>
         <item name="colorAccent">@color/orange_primary</item>
         <item name="android:windowBackground">@color/bg_page</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
-        <item name="android:windowLightNavigationBar">true</item>
     </style>
 
     <!-- 优雅紫 -->
-    <style name="Theme.BillBook.Purple" parent="Theme.MaterialComponents.Light.NoActionBar">
+    <style name="Theme.BillBook.Purple" parent="BillBookLightBase">
         <item name="colorPrimary">@color/purple_primary</item>
         <item name="colorPrimaryDark">@color/purple_primary_dark</item>
         <item name="colorAccent">@color/purple_primary</item>
         <item name="android:windowBackground">@color/bg_page</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
-        <item name="android:windowLightNavigationBar">true</item>
     </style>
 
     <!-- 少女粉 -->
-    <style name="Theme.BillBook.Pink" parent="Theme.MaterialComponents.Light.NoActionBar">
+    <style name="Theme.BillBook.Pink" parent="BillBookLightBase">
         <item name="colorPrimary">@color/pink_primary</item>
         <item name="colorPrimaryDark">@color/pink_primary_dark</item>
         <item name="colorAccent">@color/pink_primary</item>
         <item name="android:windowBackground">@color/bg_page</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
-        <item name="android:windowLightNavigationBar">true</item>
     </style>
 
     <!-- 底部导航文字样式 -->
@@ -76,5 +73,22 @@
         <item name="android:textColor">@android:color/white</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
+    </style>
+
+    <!-- 自动记账的底部确认面板：全屏透明 + 从底部滑入，背景遮罩画在布局里 -->
+    <style name="Theme.BillBook.BottomSheet" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:backgroundDimEnabled">false</item>
+        <item name="android:windowAnimationStyle">@style/Animation_BillBookBottomUp</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowSoftInputMode">adjustResize</item>
+    </style>
+
+    <style name="Animation_BillBookBottomUp">
+        <item name="android:windowEnterAnimation">@anim/slide_in_bottom</item>
+        <item name="android:windowExitAnimation">@anim/slide_out_bottom</item>
     </style>
 </resources>

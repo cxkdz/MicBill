@@ -1,9 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <queries>
+        <package android:name="com.tencent.mm" />
+        <package android:name="com.eg.android.AlipayGphone" />
+    </queries>
+
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- 自动记账：后台在支付页之上弹确认面板，需要悬浮窗权限 -->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <!-- 兜底通知（Android 13+ 需运行时授予） -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
         android:name=".BillBookApp"
@@ -25,6 +34,45 @@
 
         <activity android:name=".AddBillActivity" />
         <activity android:name=".BillDetailActivity" />
+
+        <!-- 自动记账：系统绑定的通知监听服务，必须在系统「通知使用权」里手动开启 -->
+        <service
+            android:name=".autobill.PayNotificationListenerService"
+            android:exported="true"
+            android:label="MicBill 自动记账"
+            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
+            <intent-filter>
+                <action android:name="android.service.notification.NotificationListenerService" />
+            </intent-filter>
+        </service>
+
+        <!-- 可选的支付结果页面捕获，仅由系统无障碍授权后绑定 -->
+        <service
+            android:name=".autobill.AutoBillAccessibilityService"
+            android:exported="true"
+            android:label="@string/autobill_accessibility_label"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/autobill_accessibility_service" />
+        </service>
+
+        <!-- 付款后从底部弹出的确认面板：独立任务栈，不留在最近任务里 -->
+        <activity
+            android:name=".autobill.ConfirmAutoBillActivity"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:launchMode="singleInstance"
+            android:taskAffinity="com.billbook.app.autobill.confirm"
+            android:theme="@style/Theme.BillBook.BottomSheet" />
+
+        <!-- 兜底通知上的「填名称并记入 / 忽略」 -->
+        <receiver
+            android:name=".autobill.AutoBillActionReceiver"
+            android:exported="false" />
 
     </application>
 </manifest>

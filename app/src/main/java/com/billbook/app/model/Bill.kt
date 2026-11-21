@@ -27,6 +27,8 @@ data class Bill(
         const val SOURCE_MANUAL = "手动录入"
         const val SOURCE_WECHAT_IMPORT = "微信导入"
         const val SOURCE_ALIPAY_IMPORT = "支付宝导入"
+        const val SOURCE_AUTO_NOTIFY = "通知自动记账"
+        const val SOURCE_AUTO_SCREEN = "页面自动记账"
 
         val PAY_TYPES = listOf(PAY_WECHAT, PAY_ALIPAY, PAY_CASH, PAY_BANK, PAY_OTHER)
     }
